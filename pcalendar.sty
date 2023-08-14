@@ -1,0 +1,438 @@
+%%
+%% This is file `pcalendar.sty',
+%%
+%%% Copyright © 2015 by Seiied-Mohammad-Javad Razavian
+%% <javadr@gmail.com>
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% This work is “author-maintained” (as per LPPL maintenance status)
+%% by Seiied-Mohammad-Javad Razavian
+%% The Current Maintainer of this work is Seiied-Mohammad-Javad Razavian
+%%
+%% This work consists of the files pcalendar.sty and pcalendar-doc.tex.%%
+%%
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{pcalendar}[2023/11/07 v0.4 Provides Persian Calendar]
+\RequirePackage{pgf}
+\RequirePackage{pgfcalendar}
+%
+\newif\ifpcal@leap\newif\ifpcal@kabiseh%
+\newcount\pcal@i%
+\newcount\pcal@y%
+\newcount\pcal@m%
+\newcount\pcal@d%
+\newcount\pcal@latini%
+\newcount\pcal@latinii%
+\newcount\pcal@latiniii%
+\newcount\pcal@latiniv%
+\newcount\pcal@latinv%
+\newcount\pcal@latinvi%
+\newcount\pcal@latinvii%
+\newcount\pcal@latinviii%
+\newcount\pcal@latinix%
+\newcount\pcal@latinx%
+\newcount\pcal@latinxi%
+\newcount\pcal@latinxii%
+%
+\newcount\pcal@persiani%
+\newcount\pcal@persianii%
+\newcount\pcal@persianiii%
+\newcount\pcal@persianiv%
+\newcount\pcal@persianv%
+\newcount\pcal@persianvi%
+\newcount\pcal@persianvii%
+\newcount\pcal@persianviii%
+\newcount\pcal@persianix%
+\newcount\pcal@persianx%
+\newcount\pcal@persianxi%
+\newcount\pcal@persianxii%
+%
+\newcount\pcal@temp%
+\newcount\pcal@temptwo%
+\newcount\pcal@tempthree%
+\newcount\pcal@yModHundred%
+\newcount\pcal@thirtytwo%
+\newcount\pcal@dn%
+\newcount\pcal@sn%
+\newcount\pcal@mminusone%
+%
+\def\pcal@getymd #1-#2-#3;{\def\pcal@get@y{#1}\def\pcal@get@m{#2}\def\pcal@get@d{#3}}%
+%
+\def\pcal@modulo#1#2{\number\numexpr#1-((#1/#2)*#2)\relax}%
+%
+\def\pcal@gregoriantojalali#1{%
+    \pcal@getymd #1;
+    \pcal@y=\pcal@get@y%year
+    \pcal@m=\pcal@get@m%month
+    \pcal@d=\pcal@get@d%day
+    \pcal@temp=\pcal@y
+    \divide\pcal@temp by 100\relax
+    \multiply\pcal@temp by 100\relax
+    \pcal@yModHundred=\pcal@y
+    \advance\pcal@yModHundred by -\pcal@temp\relax
+    \ifodd\pcal@yModHundred
+        \pcal@leapfalse
+    \else
+    \pcal@temp=\pcal@yModHundred
+    \divide\pcal@temp by 2\relax
+    \ifodd\pcal@temp\pcal@leapfalse
+    \else
+        \ifnum\pcal@yModHundred=0%
+            \pcal@temp=\pcal@y
+            \divide\pcal@temp by 400\relax
+            \multiply\pcal@temp by 400\relax
+            \ifnum\pcal@y=\pcal@temp\pcal@leaptrue\else\pcal@leapfalse\fi
+        \else\pcal@leaptrue
+        \fi
+    \fi
+    \fi
+    \pcal@latini=31\relax
+    \ifpcal@leap
+        \pcal@latinii = 29\relax
+    \else
+        \pcal@latinii = 28\relax
+    \fi
+    \pcal@latiniii = 31\relax
+    \pcal@latiniv  = 30\relax
+    \pcal@latinv = 31\relax
+    \pcal@latinvi = 30\relax
+    \pcal@latinvii = 31\relax
+    \pcal@latinviii = 31\relax
+    \pcal@latinix = 30\relax
+    \pcal@latinx = 31\relax
+    \pcal@latinxi = 30\relax
+    \pcal@latinxii = 31\relax
+    \pcal@thirtytwo=32\relax
+    \pcal@temp=\pcal@y
+    \advance\pcal@temp by -17\relax
+    \pcal@temptwo=\pcal@temp
+    \divide\pcal@temptwo by 33\relax
+    \multiply\pcal@temptwo by 33\relax
+    \advance\pcal@temp by -\pcal@temptwo
+    \ifnum\pcal@temp=\pcal@thirtytwo\pcal@kabisehfalse
+    \else
+        \pcal@temptwo=\pcal@temp
+        \divide\pcal@temptwo by 4\relax
+        \multiply\pcal@temptwo by 4\relax
+        \advance\pcal@temp by -\pcal@temptwo
+        \ifnum\pcal@temp=\z@\pcal@kabisehtrue\else\pcal@kabisehfalse\fi
+    \fi
+    \pcal@tempthree=\pcal@y                 % Number of Leap years
+    \advance\pcal@tempthree by -1
+    \pcal@temp=\pcal@tempthree              % T := (MY-1) div 4
+    \divide\pcal@temp by 4\relax
+    \pcal@temptwo=\pcal@tempthree           % T := T - ((MY-1) div 100)
+    \divide\pcal@temptwo by 100\relax
+    \advance\pcal@temp by -\pcal@temptwo
+    \pcal@temptwo=\pcal@tempthree           % T := T + ((MY-1) div 400)
+    \divide\pcal@temptwo by 400\relax
+    \advance\pcal@temp by \pcal@temptwo
+    \advance\pcal@tempthree by -611       % Number of Kabise years
+    \pcal@temptwo=\pcal@tempthree           % T := T - ((SY+10) div 33) * 8
+    \divide\pcal@temptwo by 33\relax
+    \multiply\pcal@temptwo by 8\relax
+    \advance\pcal@temp by -\pcal@temptwo
+    \pcal@temptwo=\pcal@tempthree           %
+    \divide\pcal@temptwo by 33\relax
+    \multiply\pcal@temptwo by 33\relax
+    \advance\pcal@tempthree by -\pcal@temptwo
+    \ifnum\pcal@tempthree=32\advance\pcal@temp by 1\fi % if (SY+10) mod 33=32 then Inc(T);
+    \divide\pcal@tempthree by 4\relax     % T := T - ((SY+10) mod 33) div 4
+    \advance\pcal@temp by -\pcal@tempthree
+    \advance\pcal@temp by -137            % T := T - 137  Adjust the value
+    \pcal@persiani=31
+    \advance\pcal@persiani by -\pcal@temp                 % now 31 - T is the persiani
+    \pcal@persianii = 30\relax
+    \ifpcal@kabiseh
+        \pcal@persianiii = 30\relax
+    \else
+        \pcal@persianiii = 29\relax
+    \fi
+    \pcal@persianiv  = 31\relax
+    \pcal@persianv   = 31\relax
+    \pcal@persianvi  = 31\relax
+    \pcal@persianvii = 31\relax
+    \pcal@persianviii= 31\relax
+    \pcal@persianix  = 31\relax
+    \pcal@persianx   = 30\relax
+    \pcal@persianxi  = 30\relax
+    \pcal@persianxii = 30\relax
+    \pcal@persianxiii= 30\relax
+    \pcal@dn= 0\relax
+    \pcal@sn= 0\relax
+    \pcal@mminusone=\pcal@m
+    \advance\pcal@mminusone by -1\relax
+    \pcal@i=0\relax
+    \ifnum\pcal@i < \pcal@mminusone
+    \loop
+    \advance \pcal@i by 1\relax
+    \advance\pcal@dn by \csname pcal@latin\romannumeral\the\pcal@i\endcsname
+    \ifnum\pcal@i<\pcal@mminusone \repeat
+    \fi
+    \advance \pcal@dn by \pcal@d
+    \pcal@i=1\relax
+    \pcal@sn = \pcal@persiani
+    \ifnum \pcal@sn<\pcal@dn
+    \loop
+    \advance \pcal@i by 1\relax
+    \advance\pcal@sn by \csname pcal@persian\romannumeral\the\pcal@i\endcsname
+    \ifnum \pcal@sn<\pcal@dn \repeat
+    \fi
+    \ifnum \pcal@i < 4
+        \pcal@m = 9 \advance\pcal@m by \pcal@i
+        \advance \pcal@y by -622\relax
+    \else
+        \pcal@m = \pcal@i \advance \pcal@m by -3\relax
+        \advance \pcal@y by -621\relax
+    \fi
+    \advance\pcal@sn by -\csname pcal@persian\romannumeral\the\pcal@i%
+    \endcsname
+    \ifnum\pcal@i = 1
+        \pcal@d = \pcal@dn \advance \pcal@d by 30 \advance\pcal@d by -\pcal@persiani
+    \else
+        \pcal@d = \pcal@dn \advance \pcal@d by -\pcal@sn
+    \fi
+}
+%
+\newcount\pcal@gy%
+\newcount\pcal@gm%
+\newcount\pcal@gd%
+\newcount\pcal@days%
+%
+\def\pcal@jalalitogregorian#1{%
+    \newcount\pcal@temp % redefinig for this macro
+    \pcal@getymd #1;
+    \pcal@y=\pcal@get@y% jalali year
+    \pcal@m=\pcal@get@m% jalali month
+    \pcal@d=\pcal@get@d% jalali day
+    %
+    \ifnum\pcal@y<980
+        \pcal@gy=621\relax
+    \else
+        \pcal@gy=1600\relax
+        \advance\pcal@y by -979\relax
+    \fi
+    \pcal@days=\pcal@y
+    \multiply\pcal@days by 365\relax
+    %
+    \pcal@temp=\pcal@y
+    \divide\pcal@temp by 33\relax
+    \multiply\pcal@temp by 8\relax
+    \advance\pcal@days by \pcal@temp
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \pcal@temp=\pcal@y
+    \divide\pcal@temp by 33\relax
+    \pcal@temptwo=\pcal@temp
+    \multiply\pcal@temptwo by 33\relax
+    \pcal@temp=\pcal@y
+    \advance\pcal@temp by -\pcal@temptwo
+    %%%%%\pcal@temp=\pcal@modulo{\pcal@y}{33}
+    \advance\pcal@temp by 3\relax
+    \divide\pcal@temp by 4\relax
+    \advance\pcal@days by \pcal@temp\relax
+    \advance\pcal@days by 78\relax
+    \advance\pcal@days by \pcal@d\relax
+    \ifnum\pcal@m < 7
+        \pcal@temp=\pcal@m
+        \advance\pcal@temp by -1\relax
+        \multiply\pcal@temp by 31\relax
+    \else
+        \pcal@temp=\pcal@m
+        \advance\pcal@temp by -7\relax
+        \multiply\pcal@temp by 30\relax
+        \advance\pcal@days by 186\relax
+    \fi
+    \advance\pcal@days by \pcal@temp\relax
+    %
+    \pcal@temp=\pcal@days
+    \divide\pcal@temp by 146097\relax
+    \multiply\pcal@temp by 400\relax
+    \advance\pcal@gy by \pcal@temp\relax
+    %
+    \pcal@temp=\pcal@days
+    \divide\pcal@temp by 146097\relax
+    \pcal@temptwo=\pcal@temp
+    \multiply\pcal@temptwo by 146097\relax
+    \advance\pcal@days by -\pcal@temptwo\relax
+    %
+    %\advance\pcal@days by -\pcal@modulo{\pcal@days}{146097}\relax
+    \ifnum\pcal@days > 36524
+        \advance\pcal@days by -1\relax
+        \pcal@temp=\pcal@days
+        \advance\pcal@temp by -1\relax
+        \divide\pcal@temp by 36524\relax
+        \multiply\pcal@temp by 100\relax
+        \advance\pcal@gy by \pcal@temp
+    %
+        \pcal@temp=\pcal@days
+        \divide\pcal@temp by 36524\relax
+        \pcal@temptwo=\pcal@temp
+        \multiply\pcal@temptwo by 36524\relax
+        \advance\pcal@days by -\pcal@temptwo\relax
+    %    \pcal@temp=\pcal@modulo{\pcal@days}{36524}
+    %    \advance\pcal@days by -\pcal@temp\relax
+        \ifnum\pcal@days>366
+            \advance\pcal@days by 1\relax
+        \fi
+    \fi
+    \pcal@temp=\pcal@days
+    \divide\pcal@temp by 1461\relax
+    \multiply\pcal@temp by 4\relax
+    \advance\pcal@gy by \pcal@temp
+    %
+    \pcal@temp=\pcal@days
+    \divide\pcal@temp by 1461\relax
+    \pcal@temptwo=\pcal@temp
+    \multiply\pcal@temptwo by 1461\relax
+    \advance\pcal@days by -\pcal@temptwo\relax
+    %
+    %\pcal@temp=\pcal@modulo{\pcal@days}{1461}
+    %\advance\pcal@days by -\pcal@temp\relax
+    \pcal@temp=\pcal@days
+    \advance\pcal@temp by -1\relax
+    \divide\pcal@temp by 365\relax
+    \advance\pcal@gy by \pcal@temp
+    \ifnum\pcal@days > 365
+    %
+        \advance\pcal@days by -1\relax
+        \pcal@temp=\pcal@days
+        \divide\pcal@temp by 365\relax
+        \pcal@temptwo=\pcal@temp
+        \multiply\pcal@temptwo by 365\relax
+        \advance\pcal@days by -\pcal@temptwo\relax
+    %
+    %    \pcal@temp=\pcal@modulo{\pcal@days}{365}
+    %    \advance\pcal@days by -\pcal@temp\relax
+    \fi
+    \pcal@gd=\pcal@days
+    \advance\pcal@gd by 1\relax
+    \pcal@leapfalse
+    \ifnum\pcal@modulo{\pcal@gy}{4}=0
+        \newcount\pcal@mod
+        \pcal@mod=\pcal@modulo{\pcal@gy}{100}
+        \ifnum\ifnum\pcal@mod>0 1\else\ifnum\pcal@mod<0 1\else 0\fi\fi=1
+            \pcal@leaptrue
+        \fi
+    \fi
+    \ifnum\pcal@modulo{\pcal@gy}{400}=0
+        \pcal@leaptrue
+    \fi
+    \newcount\pcal@loop
+    \pcal@loop=1
+    \loop
+        \ifnum\pcal@gd>\pcal@greg@month{\pcal@loop}
+        \advance\pcal@gd by -\pcal@greg@month{\pcal@loop}\relax
+        \advance\pcal@loop by 1\relax
+    \repeat
+    \pcal@gm=\pcal@loop
+}
+\def\pcal@greg@month#1{%
+    \ifcase#1\or 31\or%
+    \ifpcal@leap 29\else 28\fi%
+    \or 31\or 30\or 31\or 30\or 31\or 31\or 30\or 31\or 30\or 31%
+    \fi
+}
+%
+\def\pdate#1{%
+    \pcal@gregoriantojalali{#1}
+    \number\pcal@d\space%
+    \pcal@persian@month{\pcal@m}\space\number\pcal@y%
+}
+%
+\def\gdate#1{%
+    \pcal@jalalitogregorian{#1}
+    \number\pcal@gd\space%
+    \pcal@gregorian@month{\pcal@gm}\space\number\pcal@gy%
+}
+%
+\def\pcalendar@unpack#1+{\count8=#1\relax}%
+\def\pcalendardatetojulian#1#2{\edef\pcal@temp{#1}\expandafter\pcalendar@datetojulian\pcal@temp+/{#2}}
+\def\pcalendar@datetojulian#1-#2-#3+#4/#5{%
+    \count1=#1\relax% % jalali year
+    \count2=#2\relax% % jalali month
+    \edef\pcal@temp{#3}% % jalali day
+    \count3=\pcal@temp\relax%
+    \edef\pcal@@temp{#4}%
+    \ifx\pcal@@temp\pgfutil@empty%
+        \count8=0\relax%
+    \else%
+        \pcalendar@unpack#4%
+    \fi%
+    \pcal@jalalitogregorian{\count1-\count2-\count3}
+    \pgfcalendardatetojulian{\pcal@gy-\pcal@gm-\pcal@gd}{#5}
+    \advance#5 by \count8\relax
+}%
+%
+\def\pcalendarjuliantodate#1#2#3#4{%
+    \pgfcalendarjuliantodate#1#2#3#4
+    \pcal@gregoriantojalali{#2-#3-#4}
+    \let#2=\pcal@y
+    \let#3=\pcal@m
+    \let#4=\pcal@d
+}%
+%
+\def\pisodate#1{%
+    \pcal@gregoriantojalali{#1}
+    \ifnum\pcal@d<10 0\fi\number\pcal@d\slash%
+    \ifnum\pcal@m<10 0\fi\number\pcal@m\slash%
+    \number\pcal@y%
+}%
+\def\gisodate#1{%
+    \pcal@jalalitogregorian{#1}%
+    \ifnum\pcal@gd<10 0\fi\number\pcal@gd\slash%
+    \ifnum\pcal@gm<10 0\fi\number\pcal@gm\slash%
+    \number\pcal@gy%
+}%
+%
+\def\pcalendaryearname#1{%
+\ifnum#1>-1\ifnum#1<2100\relax
+    \newcount\thousandth \thousandth=#1
+    \newcount\decimal \decimal=#1
+    \divide\thousandth by 100\relax
+    \pcal@temp=\thousandth
+    \multiply\pcal@temp by 100\relax
+    \advance\decimal by -\pcal@temp\relax
+%
+    \newcount\pcal@first \pcal@first=\thousandth
+    \pcal@temp=\thousandth
+    \divide\pcal@temp by 3\relax
+    \multiply\pcal@temp by 3\relax
+    \advance\pcal@first by -\pcal@temp\relax
+%
+    \newcount\pcal@second \pcal@second=\decimal
+    \pcal@temp=\decimal
+    \divide\pcal@temp by 12\relax
+    \multiply\pcal@temp by 12\relax
+    \advance\pcal@second by -\pcal@temp\relax
+    \ifcase\pcal@first
+        \ifcase\pcal@second
+        مار\or اسب\or گوسفند\or میمون\or مرغ\or سگ\or خوک\or موش\or گاو\or پلنگ\or خرگوش\or نهنگ\fi\or
+        \ifcase\pcal@second
+        مرغ\or سگ\or خوک\or موش\or گاو\or پلنگ\or خرگوش\or نهنگ\or مار\or اسب\or گوسفند\or میمون\fi\or
+        \ifcase\pcal@second
+        گاو\or پلنگ\or خرگوش\or نهنگ\or مار\or اسب\or گوسفند\or میمون\or مرغ\or سگ\or خوک\or موش\fi
+    \fi
+\fi\fi
+}%
+%
+\def\pcal@persian@month#1{\ifcase#1\or فروردین\or اردیبهشت\or خرداد\or تیر\or مرداد\or شهریور%
+\or مهر\or آبان\or آذر\or دی\or بهمن\or اسفند\fi}%
+\def\pcal@gregorian@month#1{\ifcase#1\or ژانویه\or فوریه\or مارس\or آوریل\or می\or ژوئن%
+\or جولای\or آگوست\or سپتامبر\or اکتبر\or نوامبر\or دسامبر\fi}%
+%
+\def\pcalendarweekdayname#1{\ifcase#1 شنبه\or یکشنبه\or دوشنبه\or سه‌شنبه\or چهارشنبه\or پنجشنبه\or جمعه\fi}%
+\def\pcalendarweekdayshortname#1{\ifcase#1 ش\or ی\or د\or س\or چ\or پ\or ج\fi}%
+\def\pcalendarmonthname#1{\pcal@persian@month{#1}}%
+\def\pcalendargregorianmonthname#1{\pcal@gregorian@month{#1}}%
+\endinput
+%%
+%% End of file `pcalendar.sty'.
