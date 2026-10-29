@@ -1,0 +1,24 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+
+# compiled demo output (root only, so article/*.pdf stays trackable)
+/*.pdf
+
+# Claude Code / tooling (local state)
+.claude/
+.serena/
+.codebase-memory/
+graphify-out/

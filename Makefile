@@ -1,0 +1,88 @@
+#!/usr/bin/bash
+
+.ONESHELL:
+
+PKG     := pcalendar
+DEMOS   := WebNote phd-study
+DATE    := $(shell sed -n 's/.*\\ProvidesPackage{$(PKG)}\[\([^ ]*\) .*/\1/p' $(PKG).sty)
+YEAR    := $(firstword $(subst /, ,$(DATE)))
+VERSION := $(shell sed -n 's/.*\\ProvidesPackage{$(PKG)}\[[^ ]* v\([^ ]*\).*/\1/p' $(PKG).sty)
+
+.PHONY: all
+all: readme test doc cleanup
+
+# Compile the demo documents (they need xepersian, fonts Parisa/Yas and the quran package).
+# They stop at the first TeX error, so a broken conversion macro fails the build.
+.PHONY: test
+test:
+	for f in $(DEMOS); do \
+	  xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; \
+	done
+
+# Compile-only sanity check of the package itself: load it and convert one known date.
+# 1394-01-01 (Jalali) must be 2015-03-21 (Gregorian).
+.PHONY: check
+check:
+	printf '%s\n' '\documentclass{article}\usepackage{$(PKG)}\begin{document}' \
+	  '\newcount\ja\newcount\ga\pcalendardatetojulian{1394-01-01}\ja\pgfcalendardatetojulian{2015-03-21}\ga' \
+	  '\ifnum\ja=\ga \typeout{CHECK-OK}\else\errmessage{CHECK-FAILED}\fi' \
+	  '\end{document}' > check-tmp.tex
+	pdflatex -interaction=nonstopmode -halt-on-error check-tmp.tex | grep -q CHECK-OK \
+	  && echo "check OK" || { echo "check FAILED"; rm -f check-tmp.*; exit 1; }
+	rm -f check-tmp.*
+
+# There is no pcalendar-doc.tex yet (the .sty header mentions it); builds it once it exists.
+.PHONY: doc
+doc:
+	@if [ -f $(PKG)-doc.tex ]; then \
+	  xelatex $(PKG)-doc && xelatex $(PKG)-doc; \
+	else \
+	  echo "$(PKG)-doc.tex not found: skipping doc"; \
+	fi
+
+# Install the package into the local texmf tree for use from any document.
+.PHONY: dev
+dev:
+	TEXMF_LOCAL=$$(kpsewhich -var-value TEXMFLOCAL) && \
+	sudo mkdir -p "$$TEXMF_LOCAL/tex/latex/$(PKG)" && \
+	sudo cp -v $(PKG).sty "$$TEXMF_LOCAL/tex/latex/$(PKG)" && \
+	sudo mktexlsr
+
+.PHONY: clean
+clean:
+	@rm -fv ./*.aux ./*.log ./*.toc ./*.out ./*.xdv ./*~
+
+.PHONY: cleanup
+cleanup: clean
+
+.PHONY: ctan
+ctan: readme cleanup
+	mkdir -p $(PKG)
+	cp -v $(PKG).sty ChangeLogs README $(PKG)
+	@if [ -f $(PKG)-doc.tex ]; then cp -v $(PKG)-doc.tex $(PKG)-doc.pdf $(PKG); fi
+	zip -r $(PKG)-$(VERSION).zip $(PKG)
+	rm -rf $(PKG)
+
+# README is generated from the \ProvidesPackage line (version, date); do not edit it by hand.
+.PHONY: readme
+readme:
+	@printf '%s\n' \
+	  "_____________________" \
+	  "The $(PKG) package" \
+	  "v$(VERSION)" \
+	  "" \
+	  "Provides Persian (Jalali) calendar support for LaTeX: conversion between" \
+	  "Jalali and Gregorian dates, Persian month, weekday and year names," \
+	  "and Julian-day arithmetic on top of pgfcalendar." \
+	  "" \
+	  "Release Date of the Current Version: $(DATE)" \
+	  "___________________" \
+	  "Javad Razavian" \
+	  "javadr@gmail.com" \
+	  "" \
+	  "Copyright © 2015-$(YEAR)" \
+	  "This package may be distributed and/or modified under the terms of the LaTeX Project Public License," \
+	  "version 1.3c or later (at your option). The latest version of" \
+	  "the license is at: http://www.latex-project.org/lppl.txt" \
+	  "" \
+	  "This work has the LPPL maintenance status 'author-maintained'." > README
