@@ -58,11 +58,6 @@ Download: [SID](https://www.sid.ir/fa/journal/ViewPaper.aspx?id=97372) · [autho
 
 `pcalendar` uses the 33-year arithmetic leap rule (8 leap years in every 33). Articles 1, 3 and 4 discuss the 2820-year alternative, and article 5 compares the common rules. They are the place to start if you want to check the package against another leap-year rule (see the "Limitations" section of the manuals).
 
-## Other files
-
-- [`code/`](code/): `jalconv.py` and `jdconv.php` (converters used to cross-check results) and a copy of `pgfcalendar.code.tex`.
-- [`archive/calendar_2.zip`](archive/calendar_2.zip): an older version of the package.
-
 ## Notes
 
 - The download links were taken from the journal and portal pages in November 2026. The `jihs.ut.ac.ir` file names contain a hash, so if a link breaks, search for the title on the [journal page](https://jihs.ut.ac.ir/).

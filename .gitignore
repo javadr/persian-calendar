@@ -14,8 +14,13 @@
 *.bcf
 *.run.xml
 
-# compiled demo output (reference/articles/*.pdf stays trackable)
+# compiled demo output (references/articles/*.pdf stays trackable)
 /package/sample/*.pdf
+
+# local-only reference material: kept on disk, deliberately not committed
+# (only references/README.md and references/articles/ are tracked)
+/references/code/
+/references/archive/
 
 # Claude Code / tooling (local state)
 .claude/
