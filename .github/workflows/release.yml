@@ -1,0 +1,90 @@
+---
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  # Rebuild a release without moving the tag: run it from the Actions tab and
+  # give the tag to build (empty = the version declared in pcalendar.sty).
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag to build and release (e.g. v0.5)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Resolve release tag
+        id: tag
+        run: |
+          VERSION=$(sed -n 's/.*pcalendarversion{\([^}]*\)}.*/\1/p' package/tex/pcalendar.sty)
+          TAG="${{ inputs.ref }}"
+          [ -n "$TAG" ] || TAG="${{ github.ref_name }}"
+          # Refuse to publish a tag that disagrees with the package version.
+          if [ "$TAG" != "v$VERSION" ]; then
+            echo "::error::Tag $TAG does not match \\pcalendarversion ($VERSION); expected v$VERSION"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Install TeX Live and fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-xetex \
+            texlive-latex-extra \
+            texlive-pictures \
+            texlive-lang-other \
+            texlive-lang-arabic \
+            texlive-fonts-recommended \
+            fonts-lmodern \
+            zip
+
+      # Parisa is on CTAN but not in TeX Live; XB Niloofar (X Series 2) is
+      # downloaded from a GitHub mirror of the font files.
+      - name: Install Parisa and XB Niloofar
+        run: |
+          mkdir -p ~/.fonts && cd "$RUNNER_TEMP"
+          curl -fsSL -o parisa.zip https://mirrors.ctan.org/fonts/parisa.zip
+          unzip -q parisa.zip
+          cp parisa/fonts/*.otf ~/.fonts/
+          for s in "" Bd BdIt It; do
+            curl -fsSL -o "XB Niloofar$s.ttf" \
+              "https://raw.githubusercontent.com/abodin/Boostan/master/fonts/XB/XB%20Niloofar$s.ttf"
+            cp "XB Niloofar$s.ttf" ~/.fonts/
+          done
+          fc-cache -f
+
+      - name: Check fonts
+        run: |
+          xelatex --version
+          for f in Parisa "XB Niloofar"; do
+            fc-list | grep -q "$f" || { echo "::error::font '$f' is not installed"; exit 1; }
+          done
+
+      - name: Run tests
+        run: make check
+
+      - name: Build CTAN package and manuals
+        run: make ctan
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          files: |
+            package/doc/pcalendar-doc.pdf
+            package/doc/pcalendar-doc-fa.pdf
+            pcalendar.zip
