@@ -13,7 +13,7 @@ YEAR    := $(shell date +%Y)
 .PHONY: all
 all: readme test doc cleanup
 
-# Compile every package/sample/*.tex with XeLaTeX (they need xepersian and the Parisa font).
+# Compile every package/sample/*.tex with XeLaTeX (they typeset Persian, so they need xepersian and the Parisa font; the package itself does not).
 # Stops at the first TeX error, so a broken conversion macro fails the build.
 .PHONY: sample
 sample:
@@ -29,7 +29,7 @@ test: sample
 check:
 	cd $(DIR) && l3build check
 
-# Build the English and Persian manuals (need xepersian and the Parisa font).
+# Build the English and Persian manuals (they typeset Persian, so they need xepersian, the Parisa font and XB Niloofar).
 .PHONY: doc
 doc:
 	cd $(DIR)/doc && for f in $(PKG)-doc $(PKG)-doc-fa; do \

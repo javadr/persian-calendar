@@ -1,4 +1,7 @@
 %% Change Logs
+%% ver 0.51 ## Nov 1, 2026
+%% documented that only printing the Persian names needs a Unicode engine and a Persian font (xepersian is optional)
+%% rewrote the Persian manual, moved the package files into package/, added the release workflow and references/
 %% ver 0.5 ## Nov 1, 2026
 %% added the manual, pcalendar-doc.tex, with a Persian version, pcalendar-doc-fa.tex, and README.md for GitHub
 %% fixed per-call \newcount register leak and the undeclared \pcal@persianxiii register

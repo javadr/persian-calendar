@@ -1,10 +1,12 @@
 # pcalendar
 
-A LaTeX package for the Persian (Jalali, Solar Hijri) calendar. It converts dates between the Persian and Gregorian calendars, prints dates with Persian month names, gives day numbers for date arithmetic, and provides Persian month, weekday and year-animal names. It is built on `pgfcalendar` and meant to be used with `xepersian` under XeLaTeX.
+A LaTeX package for the Persian (Jalali, Solar Hijri) calendar. It converts dates between the Persian and Gregorian calendars, prints dates with Persian month names, gives day numbers for date arithmetic, and provides Persian month, weekday and year-animal names. It is built on `pgfcalendar`. The date conversions work with any engine (pdfLaTeX, XeLaTeX, LuaLaTeX); printing the Persian names needs a Unicode engine and a Persian font, for example XeLaTeX with `xepersian`.
 
 It is a date converter and a set of name tables. It does not typeset a month grid or a wall calendar, and it has no holidays.
 
 ## Usage
+
+Load `pcalendar` in the preamble. The example below uses `xepersian` and a Persian font so that the Persian names print; any setup that can typeset Persian works. The numeric macros (`\pisodate`, `\gisodate`, the Julian day macros) need nothing else.
 
 ```latex
 \usepackage{pcalendar}
@@ -62,7 +64,7 @@ The `Makefile` has these targets:
 | `make ctan` | builds `pcalendar.zip` for upload: `README`, `tex/` and `doc/` |
 | `make clean` | removes build files |
 
-The samples and manuals need XeLaTeX, `xepersian` and the Parisa font; the Persian manual also uses XB Niloofar.
+The package itself needs only `pgf`. The samples and manuals typeset Persian text, so they need XeLaTeX, `xepersian` and the Parisa font; the Persian manual also uses XB Niloofar.
 
 The tests in `package/testfiles/` are `l3build` test files. They check known date pairs in both directions (Nowruz of several years, leap days, the last day of Esfand in leap years, month boundaries), the internal helper macros, the Julian day macros, a round trip over 1500 consecutive days, and that no registers are allocated per call. After an intended change, record a new baseline with `l3build save <name>`.
 

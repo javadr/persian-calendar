@@ -1,5 +1,5 @@
 % Sample for pcalendar: every line shows the call (in monospace) followed by what it prints.
-% Build: make test   (XeLaTeX, font Parisa)
+% Build: make test   (XeLaTeX; xepersian and the font Parisa are needed only to print the Persian text)
 \documentclass[12pt]{article}
 
 \usepackage[a4paper,margin=2cm]{geometry}
@@ -40,7 +40,8 @@
 
 \note{pcalendar converts dates between the Persian (Jalali) and Gregorian calendars and provides
 Persian month, weekday and year names. Each line below shows the call, an arrow, and the typeset result.
-The Persian text needs XeLaTeX with \texttt{xepersian}.}
+Only printing the Persian text needs a Unicode engine and a Persian font; this sample uses XeLaTeX with
+\texttt{xepersian}. The conversions themselves work with any engine.}
 
 \subsection*{\lr{1. Today}}
 \note{\texttt{\textbackslash year}, \texttt{\textbackslash month} and \texttt{\textbackslash day} are

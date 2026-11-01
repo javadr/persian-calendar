@@ -1,6 +1,6 @@
 _____________________
 The pcalendar package
-v0.5
+v0.51
 
 Provides Persian (Jalali) calendar support for LaTeX: conversion between
 Jalali and Gregorian dates, Persian month, weekday and year names,

@@ -46,7 +46,8 @@
 \pkg{pcalendar} converts dates between the Persian (Jalali, Solar Hijri) and Gregorian calendars
 inside \LaTeX{}. It prints dates with Persian month names, gives day numbers you can do arithmetic
 on, and provides Persian month, weekday and year-animal names. It is built on the \pkg{pgfcalendar}
-package and is meant to be used with \pkg{xepersian} under XeLaTeX.
+package. The conversions work with any engine; printing the Persian names needs a Unicode
+engine and a Persian font, for example XeLaTeX with \pkg{xepersian}.
 \end{abstract}
 
 \tableofcontents
@@ -64,9 +65,13 @@ The package is a date converter and a set of name tables. It provides:
 It does \emph{not} typeset a month grid or a wall calendar, it has no holidays, and it has no macro
 that returns the weekday of a date (section~\ref{sec:names6} shows how to get one in three lines).
 
-\paragraph{Requirements.} XeLaTeX, the \pkg{pgf} bundle (which contains \pkg{pgfcalendar}), and
-\pkg{xepersian} with a font that has Persian letters. The names are stored as Persian text in the
-source file, which is UTF-8.
+\paragraph{Requirements.} The \pkg{pgf} bundle (which contains \pkg{pgfcalendar}) is all the
+conversions need, and they work with pdf\LaTeX{}, Xe\LaTeX{} and Lua\LaTeX{}. Only the names (and
+so \cs{pdate}, \cs{gdate} and the \texttt{\textbackslash pcalendar\ldots name} macros) are Persian
+text: they are stored as UTF-8 in the source file, so printing them needs an engine and packages that
+handle UTF-8 Persian letters, together with a font that has them. \pkg{xepersian} with Xe\LaTeX{} is
+what this manual uses, but any setup that can typeset Persian will do. Without one, use the numeric
+macros \cs{pisodate} and \cs{gisodate}, which print only digits.
 
 % ---------------------------------------------------------------------------
 \section{Installation}\label{sec:installation2}
@@ -77,7 +82,8 @@ From a TeX distribution that includes the package, nothing needs doing. To insta
 source repository, \texttt{make dev} does this for you. You can also keep \texttt{pcalendar.sty}
 next to your document.
 
-Load the package in the preamble. In the examples here it is loaded before \pkg{xepersian}:
+Load the package in the preamble. The examples here use \pkg{xepersian} for the Persian text and load
+\pkg{pcalendar} before it:
 \begin{verbatim}
 \usepackage{pcalendar}
 \usepackage{xepersian}
@@ -226,7 +232,6 @@ one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalendarweekdayname} number
 shift by two:
 \begin{verbatim}
 \newcount\jd \newcount\wd
-\renewcommand\thepage{\lr{\arabic{page}}}   % page numbers in Latin digits (the footer is typeset in the Persian font)
 \pcalendardatetojulian{1403-01-01}\jd
 \pgfcalendarjuliantoweekday{\jd}{\wd}
 \advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
@@ -341,6 +346,8 @@ conversions can be made in one document. A test in the repository (\texttt{leaks
 \section{Version history}\label{sec:version11}
 
 \begin{description}
+  \item[0.51 (2026-11-01)] Documentation only: the manuals now say that only printing the Persian names
+    needs a Unicode engine and a Persian font; the Persian manual was rewritten.
   \item[0.5 (2026-11-01)] Fixed the register leak (several \cs{newcount} per call) and the undeclared
     month-length register; added this manual and
     \cs{pcalendardate}/\cs{pcalendarversion}.
