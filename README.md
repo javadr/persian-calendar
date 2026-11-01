@@ -70,6 +70,6 @@ The tests in `package/testfiles/` are `l3build` test files. They check known dat
 
 Change `\pcalendardate` and `\pcalendarversion` at the top of `package/tex/pcalendar.sty`, add an entry to `ChangeLogs`, then run `make readme` and `make ctan`. The `Makefile` reads the version and date from those two macros. The CTAN `package/README` is generated, so do not edit it by hand; this `README.md` is for GitHub and is not part of the CTAN archive.
 
-## Author and license
+## License
 
 Copyright 2015-2026. Distributed under the LaTeX Project Public License, version 1.3 or later (see <http://www.latex-project.org/lppl.txt>). The work has the LPPL maintenance status "author-maintained".
