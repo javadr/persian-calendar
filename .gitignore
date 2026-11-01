@@ -14,11 +14,14 @@
 *.bcf
 *.run.xml
 
-# compiled demo output (root only, so article/*.pdf stays trackable)
-/*.pdf
+# compiled demo output (reference/articles/*.pdf stays trackable)
+/sample/*.pdf
 
 # Claude Code / tooling (local state)
 .claude/
 .serena/
 .codebase-memory/
 graphify-out/
+
+# l3build output
+build/

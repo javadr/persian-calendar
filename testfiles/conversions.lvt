@@ -1,0 +1,37 @@
+\documentclass{article}
+\input{regression-test}
+\usepackage{pcalendar}
+\makeatletter
+% \G2J{greg}{jalali} / \J2G{jalali}{greg}: run the internal macro, compare the result registers
+\def\gdmy{\the\pcal@gy-\the\pcal@gm-\the\pcal@gd}
+\def\jdmy{\the\pcal@y-\the\pcal@m-\the\pcal@d}
+\def\G2J#1#2{\pcal@gregoriantojalali{#1}\ASSERT{\jdmy}{#2}}
+\def\J2G#1#2{\pcal@jalalitogregorian{#1}\ASSERT{\gdmy}{#2}}
+\def\PAIR#1#2{\G2J{#1}{#2}\J2G{#2}{#1}}
+\begin{document}
+\START
+\TEST{Nowruz: first day of the year}{
+  \PAIR{2015-3-21}{1394-1-1}
+  \PAIR{2021-3-21}{1400-1-1}
+  \PAIR{2023-3-21}{1402-1-1}
+  \PAIR{2024-3-20}{1403-1-1}
+}
+\TEST{Gregorian new year and leap day}{
+  \PAIR{2000-1-1}{1378-10-11}
+  \PAIR{2000-2-29}{1378-12-10}
+  \PAIR{2024-12-31}{1403-10-11}
+}
+\TEST{Last day of Esfand in Jalali leap years}{
+  \PAIR{2021-3-20}{1399-12-30}
+  \PAIR{2025-3-20}{1403-12-30}
+}
+\TEST{Jalali month boundaries}{
+  \PAIR{2015-9-22}{1394-6-31}
+  \PAIR{2015-9-23}{1394-7-1}
+  \PAIR{2016-3-19}{1394-12-29}
+}
+\TEST{Dates in Dey (uses the 13th month-length slot)}{
+  \PAIR{2023-12-31}{1402-10-10}
+  \PAIR{2024-1-20}{1402-10-30}
+}
+\END

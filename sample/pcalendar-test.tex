@@ -1,0 +1,80 @@
+% Sample / manual test for pcalendar. Build: make test   (XeLaTeX, font Parisa)
+\documentclass[12pt]{article}
+
+\usepackage{pcalendar}
+\usepackage{pgffor}
+\usepackage{xepersian}
+
+\settextfont{Parisa}
+
+\newcount\jd \newcount\wd
+% \row{label}{content}: one line of a two-column listing
+\newcommand\row[2]{\par\noindent\lr{#1}\quad #2}
+
+% The conversion macros take a literal Y-M-D (a macro such as \d would not be expanded),
+% so dates are spelled out through these helpers instead of a \foreach list.
+\newcommand\GtoJ[1]{\row{#1}{\pdate{#1}\quad\pisodate{#1}}}
+\newcommand\JtoG[1]{\row{#1}{\gdate{#1}\quad\gisodate{#1}}}
+% pgf counts Monday as 0; pcalendarweekdayname counts Saturday as 0
+\newcommand\WEEKDAY[1]{%
+  \pcalendardatetojulian{#1}\jd
+  \pgfcalendarjuliantoweekday{\jd}{\wd}%
+  \advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
+  \row{#1}{\pcalendarweekdayname{\wd}}}
+
+\begin{document}
+
+\section*{\lr{pcalendar sample}}
+
+\subsection*{Today}
+\row{\texttt{\textbackslash pdate}}{\pdate{\year-\month-\day}}
+\row{\texttt{\textbackslash pisodate}}{\pisodate{\year-\month-\day}}
+
+\subsection*{Names}
+\row{months}{\foreach \m in {1,...,12}{\pcalendarmonthname{\m}\space}}
+\row{gregorian months}{\foreach \m in {1,...,12}{\pcalendargregorianmonthname{\m}\space}}
+\row{weekdays}{\foreach \w in {0,...,6}{\pcalendarweekdayname{\w}\space}}
+\row{short weekdays}{\foreach \w in {0,...,6}{\pcalendarweekdayshortname{\w}\space}}
+
+\subsection*{Gregorian to Jalali (\texttt{\textbackslash pdate}, \texttt{\textbackslash pisodate})}
+\GtoJ{2015-03-21}
+\GtoJ{2021-03-20}
+\GtoJ{2024-03-20}
+\GtoJ{2024-12-31}
+\GtoJ{2025-03-20}
+
+\subsection*{Jalali to Gregorian (\texttt{\textbackslash gdate}, \texttt{\textbackslash gisodate})}
+\JtoG{1394-01-01}
+\JtoG{1399-12-30}
+\JtoG{1403-01-01}
+\JtoG{1403-10-11}
+\JtoG{1403-12-30}
+
+\subsection*{First day of each year (\texttt{\textbackslash gisodate})}
+\foreach \y in {1380,1385,...,1405}{%
+  \row{\y}{\hbox{\gisodate{\y-01-01}}}%
+}
+
+\subsection*{Julian day numbers}
+\pcalendardatetojulian{1394-01-01}\jd
+\row{1394-01-01}{\number\jd}
+\pcalendardatetojulian{1394-01-01+10}\jd
+\row{1394-01-01 +10}{\number\jd}
+\pcalendarjuliantodate\jd\y\m\d
+\row{back to Jalali}{\number\y-\number\m-\number\d}
+\pcalendardatetojulian{1403-12-29+1}\jd
+\pcalendarjuliantodate\jd\y\m\d
+\row{1403-12-29 +1 (leap year, expect 1403-12-30)}{\number\y-\number\m-\number\d}
+\pcalendardatetojulian{1403-12-29+2}\jd
+\pcalendarjuliantodate\jd\y\m\d
+\row{1403-12-29 +2 (expect 1404-1-1)}{\number\y-\number\m-\number\d}
+
+\subsection*{Weekday of a Jalali date}
+\WEEKDAY{1394-01-01}
+\WEEKDAY{1403-01-01}
+\WEEKDAY{1404-01-01}
+
+\subsection*{Animal year names (\texttt{\textbackslash pcalendaryearname})}
+\foreach \y in {1380,...,1403}{\y~\pcalendaryearname{\y}\quad}
+
+\end{document}

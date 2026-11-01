@@ -3,7 +3,7 @@
 .ONESHELL:
 
 PKG     := pcalendar
-DEMOS   := WebNote phd-study
+DEMOS   := pcalendar-test phd-study
 DATE    := $(shell sed -n 's/.*\\ProvidesPackage{$(PKG)}\[\([^ ]*\) .*/\1/p' $(PKG).sty)
 YEAR    := $(firstword $(subst /, ,$(DATE)))
 VERSION := $(shell sed -n 's/.*\\ProvidesPackage{$(PKG)}\[[^ ]* v\([^ ]*\).*/\1/p' $(PKG).sty)
@@ -15,21 +15,14 @@ all: readme test doc cleanup
 # They stop at the first TeX error, so a broken conversion macro fails the build.
 .PHONY: test
 test:
-	for f in $(DEMOS); do \
-	  xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; \
+	cd sample && for f in $(DEMOS); do \
+	  TEXINPUTS=..: xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; \
 	done
 
-# Compile-only sanity check of the package itself: load it and convert one known date.
-# 1394-01-01 (Jalali) must be 2015-03-21 (Gregorian).
+# Regression tests (testfiles/*.lvt vs *.tlg); use `l3build save <name>` to record a new baseline.
 .PHONY: check
 check:
-	printf '%s\n' '\documentclass{article}\usepackage{$(PKG)}\begin{document}' \
-	  '\newcount\ja\newcount\ga\pcalendardatetojulian{1394-01-01}\ja\pgfcalendardatetojulian{2015-03-21}\ga' \
-	  '\ifnum\ja=\ga \typeout{CHECK-OK}\else\errmessage{CHECK-FAILED}\fi' \
-	  '\end{document}' > check-tmp.tex
-	pdflatex -interaction=nonstopmode -halt-on-error check-tmp.tex | grep -q CHECK-OK \
-	  && echo "check OK" || { echo "check FAILED"; rm -f check-tmp.*; exit 1; }
-	rm -f check-tmp.*
+	l3build check
 
 # There is no pcalendar-doc.tex yet (the .sty header mentions it); builds it once it exists.
 .PHONY: doc
@@ -51,6 +44,8 @@ dev:
 .PHONY: clean
 clean:
 	@rm -fv ./*.aux ./*.log ./*.toc ./*.out ./*.xdv ./*~
+	@rm -rfv build
+	@rm -fv sample/*.{aux,log,toc,out,xdv}
 
 .PHONY: cleanup
 cleanup: clean

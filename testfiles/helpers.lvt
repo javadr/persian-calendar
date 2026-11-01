@@ -1,0 +1,32 @@
+\documentclass{article}
+\input{regression-test}
+\usepackage{pcalendar}
+\makeatletter
+% \G2J{greg}{jalali} / \J2G{jalali}{greg}: run the internal macro, compare the result registers
+\def\gdmy{\the\pcal@gy-\the\pcal@gm-\the\pcal@gd}
+\def\jdmy{\the\pcal@y-\the\pcal@m-\the\pcal@d}
+\def\G2J#1#2{\pcal@gregoriantojalali{#1}\ASSERT{\jdmy}{#2}}
+\def\J2G#1#2{\pcal@jalalitogregorian{#1}\ASSERT{\gdmy}{#2}}
+\def\PAIR#1#2{\G2J{#1}{#2}\J2G{#2}{#1}}
+\begin{document}
+\START
+\TEST{\pcal@getymd splits Y-M-D}{
+  \pcal@getymd 2015-03-21;
+  \ASSERT{\pcal@get@y,\pcal@get@m,\pcal@get@d}{2015,03,21}
+}
+\TEST{\pcal@modulo: zero only for exact multiples (numexpr rounds, so not a true modulo)}{
+  \ASSERT{\pcal@modulo{100}{4}}{0}
+  \ASSERT{\pcal@modulo{2000}{400}}{0}
+  \ASSERT{\ifnum\pcal@modulo{7}{4}=0 zero\else nonzero\fi}{nonzero}
+}
+\TEST{\pcal@greg@month lengths}{
+  \pcal@leapfalse \ASSERT{\pcal@greg@month{2}}{28}
+  \pcal@leaptrue  \ASSERT{\pcal@greg@month{2}}{29}
+  \ASSERT{\pcal@greg@month{1},\pcal@greg@month{4},\pcal@greg@month{12}}{31,30,31}
+}
+\TEST{Gregorian leap flag set by jalalitogregorian (2000 yes, 2001 no, 2100 no)}{
+  \J2G{1378-12-10}{2000-2-29}\ASSERT{\ifpcal@leap y\else n\fi}{y}
+  \J2G{1379-12-11}{2001-3-1}\ASSERT{\ifpcal@leap y\else n\fi}{n}
+  \J2G{1479-1-1}{2100-3-21}\ASSERT{\ifpcal@leap y\else n\fi}{n}
+}
+\END

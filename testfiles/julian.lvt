@@ -1,0 +1,26 @@
+\documentclass{article}
+\input{regression-test}
+\usepackage{pcalendar}
+\makeatletter
+% \G2J{greg}{jalali} / \J2G{jalali}{greg}: run the internal macro, compare the result registers
+\def\gdmy{\the\pcal@gy-\the\pcal@gm-\the\pcal@gd}
+\def\jdmy{\the\pcal@y-\the\pcal@m-\the\pcal@d}
+\def\G2J#1#2{\pcal@gregoriantojalali{#1}\ASSERT{\jdmy}{#2}}
+\def\J2G#1#2{\pcal@jalalitogregorian{#1}\ASSERT{\gdmy}{#2}}
+\def\PAIR#1#2{\G2J{#1}{#2}\J2G{#2}{#1}}
+\newcount\ja \newcount\ga
+\begin{document}
+\START
+\TEST{\pcalendardatetojulian equals the pgf Julian day of the Gregorian date}{
+  \pcalendardatetojulian{1394-01-01}\ja \pgfcalendardatetojulian{2015-03-21}\ga
+  \ASSERT{\the\ja}{\the\ga}
+}
+\TEST{+offset adds days}{
+  \pcalendardatetojulian{1394-01-01+10}\ja \pgfcalendardatetojulian{2015-03-31}\ga
+  \ASSERT{\the\ja}{\the\ga}
+}
+\TEST{\pcalendarjuliantodate returns the Jalali date}{
+  \pgfcalendardatetojulian{2015-03-21}\ja \pcalendarjuliantodate\ja\y\m\d
+  \ASSERT{\number\y-\number\m-\number\d}{1394-1-1}
+}
+\END

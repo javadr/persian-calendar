@@ -55,6 +55,7 @@
 \newcount\pcal@persianx%
 \newcount\pcal@persianxi%
 \newcount\pcal@persianxii%
+\newcount\pcal@persianxiii%
 %
 \newcount\pcal@temp%
 \newcount\pcal@temptwo%
@@ -64,6 +65,12 @@
 \newcount\pcal@dn%
 \newcount\pcal@sn%
 \newcount\pcal@mminusone%
+\newcount\pcal@mod%
+\newcount\pcal@loop%
+\newcount\pcal@thousandth%
+\newcount\pcal@decimal%
+\newcount\pcal@first%
+\newcount\pcal@second%
 %
 \def\pcal@getymd #1-#2-#3;{\def\pcal@get@y{#1}\def\pcal@get@m{#2}\def\pcal@get@d{#3}}%
 %
@@ -209,7 +216,6 @@
 \newcount\pcal@days%
 %
 \def\pcal@jalalitogregorian#1{%
-    \newcount\pcal@temp % redefinig for this macro
     \pcal@getymd #1;
     \pcal@y=\pcal@get@y% jalali year
     \pcal@m=\pcal@get@m% jalali month
@@ -317,7 +323,6 @@
     \advance\pcal@gd by 1\relax
     \pcal@leapfalse
     \ifnum\pcal@modulo{\pcal@gy}{4}=0
-        \newcount\pcal@mod
         \pcal@mod=\pcal@modulo{\pcal@gy}{100}
         \ifnum\ifnum\pcal@mod>0 1\else\ifnum\pcal@mod<0 1\else 0\fi\fi=1
             \pcal@leaptrue
@@ -326,7 +331,6 @@
     \ifnum\pcal@modulo{\pcal@gy}{400}=0
         \pcal@leaptrue
     \fi
-    \newcount\pcal@loop
     \pcal@loop=1
     \loop
         \ifnum\pcal@gd>\pcal@greg@month{\pcal@loop}
@@ -355,12 +359,12 @@
 }
 %
 \def\pcalendar@unpack#1+{\count8=#1\relax}%
-\def\pcalendardatetojulian#1#2{\edef\pcal@temp{#1}\expandafter\pcalendar@datetojulian\pcal@temp+/{#2}}
+\def\pcalendardatetojulian#1#2{\edef\pcal@arg{#1}\expandafter\pcalendar@datetojulian\pcal@arg+/{#2}}
 \def\pcalendar@datetojulian#1-#2-#3+#4/#5{%
     \count1=#1\relax% % jalali year
     \count2=#2\relax% % jalali month
-    \edef\pcal@temp{#3}% % jalali day
-    \count3=\pcal@temp\relax%
+    \edef\pcal@arg{#3}% % jalali day
+    \count3=\pcal@arg\relax%
     \edef\pcal@@temp{#4}%
     \ifx\pcal@@temp\pgfutil@empty%
         \count8=0\relax%
@@ -395,21 +399,21 @@
 %
 \def\pcalendaryearname#1{%
 \ifnum#1>-1\ifnum#1<2100\relax
-    \newcount\thousandth \thousandth=#1
-    \newcount\decimal \decimal=#1
-    \divide\thousandth by 100\relax
-    \pcal@temp=\thousandth
+    \pcal@thousandth=#1
+    \pcal@decimal=#1
+    \divide\pcal@thousandth by 100\relax
+    \pcal@temp=\pcal@thousandth
     \multiply\pcal@temp by 100\relax
-    \advance\decimal by -\pcal@temp\relax
+    \advance\pcal@decimal by -\pcal@temp\relax
 %
-    \newcount\pcal@first \pcal@first=\thousandth
-    \pcal@temp=\thousandth
+    \pcal@first=\pcal@thousandth
+    \pcal@temp=\pcal@thousandth
     \divide\pcal@temp by 3\relax
     \multiply\pcal@temp by 3\relax
     \advance\pcal@first by -\pcal@temp\relax
 %
-    \newcount\pcal@second \pcal@second=\decimal
-    \pcal@temp=\decimal
+    \pcal@second=\pcal@decimal
+    \pcal@temp=\pcal@decimal
     \divide\pcal@temp by 12\relax
     \multiply\pcal@temp by 12\relax
     \advance\pcal@second by -\pcal@temp\relax

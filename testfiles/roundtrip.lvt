@@ -1,0 +1,30 @@
+\documentclass{article}
+\input{regression-test}
+\usepackage{pcalendar}
+\makeatletter
+% \G2J{greg}{jalali} / \J2G{jalali}{greg}: run the internal macro, compare the result registers
+\def\gdmy{\the\pcal@gy-\the\pcal@gm-\the\pcal@gd}
+\def\jdmy{\the\pcal@y-\the\pcal@m-\the\pcal@d}
+\def\G2J#1#2{\pcal@gregoriantojalali{#1}\ASSERT{\jdmy}{#2}}
+\def\J2G#1#2{\pcal@jalalitogregorian{#1}\ASSERT{\gdmy}{#2}}
+\def\PAIR#1#2{\G2J{#1}{#2}\J2G{#2}{#1}}
+\newcount\jd \newcount\jdend \newcount\bad
+\begin{document}
+\START
+\TEST{Gregorian -> Jalali -> Gregorian for 1500 consecutive days}{
+  \pgfcalendardatetojulian{2020-01-01}\jd \jdend=\jd \advance\jdend by 1500
+  % the package uses \loop itself, so the body runs in a group to keep ours intact
+  \loop
+    \begingroup
+    \pgfcalendarjuliantodate\jd\ty\tm\td
+    \edef\gin{\number\ty-\number\tm-\number\td}
+    \expandafter\pcal@gregoriantojalali\expandafter{\gin}
+    \edef\jin{\jdmy}
+    \expandafter\pcal@jalalitogregorian\expandafter{\jin}
+    \edef\out{\gdmy}\ifx\out\gin\else\global\advance\bad1 \fi
+    \endgroup
+    \advance\jd1
+  \ifnum\jd<\jdend \repeat
+  \ASSERT{\the\bad}{0}
+}
+\END

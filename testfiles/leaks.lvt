@@ -1,0 +1,21 @@
+\documentclass{article}
+\input{regression-test}
+\usepackage{pcalendar}
+\makeatletter
+\newcount\iter \newcount\jd \newcount\before
+\begin{document}
+\START
+% \count10 is the LaTeX allocation counter: it moves whenever a \newcount is executed.
+\TEST{Conversion macros allocate no registers per call}{
+  \before=\count10
+  \iter=0
+  \loop
+    \pcal@gregoriantojalali{2024-03-20}
+    \pcal@jalalitogregorian{1403-01-01}
+    \pcalendardatetojulian{1403-01-01+5}\jd
+    \tracinglostchars=0 \setbox0\hbox{\pcalendaryearname{1403}}
+    \advance\iter by 1
+  \ifnum\iter<2000 \repeat
+  \ASSERT{\the\numexpr\count10-\before\relax}{0}
+}
+\END
