@@ -25,3 +25,6 @@ graphify-out/
 
 # l3build output
 build/
+
+# CTAN release archive
+/pcalendar.zip

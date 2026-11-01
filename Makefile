@@ -3,21 +3,24 @@
 .ONESHELL:
 
 PKG     := pcalendar
-DEMOS   := pcalendar-test phd-study
-DATE    := $(shell sed -n 's/.*\\ProvidesPackage{$(PKG)}\[\([^ ]*\) .*/\1/p' $(PKG).sty)
-YEAR    := $(firstword $(subst /, ,$(DATE)))
-VERSION := $(shell sed -n 's/.*\\ProvidesPackage{$(PKG)}\[[^ ]* v\([^ ]*\).*/\1/p' $(PKG).sty)
+DEMOS   := $(basename $(notdir $(wildcard sample/*.tex)))
+DATE    := $(shell grep "pcalendardate{" $(PKG).sty | cut -d'{' -f2 | tr -d '}')
+VERSION := $(shell grep "pcalendarversion{" $(PKG).sty | cut -d'{' -f2 | tr -d '}')
+YEAR    := $(shell date +%Y)
 
 .PHONY: all
 all: readme test doc cleanup
 
-# Compile the demo documents (they need xepersian, fonts Parisa/Yas and the quran package).
-# They stop at the first TeX error, so a broken conversion macro fails the build.
-.PHONY: test
-test:
+# Compile every sample/*.tex with XeLaTeX (they need xepersian, fonts Parisa/Yas; phd-study also needs
+# the quran package). Stops at the first TeX error, so a broken conversion macro fails the build.
+.PHONY: sample
+sample:
 	cd sample && for f in $(DEMOS); do \
 	  TEXINPUTS=..: xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; \
 	done
+
+.PHONY: test
+test: sample
 
 # Regression tests (testfiles/*.lvt vs *.tlg); use `l3build save <name>` to record a new baseline.
 .PHONY: check
@@ -50,13 +53,21 @@ clean:
 .PHONY: cleanup
 cleanup: clean
 
+# CTAN layout: pcalendar/{README,tex/,doc/}, zipped as pcalendar.zip (no version in the name).
 .PHONY: ctan
-ctan: readme cleanup
-	mkdir -p $(PKG)
-	cp -v $(PKG).sty ChangeLogs README $(PKG)
-	@if [ -f $(PKG)-doc.tex ]; then cp -v $(PKG)-doc.tex $(PKG)-doc.pdf $(PKG); fi
-	zip -r $(PKG)-$(VERSION).zip $(PKG)
+ctan: readme
+	(cd sample && for i in 1 2; do \
+	  TEXINPUTS=..: xelatex -interaction=nonstopmode -halt-on-error pcalendar-test || exit 1; \
+	done)
+	rm -rf $(PKG) $(PKG).zip
+	mkdir -p $(PKG)/tex $(PKG)/doc
+	cp -v README $(PKG)
+	cp -v $(PKG).sty $(PKG)/tex
+	cp -v sample/pcalendar-test.tex sample/pcalendar-test.pdf $(PKG)/doc
+	@if [ -f $(PKG)-doc.tex ]; then cp -v $(PKG)-doc.tex $(PKG)-doc.pdf $(PKG)/doc; fi
+	zip -r $(PKG).zip $(PKG)
 	rm -rf $(PKG)
+	$(MAKE) cleanup
 
 # README is generated from the \ProvidesPackage line (version, date); do not edit it by hand.
 .PHONY: readme

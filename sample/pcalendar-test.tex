@@ -1,80 +1,134 @@
-% Sample / manual test for pcalendar. Build: make test   (XeLaTeX, font Parisa)
+% Sample for pcalendar: every line shows the call (in monospace) followed by what it prints.
+% Build: make test   (XeLaTeX, font Parisa)
 \documentclass[12pt]{article}
 
+\usepackage[a4paper,margin=2cm]{geometry}
 \usepackage{pcalendar}
 \usepackage{pgffor}
 \usepackage{xepersian}
 
 \settextfont{Parisa}
+\setlatintextfont{Latin Modern Roman}
 
 \newcount\jd \newcount\wd
-% \row{label}{content}: one line of a two-column listing
-\newcommand\row[2]{\par\noindent\lr{#1}\quad #2}
 
-% The conversion macros take a literal Y-M-D (a macro such as \d would not be expanded),
-% so dates are spelled out through these helpers instead of a \foreach list.
-\newcommand\GtoJ[1]{\row{#1}{\pdate{#1}\quad\pisodate{#1}}}
-\newcommand\JtoG[1]{\row{#1}{\gdate{#1}\quad\gisodate{#1}}}
-% pgf counts Monday as 0; pcalendarweekdayname counts Saturday as 0
-\newcommand\WEEKDAY[1]{%
+% \note{English text}: explanatory paragraph
+\newcommand\note[1]{\par\medskip\noindent\lr{#1}\par\smallskip}
+% \code{...}: the call, shown literally
+\newcommand\code[1]{\lr{\texttt{\detokenize{#1}}}}
+% \demo{call as text}{result}{comment}: one line = call, result, comment
+\newcommand\demo[3]{\par\noindent\code{#1}\quad$\Rightarrow$\quad#2\ifx\relax#3\relax\else\quad\lr{(#3)}\fi}
+
+% The date macros take a literal Y-M-D (a macro such as \d would not be expanded),
+% so the dates are spelled out through these helpers rather than a \foreach list.
+\newcommand\GtoJ[2]{\demo{\pdate{#1}}{\pdate{#1}}{}\demo{\pisodate{#1}}{\lr{\pisodate{#1}}}{#2}\par\smallskip}
+\newcommand\JtoG[2]{\demo{\gdate{#1}}{\gdate{#1}}{}\demo{\gisodate{#1}}{\lr{\gisodate{#1}}}{#2}\par\smallskip}
+\newcommand\YEAR[1]{\demo{\gisodate{#1-01-01}}{\lr{\gisodate{#1-01-01}}}{start of Jalali year #1}}
+% one table cell: year and its animal; \YROW gives a row of years 6 apart
+\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\lr{\yy}\quad\pcalendaryearname{\yy}}
+\newcommand\YROW[1]{\yc{#1}&\yc{#1+6}&\yc{#1+12}&\yc{#1+18}}
+\newcommand\WEEKDAY[2]{%
   \pcalendardatetojulian{#1}\jd
   \pgfcalendarjuliantoweekday{\jd}{\wd}%
   \advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
-  \row{#1}{\pcalendarweekdayname{\wd}}}
+  \par\noindent\code{#1}\quad$\Rightarrow$\quad\pcalendarweekdayname{\wd}\quad\lr{(#2)}}
 
 \begin{document}
+\setLTR % the explanations are English; only the results are Persian
 
-\section*{\lr{pcalendar sample}}
+\section*{\lr{pcalendar: sample and manual test}}
 
-\subsection*{Today}
-\row{\texttt{\textbackslash pdate}}{\pdate{\year-\month-\day}}
-\row{\texttt{\textbackslash pisodate}}{\pisodate{\year-\month-\day}}
+\note{pcalendar converts dates between the Persian (Jalali) and Gregorian calendars and provides
+Persian month, weekday and year names. Each line below shows the call, an arrow, and the typeset result.
+The Persian text needs XeLaTeX with \texttt{xepersian}.}
 
-\subsection*{Names}
-\row{months}{\foreach \m in {1,...,12}{\pcalendarmonthname{\m}\space}}
-\row{gregorian months}{\foreach \m in {1,...,12}{\pcalendargregorianmonthname{\m}\space}}
-\row{weekdays}{\foreach \w in {0,...,6}{\pcalendarweekdayname{\w}\space}}
-\row{short weekdays}{\foreach \w in {0,...,6}{\pcalendarweekdayshortname{\w}\space}}
+\subsection*{\lr{1. Today}}
+\note{\texttt{\textbackslash year}, \texttt{\textbackslash month} and \texttt{\textbackslash day} are
+LaTeX's current date (Gregorian), so these lines change every day.}
+\demo{\pdate{\year-\month-\day}}{\pdate{\year-\month-\day}}{today as day, month name, year}
+\demo{\pisodate{\year-\month-\day}}{\lr{\pisodate{\year-\month-\day}}}{today as DD/MM/YYYY}
 
-\subsection*{Gregorian to Jalali (\texttt{\textbackslash pdate}, \texttt{\textbackslash pisodate})}
-\GtoJ{2015-03-21}
-\GtoJ{2021-03-20}
-\GtoJ{2024-03-20}
-\GtoJ{2024-12-31}
-\GtoJ{2025-03-20}
+\subsection*{\lr{2. Gregorian to Jalali}}
+\note{\texttt{\textbackslash pdate\{Y-M-D\}} takes a Gregorian date and prints the Jalali date with the month name.
+\texttt{\textbackslash pisodate\{Y-M-D\}} prints it as DD/MM/YYYY, zero padded.}
+\GtoJ{2015-03-21}{Nowruz 1394, the first day of the Jalali year}
+\GtoJ{2021-03-20}{last day of a leap year, Esfand 30, 1399}
+\GtoJ{2024-03-20}{Nowruz 1403}
+\GtoJ{2024-12-31}{a day in Dey, which crosses the Gregorian new year}
+\GtoJ{2025-03-20}{Esfand 30, 1403, the next leap-year end}
 
-\subsection*{Jalali to Gregorian (\texttt{\textbackslash gdate}, \texttt{\textbackslash gisodate})}
-\JtoG{1394-01-01}
-\JtoG{1399-12-30}
-\JtoG{1403-01-01}
-\JtoG{1403-10-11}
-\JtoG{1403-12-30}
+\subsection*{\lr{3. Jalali to Gregorian}}
+\note{\texttt{\textbackslash gdate\{Y-M-D\}} and \texttt{\textbackslash gisodate\{Y-M-D\}} are the reverse:
+the argument is a Jalali date, the result is Gregorian.}
+\JtoG{1394-01-01}{Nowruz 1394}
+\JtoG{1399-12-30}{last day of leap year 1399}
+\JtoG{1403-01-01}{Nowruz 1403}
+\JtoG{1403-10-11}{a day in Dey 1403}
+\JtoG{1403-12-30}{last day of leap year 1403}
 
-\subsection*{First day of each year (\texttt{\textbackslash gisodate})}
-\foreach \y in {1380,1385,...,1405}{%
-  \row{\y}{\hbox{\gisodate{\y-01-01}}}%
-}
+\subsection*{\lr{4. Start of each Jalali year}}
+\note{The Gregorian date on which every fifth Jalali year starts. It is March 20, 21 or 22.}
+\YEAR{1380}
+\YEAR{1385}
+\YEAR{1390}
+\YEAR{1395}
+\YEAR{1400}
+\YEAR{1405}
 
-\subsection*{Julian day numbers}
-\pcalendardatetojulian{1394-01-01}\jd
-\row{1394-01-01}{\number\jd}
-\pcalendardatetojulian{1394-01-01+10}\jd
-\row{1394-01-01 +10}{\number\jd}
-\pcalendarjuliantodate\jd\y\m\d
-\row{back to Jalali}{\number\y-\number\m-\number\d}
-\pcalendardatetojulian{1403-12-29+1}\jd
-\pcalendarjuliantodate\jd\y\m\d
-\row{1403-12-29 +1 (leap year, expect 1403-12-30)}{\number\y-\number\m-\number\d}
-\pcalendardatetojulian{1403-12-29+2}\jd
-\pcalendarjuliantodate\jd\y\m\d
-\row{1403-12-29 +2 (expect 1404-1-1)}{\number\y-\number\m-\number\d}
+\subsection*{\lr{5. Name macros}}
+\note{These take a number and print the name. Months are 1 to 12; weekdays are 0 to 6,
+where 0 is Saturday, the first day of the Persian week.}
+\demo{\pcalendarmonthname{1}}{\pcalendarmonthname{1}}{Jalali month 1}
+\demo{\pcalendarmonthname{12}}{\pcalendarmonthname{12}}{Jalali month 12}
+\demo{\pcalendargregorianmonthname{3}}{\pcalendargregorianmonthname{3}}{Gregorian month 3, in Persian}
+\demo{\pcalendarweekdayname{0}}{\pcalendarweekdayname{0}}{weekday 0}
+\demo{\pcalendarweekdayname{6}}{\pcalendarweekdayname{6}}{weekday 6}
+\demo{\pcalendarweekdayshortname{0}}{\pcalendarweekdayshortname{0}}{short weekday 0}
+\par\medskip\noindent\lr{All Jalali months:}\quad
+\foreach \m in {1,...,12}{\pcalendarmonthname{\m}\space}
 
-\subsection*{Weekday of a Jalali date}
-\WEEKDAY{1394-01-01}
-\WEEKDAY{1403-01-01}
-\WEEKDAY{1404-01-01}
+\subsection*{\lr{6. Julian day numbers and date arithmetic}}
+\note{\texttt{\textbackslash pcalendardatetojulian\{Y-M-D\}\{\textbackslash count\}} stores the Julian day
+number of a Jalali date in a count register. A \texttt{+N} suffix adds N days.
+\texttt{\textbackslash pcalendarjuliantodate\{\textbackslash count\}\{\textbackslash y\}\{\textbackslash m\}\{\textbackslash d\}}
+converts a day number back and sets \texttt{\textbackslash y}, \texttt{\textbackslash m}, \texttt{\textbackslash d}.}
+\pcalendardatetojulian{1394-01-01}\jd%
+\demo{\pcalendardatetojulian{1394-01-01}\jd}{\number\jd}{day number of 1394-01-01}
+\pcalendardatetojulian{1394-01-01+10}\jd%
+\demo{\pcalendardatetojulian{1394-01-01+10}\jd}{\number\jd}{ten days later}
+\pcalendarjuliantodate\jd\y\m\d%
+\demo{\pcalendarjuliantodate\jd\y\m\d}{\lr{\number\y-\number\m-\number\d}}{back to a Jalali date}
+\pcalendardatetojulian{1403-12-29+1}\jd%
+\pcalendarjuliantodate\jd\y\m\d%
+\demo{\pcalendardatetojulian{1403-12-29+1}\jd}{\lr{\number\y-\number\m-\number\d}}{1403 is a leap year, so Esfand has 30 days}
+\pcalendardatetojulian{1403-12-29+2}\jd%
+\pcalendarjuliantodate\jd\y\m\d%
+\demo{\pcalendardatetojulian{1403-12-29+2}\jd}{\lr{\number\y-\number\m-\number\d}}{rolls over into the new year}
 
-\subsection*{Animal year names (\texttt{\textbackslash pcalendaryearname})}
-\foreach \y in {1380,...,1403}{\y~\pcalendaryearname{\y}\quad}
+\subsection*{\lr{7. Weekday of a Jalali date}}
+\note{The package has no weekday macro of its own. PGF's \texttt{\textbackslash pgfcalendarjuliantoweekday}
+numbers Monday as 0, so the sample shifts the result by 2 to make Saturday 0, then calls
+\texttt{\textbackslash pcalendarweekdayname}.}
+\WEEKDAY{1394-01-01}{Saturday, March 21, 2015}
+\WEEKDAY{1403-01-01}{Wednesday, March 20, 2024}
+\WEEKDAY{1404-01-01}{Friday, March 21, 2025}
+
+\subsection*{\lr{8. Animal year names}}
+\note{\texttt{\textbackslash pcalendaryearname\{year\}} gives the animal of the 12-year cycle of the
+Turkish-Mongol calendar for a Jalali year. It is defined for 0 to 2099 only.}
+\medskip
+\begin{tabular}{llll}
+\YROW{1380}\\
+\YROW{1381}\\
+\YROW{1382}\\
+\YROW{1383}\\
+\YROW{1384}\\
+\YROW{1385}\\
+\end{tabular}
+
+\subsection*{\lr{Limits}}
+\note{The date arguments must be literal \texttt{Y-M-D} text. A macro holding a date, such as
+\texttt{\textbackslash pdate\{\textbackslash mydate\}}, is not expanded and fails. The Jalali leap rule is the
+33-year arithmetic approximation, which can differ from the official calendar in some years.}
 
 \end{document}

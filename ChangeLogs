@@ -1,5 +1,5 @@
 %% Change Logs
-%% unreleased ## Oct 29, 2026
+%% ver 0.5 ## Nov 1, 2026
 %% fixed per-call \newcount register leak and the undeclared \pcal@persianxiii register
 %% added l3build regression tests (testfiles/), Makefile, generated README, .gitignore, sample/pcalendar-test.tex
 %% ver 0.4 ## Nov 7, 2023
