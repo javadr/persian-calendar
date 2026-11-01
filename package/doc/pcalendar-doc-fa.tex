@@ -1,0 +1,315 @@
+% Persian manual of the pcalendar package. Build: make doc   (XeLaTeX, font XB Niloofar)
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{pcalendar}
+\usepackage{pgffor}
+\usepackage[colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{xepersian}
+
+\settextfont{XB Niloofar}
+\setdigitfont{Parisa}
+\setlatintextfont[Extension=.otf,BoldFont=lmroman10-bold,ItalicFont=lmroman10-italic,BoldItalicFont=lmroman10-bolditalic]{lmroman10-regular}
+
+% --- helpers --------------------------------------------------------------
+\newcommand\tx[1]{\mbox{\lr{\texttt{#1}}}}                  % code inside Persian text
+\newcommand\cs[1]{\mbox{\lr{\texttt{\textbackslash #1}}}}   % a control sequence
+\newcommand\pkg[1]{\mbox{\lr{\textsf{#1}}}}
+\newcommand\iso[1]{\mbox{\lr{#1}}}                          % numeric dates must stay left to right
+\newcommand\gap{\par\smallskip}
+% \macro|syntax|: heading line for a macro description
+\NewDocumentCommand\macro{v}{\par\bigskip\noindent\lr{\texttt{\bfseries #1}}\par\nopagebreak\smallskip}
+% \ex|code|{result}: a call, an arrow and its typeset result (the call is typed twice on purpose)
+\NewDocumentCommand\ex{v m}{\par\noindent\hspace*{1em}\lr{\texttt{#1}}\quad$\leftarrow$\quad#2}
+\emergencystretch=3em
+\newcount\jd \newcount\wd
+\makeatletter\renewcommand*\l@section{\@dottedtocline{1}{0em}{2.3em}}\makeatother
+% table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four
+\newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\tx{\mm}\quad\pcalendarmonthname{\mm}}
+\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\tx{\yy}\quad\pcalendaryearname{\yy}}
+\newcommand\MROW[1]{\mc{#1}&\mc{#1+3}&\mc{#1+6}&\mc{#1+9}}
+\newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}}
+
+\title{بستهٔ \pkg{pcalendar}}
+\author{جواد رضویان\\\tx{javadr@gmail.com}}
+\date{نسخهٔ \lr{\pcalendarversion}\quad(\lr{\pcalendardate})}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}\noindent
+\pkg{pcalendar} بسته‌ای برای کار با تقویم هجری شمسی در \lr{\LaTeX} است. با آن می‌توانید تاریخ شمسی را به
+میلادی و تاریخ میلادی را به شمسی تبدیل کنید، تاریخ را با نام فارسی ماه‌ها چاپ کنید و به تاریخ‌ها روز
+اضافه کنید یا از آن‌ها روز کم کنید. نام ماه‌ها، روزهای هفته و سال‌های دوازده‌حیوانی هم در همین بسته آماده
+است. \pkg{pcalendar} بر پایهٔ \pkg{pgfcalendar} نوشته شده و همراه با \pkg{xepersian} در \lr{XeLaTeX}
+کار می‌کند.
+\end{abstract}
+
+\tableofcontents
+
+% ---------------------------------------------------------------------------
+\section{معرفی}\label{sec:what}
+
+با \pkg{pcalendar} می‌توانید:
+\begin{itemize}
+  \item تاریخ میلادی را به شمسی و تاریخ شمسی را به میلادی تبدیل کنید، چه به‌صورت متن (مثل «۱ فروردین ۱۳۹۴») و چه به‌صورت عدد (مثل ۰۱/۰۱/۱۳۹۴)؛
+  \item شمارهٔ روز ژولین یک تاریخ شمسی را بگیرید، چند روز به آن اضافه یا از آن کم کنید و دوباره به تاریخ
+    برگردانید؛
+  \item نام ماه‌های شمسی و میلادی و نام روزهای هفته را چاپ کنید؛
+  \item بفهمید هر سال به کدام حیوان از دورهٔ دوازده‌ساله تعلق دارد.
+\end{itemize}
+اما این بسته جدول ماه یا تقویم رومیزی نمی‌سازد، مناسبت‌ها و تعطیلات رسمی را نمی‌شناسد و فرمان جداگانه‌ای هم برای روز هفتهٔ یک تاریخ ندارد؛ هرچند در بخش~\ref{sec:names} می‌بینید که با چند خط می‌شود روز هفته را هم به دست آورد.
+
+\paragraph{پیش‌نیازها.} برای استفاده از بسته به \lr{XeLaTeX}، بستهٔ \pkg{pgf} (که \pkg{pgfcalendar} بخشی از آن است) و \pkg{xepersian} با یک قلم فارسی نیاز دارید. نام‌های فارسی هم به‌صورت متن \lr{UTF-8} در خود فایل بسته نوشته شده‌اند.
+
+% ---------------------------------------------------------------------------
+\section{نصب}\label{sec:install}
+
+اگر توزیع \TeX{} شما این بسته را دارد، نیازی به نصب نیست. در غیر این صورت فایل \tx{pcalendar.sty} را در یکی از پوشه‌هایی بگذارید که \TeX{} فایل‌ها را در آن‌ها پیدا می‌کند (مثلاً \tx{texmf/tex/latex/pcalendar/}) و \tx{mktexlsr} را اجرا کنید. اگر مخزن پروژه را دارید، دستور \tx{make dev} همین کار را برایتان می‌کند. اگر هم نمی‌خواهید چیزی نصب کنید، کافی است \tx{pcalendar.sty} را کنار سندتان بگذارید.
+
+بسته را در مقدمهٔ سند بارگذاری کنید. در این راهنما \pkg{pcalendar} پیش از \pkg{xepersian} بارگذاری شده است:
+\begin{latin}\begin{verbatim}
+\usepackage{pcalendar}
+\usepackage{xepersian}
+\settextfont{XB Niloofar}
+\end{verbatim}\end{latin}
+بسته گزینه‌ای ندارد.
+
+% ---------------------------------------------------------------------------
+\section{شروع سریع}\label{sec:quick}
+
+\begin{latin}\begin{verbatim}
+\pdate{2015-03-21}          % Gregorian in, Jalali text out
+\gdate{1394-01-01}          % Jalali in, Gregorian text out
+\pisodate{2015-03-21}       % Gregorian in, Jalali as DD/MM/YYYY
+\gisodate{1394-01-01}       % Jalali in, Gregorian as DD/MM/YYYY
+\end{verbatim}\end{latin}
+این چهار فرمان چنین چاپ می‌شوند:
+\ex|\pdate{2015-03-21}|{\pdate{2015-03-21}}
+\ex|\gdate{1394-01-01}|{\gdate{1394-01-01}}
+\ex|\pisodate{2015-03-21}|{\iso{\pisodate{2015-03-21}}}
+\ex|\gisodate{1394-01-01}|{\iso{\gisodate{1394-01-01}}}
+\gap
+تاریخ امروز را هم می‌توانید به تقویم شمسی چاپ کنید. نوشتن \cs{pdate}\tx{\{\textbackslash year-\textbackslash month-\textbackslash day\}} امروز را این‌طور چاپ می‌کند: \pdate{\year-\month-\day}.
+
+% ---------------------------------------------------------------------------
+\section{تبدیل تاریخ}\label{sec:date}
+
+هر چهار فرمان یک ورودی می‌گیرند: تاریخی به شکل \tx{Y-M-D}، یعنی سال و شمارهٔ ماه و روز که با خط تیره از هم جدا شده‌اند. صفر ابتدای ماه و روز را می‌توانید ننویسید: \tx{2015-3-21} با \tx{2015-03-21} فرقی ندارد.
+
+\macro|\pdate{Y-M-D}|
+تاریخ میلادی می‌گیرد و تاریخ شمسی را به شکل «روز، نام ماه، سال» چاپ می‌کند؛ مثلاً \pdate{2024-03-20}.
+
+\macro|\gdate{Y-M-D}|
+تاریخ شمسی می‌گیرد و تاریخ میلادی را به همان شکل چاپ می‌کند. نام ماه میلادی هم فارسی نوشته می‌شود؛ مثلاً \gdate{1403-01-01}.
+
+\macro|\pisodate{Y-M-D}|
+مثل \cs{pdate} تاریخ میلادی می‌گیرد و تاریخ شمسی چاپ می‌کند، اما به‌صورت عددی: روز و ماه دورقمی‌اند و با اسلش از هم جدا می‌شوند؛ مثلاً \iso{\pisodate{2024-03-20}}. ترتیب خروجی روز/ماه/سال است، نه سال-ماه-روز مثل استاندارد \lr{ISO}.
+
+\macro|\gisodate{Y-M-D}|
+مثل \cs{gdate} تاریخ شمسی می‌گیرد و تاریخ میلادی چاپ می‌کند، اما عددی و با همان ترتیب روز/ماه/سال؛ مثلاً
+\iso{\gisodate{1403-01-01}}.
+
+\paragraph{سال کبیسه.} اسفند در سال کبیسه ۳۰ روز دارد:
+\ex|\pdate{2025-03-20}|{\pdate{2025-03-20}}
+\ex|\gdate{1403-12-30}|{\gdate{1403-12-30}}
+\ex|\gdate{1404-12-30}|{\gdate{1404-12-30}}
+\gap
+تاریخ آخر غلط است، چون ۱۴۰۴ کبیسه نیست؛ اما بسته درست‌بودن ورودی را بررسی نمی‌کند
+(بخش~\ref{sec:limits}).
+
+\paragraph{نکتهٔ حروف‌چینی.} در متن فارسی ممکن است جای عددها عوض شود، چون \TeX{} متن دوسویه را طبق قاعدهٔ خاصی می‌چیند. اگر می‌خواهید خروجی \cs{pisodate} و \cs{gisodate} همیشه به ترتیب روز/ماه/سال بماند، آن را درون \cs{lr} بگذارید؛ در همین راهنما هم همین کار شده است.
+
+% ---------------------------------------------------------------------------
+\section{شمارهٔ روز و محاسبه روی تاریخ}\label{sec:julian}
+
+فرمان‌های بالا فقط تبدیل می‌کنند و با آن‌ها نمی‌شود به تاریخ روز اضافه کرد. برای این کار بسته از شمارهٔ روز ژولین کمک می‌گیرد، همان شماره‌ای که \pkg{pgfcalendar} تعریف کرده است. روزها از یک مبدأ ثابت شمرده می‌شوند، پس تفاضل دو شماره دقیقاً برابر با تعداد روزهای بین دو تاریخ است.
+
+\macro|\pcalendardatetojulian{Y-M-D}{\count}|
+شمارهٔ روز تاریخ \emph{شمسی} \tx{Y-M-D} را در شمارندهٔ \cs{count} می‌گذارد. اگر \tx{+N} را به آخر تاریخ بچسبانید، \tx{N} روز هم به آن اضافه می‌شود؛ مثلاً \tx{1394-01-01+10} یعنی ده روز بعد از اول فروردین ۱۳۹۴.
+
+\macro|\pcalendarjuliantodate{\count}{\y}{\m}{\d}|
+شمارهٔ روزِ داخل \cs{count} را دوباره به تاریخ \emph{شمسی} تبدیل می‌کند و سال و ماه و روز را در فرمان‌های \cs{y} و \cs{m} و \cs{d} می‌گذارد (به‌جای این سه می‌توانید نام دیگری هم بدهید).
+
+\begin{latin}\begin{verbatim}
+\newcount\jd
+\pcalendardatetojulian{1394-01-01+10}\jd
+\pcalendarjuliantodate\jd\y\m\d
+\number\y-\number\m-\number\d
+\end{verbatim}\end{latin}
+\pcalendardatetojulian{1394-01-01+10}\jd%
+\pcalendarjuliantodate\jd\y\m\d%
+خروجی این کد \iso{\number\y-\number\m-\number\d} است.
+
+\paragraph{\cs{y} و \cs{m} و \cs{d} را همان لحظه بخوانید.} بعد از \cs{pcalendarjuliantodate}، این سه فرمان رونوشتی از مقدار نیستند و فقط نام دیگری برای شمارنده‌های نتیجهٔ بسته‌اند. به همین دلیل هر تبدیل بعدی (\cs{pdate}، \cs{gisodate} و مانند آن‌ها) مقدارشان را عوض می‌کند. اگر بعداً به آن‌ها نیاز دارید، همان لحظه در شمارنده‌های خودتان نگه‌شان دارید:
+\tx{\textbackslash newcount\textbackslash myyear\ \textbackslash myyear=\textbackslash y}.
+
+\paragraph{عبور از پایان سال.} محاسبهٔ روز، سال کبیسه را هم درنظر می‌گیرد:
+\pcalendardatetojulian{1403-12-29+1}\jd\pcalendarjuliantodate\jd\y\m\d%
+یک روز بعد از ۱۴۰۳-۱۲-۲۹ می‌شود \iso{\number\y-\number\m-\number\d}، چون ۱۴۰۳ کبیسه است؛
+\pcalendardatetojulian{1403-12-29+2}\jd\pcalendarjuliantodate\jd\y\m\d%
+و دو روز بعد از آن می‌شود \iso{\number\y-\number\m-\number\d}.
+
+\paragraph{شمارنده‌های موقت.} \cs{pcalendardatetojulian} هنگام کار از \cs{count1}، \cs{count2}، \cs{count3} و \cs{count8} استفاده می‌کند؛ پس مقداری در این شمارنده‌ها نگه ندارید.
+
+% ---------------------------------------------------------------------------
+\section{نام‌ها}\label{sec:names}
+
+\macro|\pcalendarmonthname{n}|
+نام ماه شمسی را چاپ می‌کند. \tx{n} عددی از ۱ تا ۱۲ است؛ برای عددهای دیگر چیزی چاپ نمی‌شود.
+\ex|\pcalendarmonthname{1}|{\pcalendarmonthname{1}}
+\gap
+نام هر دوازده ماه به ترتیب:\gap
+\begin{tabular}{llll}
+\MROW{1}\\
+\MROW{2}\\
+\MROW{3}
+\end{tabular}
+
+\macro|\pcalendargregorianmonthname{n}|
+نام ماه میلادی را به فارسی چاپ می‌کند (مثلاً «مارس»). \tx{n} این‌جا هم از ۱ تا ۱۲ است.
+\ex|\pcalendargregorianmonthname{3}|{\pcalendargregorianmonthname{3}}
+
+\macro|\pcalendarweekdayname{n}|
+نام روز هفته را چاپ می‌کند. \tx{n} از ۰ تا ۶ است: ۰ شنبه، یعنی اولین روز هفته در ایران، و ۶ جمعه است.
+\gap\leavevmode
+\foreach \w in {0,...,6}{\hbox{\tx{\w}~\pcalendarweekdayname{\w}}\quad}
+
+\macro|\pcalendarweekdayshortname{n}|
+مخفف تک‌حرفی روز هفته را چاپ می‌کند؛ شماره‌گذاری مثل فرمان قبلی است.
+\gap\leavevmode
+\foreach \w in {0,...,6}{\hbox{\tx{\w}~\pcalendarweekdayshortname{\w}}\quad}
+
+\macro|\pcalendaryearname{year}|
+حیوان یک سال شمسی را در دورهٔ دوازده‌ساله چاپ می‌کند. \tx{year} باید بین ۰ تا ۲۰۹۹ باشد؛ برای مقدارهای دیگر چیزی چاپ نمی‌شود.
+\ex|\pcalendaryearname{1403}|{\pcalendaryearname{1403}}
+\gap
+حیوان‌های سال به ترتیب، از سال ۱۳۸۰:\gap
+\begin{tabular}{llll}
+\YROW{1380}\\
+\YROW{1381}\\
+\YROW{1382}
+\end{tabular}
+
+\paragraph{روز هفتهٔ یک تاریخ.} فرمان آماده‌ای برای این کار نداریم، اما از روی شمارهٔ روز می‌شود آن را حساب کرد. \pkg{pgfcalendar} دوشنبه را ۰ می‌گیرد و \cs{pcalendarweekdayname} شنبه را؛ پس نتیجه را دو واحد جابه‌جا می‌کنیم:
+\begin{latin}\begin{verbatim}
+\newcount\jd \newcount\wd
+\pcalendardatetojulian{1403-01-01}\jd
+\pgfcalendarjuliantoweekday{\jd}{\wd}
+\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
+\pcalendarweekdayname{\wd}
+\end{verbatim}\end{latin}
+\pcalendardatetojulian{1403-01-01}\jd%
+\pgfcalendarjuliantoweekday{\jd}{\wd}%
+\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi%
+نتیجه «\pcalendarweekdayname{\wd}» است؛ یعنی اول فروردین ۱۴۰۳ چهارشنبه بوده است.
+
+% ---------------------------------------------------------------------------
+\section{نمونه‌های کاربردی}\label{sec:recipes}
+
+\paragraph{فاصلهٔ دو تاریخ شمسی به روز.}\leavevmode\par
+\begin{latin}\begin{verbatim}
+\newcount\a \newcount\b
+\pcalendardatetojulian{1403-01-01}\a
+\pcalendardatetojulian{1404-01-01}\b
+\advance\b by -\a
+\number\b
+\end{verbatim}\end{latin}
+\pcalendardatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
+\pcalendardatetojulian{1404-01-01}\jd\advance\jd by -\ja
+نتیجه \number\jd{} روز است (۱۴۰۳ کبیسه است).
+
+\paragraph{چاپ چند روز پیاپی.} برای چاپ پنج روز پشت‌سرهم از اول فروردین ۱۴۰۳ می‌توانید از حلقه استفاده کنید. هر تاریخ را باید همان‌جا تبدیل و چاپ کنید، چون با تبدیل بعدی نتیجه عوض می‌شود:
+\begin{latin}\begin{verbatim}
+\newcount\jd
+\foreach \x in {0,...,4}{%
+  \pcalendardatetojulian{1403-01-01+\x}\jd
+  \pcalendarjuliantodate\jd\y\m\d
+  \number\y-\number\m-\number\d\par
+}
+\end{verbatim}\end{latin}
+\foreach \x in {0,...,4}{%
+  \pcalendardatetojulian{1403-01-01+\x}\jd
+  \pcalendarjuliantodate\jd\y\m\d
+  \par\noindent\hspace*{1em}\iso{\number\y-\number\m-\number\d}%
+}
+\par\medskip
+استفاده از \tx{\textbackslash x} درون \cs{pcalendardatetojulian} اشکالی ندارد، چون این فرمان ورودی‌اش را باز می‌کند.
+
+\paragraph{شمارنده‌ها را بیرون از حلقه تعریف کنید.} \cs{newcount} را درون حلقه ننویسید: در هر دور یک شمارندهٔ تازه برمی‌دارد و سرانجام کار با خطای «\lr{No room for a new \textbackslash count}» متوقف می‌شود.
+
+% ---------------------------------------------------------------------------
+\section{سازوکار داخلی}\label{sec:how}
+
+تبدیل‌ها فقط با حساب روی شمارنده‌های \TeX{} انجام می‌شوند؛ نه برنامهٔ بیرونی لازم است و نه \lr{Lua}. کار اصلی با دو فرمان داخلی است: هر فرمان عمومی یکی از این دو را صدا می‌زند و بعد نتیجه را چاپ یا کپی می‌کند.
+
+\begin{description}
+  \item[\tx{\textbackslash pcal@gregoriantojalali\{Y-M-D\}}] تبدیل میلادی به شمسی. ابتدا کبیسه‌بودن سال
+    میلادی را تعیین و جدول طول ماه‌های هر دو تقویم را آماده می‌کند. سپس تعداد روزهای گذشته از ابتدای سال
+    میلادی تا تاریخ ورودی را می‌شمارد و آن‌قدر در ماه‌های شمسی جلو می‌رود که این روزها تمام شوند. سال‌های
+    کبیسهٔ شمسی با قاعدهٔ رایج \emph{دورهٔ ۳۳ ساله} مشخص می‌شوند: در هر ۳۳ سال، هشت سال کبیسه است.
+  \item[\tx{\textbackslash pcal@jalalitogregorian\{Y-M-D\}}] تبدیل شمسی به میلادی. ابتدا از روی سال، تعداد
+    روزهای گذشته از یک مبدأ ثابت را حساب می‌کند (۳۶۵ روز برای هر سال، به‌اضافهٔ ۸ روز کبیسه در هر ۳۳ سال و
+    روزهای کبیسهٔ دورهٔ ناقص). بعد روزهای ماه‌های قبلی را به آن اضافه می‌کند و مجموع را به بلوک‌های ۴۰۰ ساله،
+    ۱۰۰ ساله، ۴ ساله و ۱ ساله میلادی تقسیم می‌کند.
+\end{description}
+
+\paragraph{شمارنده‌های نتیجه.} نتیجهٔ شمسی در \cs{pcal@y}، \cs{pcal@m} و \cs{pcal@d} و نتیجهٔ میلادی در
+\cs{pcal@gy}، \cs{pcal@gm} و \cs{pcal@gd} ذخیره می‌شود. پرچم‌های کبیسه \cs{ifpcal@leap} (میلادی) و
+\cs{ifpcal@kabiseh} (شمسی) هستند. طول ماه‌ها در شمارنده‌هایی نگهداری می‌شود که نامشان به عدد رومی ختم
+می‌شود (\cs{pcal@latini} تا \cs{pcal@latinxii} و \cs{pcal@persiani} تا \cs{pcal@persianxiii}). دی دو بار
+می‌آید: خانهٔ اول بخشی از دی است که در سال میلادی باقی مانده و خانهٔ آخر کل ماه را نشان می‌دهد؛ برای همین
+سیزده خانه لازم است.
+
+\paragraph{پل شمارهٔ روز ژولین.} \cs{pcalendardatetojulian} ابتدا تاریخ شمسی را با فرمان شمسی-به-میلادیِ
+بالا به تاریخ میلادی برمی‌گرداند و آن را به \cs{pgfcalendardatetojulian} می‌دهد. \cs{pcalendarjuliantodate}
+عکس این مسیر را می‌رود: \cs{pgfcalendarjuliantodate} تاریخ میلادی می‌سازد و فرمان میلادی-به-شمسی آن را
+به تاریخ شمسی تبدیل می‌کند.
+
+\paragraph{نام سال.} حیوان‌های سال هر ۱۲ سال تکرار می‌شوند. علاوه بر این، در هر سده یک جابه‌جایی سه‌حالتی
+اعمال می‌شود تا سال ۰ دوره با حیوانی غیر از حیوان سال ۱۰۰ شروع شود. به همین دلیل این فرمان فقط تا ۲۰۹۹ کار
+می‌کند.
+
+\paragraph{بدون نشتی شمارنده.} همهٔ شمارنده‌ها هنگام بارگذاری بسته فقط یک بار تعریف می‌شوند؛ پس در یک سند
+می‌توانید هر تعداد تبدیل انجام دهید. آزمونی در مخزن (\tx{leaks.lvt}) همین را بررسی می‌کند.
+
+% ---------------------------------------------------------------------------
+\section{محدودیت‌ها و مشکلات شناخته‌شده}\label{sec:limits}
+
+\begin{itemize}
+  \item \textbf{ورودی بررسی نمی‌شود.} اگر ماه ۱۳، روز ۴۰ یا رشتهٔ نادرستی بدهید، یا خروجی غلط می‌شود یا \TeX{} خطا می‌دهد (نه خود بسته).
+  \item \textbf{ورودی باید خودِ تاریخ باشد.} \cs{pdate}، \cs{gdate}، \cs{pisodate} و \cs{gisodate} ورودی را همان‌طور که نوشته شده در خط‌های تیره می‌شکنند و فرمانی را که تاریخ در آن ذخیره شده باز نمی‌کنند. پس این‌طور بنویسید: \cs{pdate}\tx{\{2015-03-21\}}، نه \cs{pdate}\cs{mydate}. (\cs{pcalendardatetojulian} ورودی‌اش را
+    باز می‌کند و این مشکل را ندارد.)
+  \item \textbf{قاعدهٔ کبیسهٔ تقریبی.} قاعدهٔ ۳۳ ساله فقط تقریبی حسابی از تقویم رسمی است، چون تقویم رسمی بر پایهٔ رصد نجومی تعیین می‌شود. این دو در سال‌های رایج یکی‌اند، اما در همهٔ سال‌ها یکی نیستند. برای سال‌های دور، نتیجه را با یک جدول معتبر مقایسه کنید.
+  \item \textbf{یک اشکال شناخته‌شده.} \cs{pcal@jalalitogregorian}\tx{\{1279-10-11\}} با پیام
+    «\lr{Missing number, treated as zero}» متوقف می‌شود، در حالی که تاریخ‌های اطرافش درست‌اند. دلیلش را هنوز
+    پیدا نکرده‌ام.
+  \item \textbf{حلقه‌های تودرتو.} تبدیل‌ها در داخل خود از \cs{loop} هستهٔ \lr{\LaTeX} استفاده می‌کنند. اگر \cs{loop}\ldots\cs{repeat} شما این فرمان‌ها را صدا می‌زند، بدنهٔ آن را درون یک گروه (\cs{begingroup}\ldots\cs{endgroup}) بگذارید؛ وگرنه حلقه بعد از یک دور متوقف می‌شود. \cs{foreach} این
+    مشکل را ندارد.
+  \item \textbf{شمارنده‌های مشترک.} هر تبدیل شمارنده‌های نتیجه را از نو می‌نویسد، همان‌طور که در
+    بخش~\ref{sec:julian} گفته شد.
+  \item \textbf{نام سال} فقط برای ۰ تا ۲۰۹۹ کار می‌کند.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+\section{تاریخچهٔ نسخه‌ها}\label{sec:history}
+
+\begin{description}
+  \item[\lr{0.5 (2026-11-01)}] رفع نشتی شمارنده (چند \cs{newcount} در هر فراخوانی) و شمارندهٔ تعریف‌نشدهٔ طول
+    ماه؛ افزودن این راهنما و \cs{pcalendardate}/\cs{pcalendarversion}.
+  \item[\lr{0.4 (2023-11-07)}] آمادهٔ انتشار در \lr{CTAN}.
+  \item[\lr{0.3 (2015-08-14)}] نام حیوان سال شمسی، از ۰ تا ۲۰۹۹.
+  \item[\lr{0.2 (2015-08-09)}] تبدیل شمسی به میلادی.
+  \item[\lr{0.1 (2015-07-25)}] نخستین نسخه.
+\end{description}
+
+% ---------------------------------------------------------------------------
+\section{مجوز}\label{sec:license}
+
+می‌توانید این اثر را طبق شرایط مجوز عمومی پروژهٔ
+\lr{\LaTeX} (\lr{LPPL})، نسخهٔ ۱٫۳ یا هر نسخهٔ جدیدتر به انتخاب خودتان، توزیع یا ویرایش کنید. آخرین نسخهٔ
+مجوز در \tx{http://www.latex-project.org/lppl.txt} موجود است. وضعیت نگهداری این اثر در \lr{LPPL}
+«\lr{author-maintained}» است، یعنی نویسنده خودش آن را نگهداری می‌کند.
+
+\end{document}

@@ -1,7 +1,9 @@
 module = "pcalendar"
 
-sourcefiles  = {"pcalendar.sty"}
-installfiles = {"*.sty"}
+sourcefiledir = "tex"
+docfiledir    = "doc"
+sourcefiles   = {"pcalendar.sty"}
+installfiles  = {"*.sty"}
 
 -- the package output is plain numbers, so one engine is enough
 checkengines = {"xetex"}

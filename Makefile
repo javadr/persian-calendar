@@ -3,35 +3,37 @@
 .ONESHELL:
 
 PKG     := pcalendar
-DEMOS   := $(basename $(notdir $(wildcard sample/*.tex)))
-DATE    := $(shell grep "pcalendardate{" $(PKG).sty | cut -d'{' -f2 | tr -d '}')
-VERSION := $(shell grep "pcalendarversion{" $(PKG).sty | cut -d'{' -f2 | tr -d '}')
+DIR     := package
+STY     := $(DIR)/tex/$(PKG).sty
+DEMOS   := $(basename $(notdir $(wildcard $(DIR)/sample/*.tex)))
+DATE    := $(shell grep "pcalendardate{" $(STY) | cut -d'{' -f2 | tr -d '}')
+VERSION := $(shell grep "pcalendarversion{" $(STY) | cut -d'{' -f2 | tr -d '}')
 YEAR    := $(shell date +%Y)
 
 .PHONY: all
 all: readme test doc cleanup
 
-# Compile every sample/*.tex with XeLaTeX (they need xepersian, fonts Parisa/Yas; phd-study also needs
-# the quran package). Stops at the first TeX error, so a broken conversion macro fails the build.
+# Compile every package/sample/*.tex with XeLaTeX (they need xepersian and the Parisa font).
+# Stops at the first TeX error, so a broken conversion macro fails the build.
 .PHONY: sample
 sample:
-	cd sample && for f in $(DEMOS); do \
-	  TEXINPUTS=..: xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; \
+	cd $(DIR)/sample && for f in $(DEMOS); do \
+	  TEXINPUTS=../tex: xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; \
 	done
 
 .PHONY: test
 test: sample
 
-# Regression tests (testfiles/*.lvt vs *.tlg); use `l3build save <name>` to record a new baseline.
+# Regression tests (package/testfiles/*.lvt vs *.tlg); use `l3build save <name>` to record a new baseline.
 .PHONY: check
 check:
-	l3build check
+	cd $(DIR) && l3build check
 
 # Build the English and Persian manuals (need xepersian and the Parisa font).
 .PHONY: doc
 doc:
-	for f in $(PKG)-doc $(PKG)-doc-fa; do \
-	  for i in 1 2; do xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; done; \
+	cd $(DIR)/doc && for f in $(PKG)-doc $(PKG)-doc-fa; do \
+	  for i in 1 2; do TEXINPUTS=../tex: xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; done; \
 	done
 
 # Install the package into the local texmf tree for use from any document.
@@ -39,30 +41,30 @@ doc:
 dev:
 	TEXMF_LOCAL=$$(kpsewhich -var-value TEXMFLOCAL) && \
 	sudo mkdir -p "$$TEXMF_LOCAL/tex/latex/$(PKG)" && \
-	sudo cp -v $(PKG).sty "$$TEXMF_LOCAL/tex/latex/$(PKG)" && \
+	sudo cp -v $(STY) "$$TEXMF_LOCAL/tex/latex/$(PKG)" && \
 	sudo mktexlsr
 
 .PHONY: clean
 clean:
-	@rm -fv ./*.aux ./*.log ./*.toc ./*.out ./*.xdv ./*~
-	@rm -rfv build
-	@rm -fv sample/*.{aux,log,toc,out,xdv}
+	@rm -fv ./*~
+	@rm -rfv $(DIR)/build
+	@rm -fv $(DIR)/{sample,doc}/*.{aux,log,toc,out,xdv}
 
 .PHONY: cleanup
 cleanup: clean
 
-# CTAN layout: pcalendar/{README,tex/,doc/}, zipped as pcalendar.zip (no version in the name).
+# CTAN archive: pcalendar/{README,tex/,doc/}, built from package/, zipped as pcalendar.zip (no version in the name).
 .PHONY: ctan
 ctan: readme doc
-	(cd sample && for i in 1 2; do \
-	  TEXINPUTS=..: xelatex -interaction=nonstopmode -halt-on-error pcalendar-test || exit 1; \
+	(cd $(DIR)/sample && for i in 1 2; do \
+	  TEXINPUTS=../tex: xelatex -interaction=nonstopmode -halt-on-error pcalendar-test || exit 1; \
 	done)
 	rm -rf $(PKG) $(PKG).zip
 	mkdir -p $(PKG)/tex $(PKG)/doc
-	cp -v README $(PKG)
-	cp -v $(PKG).sty $(PKG)/tex
-	cp -v sample/pcalendar-test.tex sample/pcalendar-test.pdf $(PKG)/doc
-	cp -v $(PKG)-doc.tex $(PKG)-doc.pdf $(PKG)-doc-fa.tex $(PKG)-doc-fa.pdf $(PKG)/doc
+	cp -v $(DIR)/README $(PKG)
+	cp -v $(STY) $(PKG)/tex
+	cp -v $(DIR)/sample/pcalendar-test.tex $(DIR)/sample/pcalendar-test.pdf $(PKG)/doc
+	cp -v $(DIR)/doc/*.tex $(DIR)/doc/*.pdf $(PKG)/doc
 	zip -r $(PKG).zip $(PKG)
 	rm -rf $(PKG)
 	$(MAKE) cleanup
@@ -89,4 +91,4 @@ readme:
 	  "version 1.3c or later (at your option). The latest version of" \
 	  "the license is at: http://www.latex-project.org/lppl.txt" \
 	  "" \
-	  "This work has the LPPL maintenance status 'author-maintained'." > README
+	  "This work has the LPPL maintenance status 'author-maintained'." > $(DIR)/README

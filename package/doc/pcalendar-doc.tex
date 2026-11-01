@@ -20,6 +20,7 @@
 \newcommand\cs[1]{\texttt{\textbackslash #1}}
 \newcommand\gap{\par\smallskip}
 \newcount\jd \newcount\wd
+\renewcommand\thepage{\lr{\arabic{page}}}   % page numbers in Latin digits (the footer is typeset in the Persian font)
 % table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four
 \newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\texttt{\mm}\quad\pcalendarmonthname{\mm}}
 \newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\texttt{\yy}\quad\pcalendaryearname{\yy}}
@@ -225,6 +226,7 @@ one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalendarweekdayname} number
 shift by two:
 \begin{verbatim}
 \newcount\jd \newcount\wd
+\renewcommand\thepage{\lr{\arabic{page}}}   % page numbers in Latin digits (the footer is typeset in the Persian font)
 \pcalendardatetojulian{1403-01-01}\jd
 \pgfcalendarjuliantoweekday{\jd}{\wd}
 \advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
@@ -268,8 +270,6 @@ conversion:
 }
 \par\medskip
 Using \texttt{\cs{x}} inside \cs{pcalendardatetojulian} works, because that macro expands its argument.
-The sample file \texttt{phd-study.tex} in the repository uses this to number 145 days of a study
-schedule.
 
 \paragraph{Declare registers once.} \cs{newcount} inside a loop allocates a new register at every
 iteration and eventually fails with ``No room for a new \cs{count}''. Declare your counters before the

@@ -34,11 +34,11 @@ It is a date converter and a set of name tables. It does not typeset a month gri
 \number\y-\number\m-\number\d         % 1394-1-11
 ```
 
-The full manual, with every macro, examples and the known limitations, is in English ([`pcalendar-doc.tex`](pcalendar-doc.tex)) and Persian ([`pcalendar-doc-fa.tex`](pcalendar-doc-fa.tex)). `sample/pcalendar-test.tex` shows every macro with its output.
+The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/pcalendar-doc.tex`](package/doc/pcalendar-doc.tex)) and Persian ([`package/doc/pcalendar-doc-fa.tex`](package/doc/pcalendar-doc-fa.tex)). `package/sample/pcalendar-test.tex` shows every macro with its output.
 
 ## Installation
 
-Copy `pcalendar.sty` into a directory TeX searches, for example `texmf/tex/latex/pcalendar/`, and run `mktexlsr`. `make dev` does this for you. You can also keep `pcalendar.sty` next to your document.
+Copy `package/tex/pcalendar.sty` into a directory TeX searches, for example `texmf/tex/latex/pcalendar/`, and run `mktexlsr`. `make dev` does this for you. You can also keep `pcalendar.sty` next to your document.
 
 ## Limitations
 
@@ -54,21 +54,21 @@ The `Makefile` has these targets:
 
 | Target | What it does |
 |---|---|
-| `make check` | runs the `l3build` regression tests in `testfiles/` |
-| `make sample` (alias `make test`) | compiles every file in `sample/` with XeLaTeX |
+| `make check` | runs the `l3build` regression tests in `package/testfiles/` |
+| `make sample` (alias `make test`) | compiles every file in `package/sample/` with XeLaTeX |
 | `make doc` | builds the English and Persian manuals |
 | `make readme` | regenerates the CTAN `README` from the version and date in the package |
 | `make dev` | installs the package into the local TeX tree (uses `sudo`) |
 | `make ctan` | builds `pcalendar.zip` for upload: `README`, `tex/` and `doc/` |
 | `make clean` | removes build files |
 
-The samples and manuals need XeLaTeX, `xepersian` and the Parisa font.
+The samples and manuals need XeLaTeX, `xepersian` and the Parisa font; the Persian manual also uses XB Niloofar.
 
-The tests in `testfiles/` are `l3build` test files. They check known date pairs in both directions (Nowruz of several years, leap days, the last day of Esfand in leap years, month boundaries), the internal helper macros, the Julian day macros, a round trip over 1500 consecutive days, and that no registers are allocated per call. After an intended change, record a new baseline with `l3build save <name>`.
+The tests in `package/testfiles/` are `l3build` test files. They check known date pairs in both directions (Nowruz of several years, leap days, the last day of Esfand in leap years, month boundaries), the internal helper macros, the Julian day macros, a round trip over 1500 consecutive days, and that no registers are allocated per call. After an intended change, record a new baseline with `l3build save <name>`.
 
 ### Releasing
 
-Change `\pcalendardate` and `\pcalendarversion` at the top of `pcalendar.sty`, add an entry to `ChangeLogs`, then run `make readme` and `make ctan`. The `Makefile` reads the version and date from those two macros. The CTAN `README` is generated, so do not edit it by hand; this `README.md` is for GitHub and is not part of the CTAN archive.
+Change `\pcalendardate` and `\pcalendarversion` at the top of `package/tex/pcalendar.sty`, add an entry to `ChangeLogs`, then run `make readme` and `make ctan`. The `Makefile` reads the version and date from those two macros. The CTAN `package/README` is generated, so do not edit it by hand; this `README.md` is for GitHub and is not part of the CTAN archive.
 
 ## Author and license
 

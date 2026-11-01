@@ -15,7 +15,7 @@
 *.run.xml
 
 # compiled demo output (reference/articles/*.pdf stays trackable)
-/sample/*.pdf
+/package/sample/*.pdf
 
 # Claude Code / tooling (local state)
 .claude/
@@ -24,9 +24,8 @@
 graphify-out/
 
 # l3build output
-build/
+/package/build/
 
 # CTAN release archive
 /pcalendar.zip
-/pcalendar-doc.pdf
-/pcalendar-doc-fa.pdf
+/package/doc/*.pdf
