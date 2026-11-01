@@ -1,0 +1,361 @@
+% Documentation of the pcalendar package. Build: make doc   (XeLaTeX, font Parisa)
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{pcalendar}
+\usepackage{pgffor}
+\usepackage[colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{xepersian}
+
+\settextfont{Parisa}
+\setlatintextfont[Extension=.otf,BoldFont=lmroman10-bold,ItalicFont=lmroman10-italic,BoldItalicFont=lmroman10-bolditalic]{lmroman10-regular}
+
+% --- helpers --------------------------------------------------------------
+% \macro|syntax|: heading line for a macro description
+\NewDocumentCommand\macro{v}{\par\bigskip\noindent\hbox{\texttt{\bfseries #1}}\par\nopagebreak\smallskip}
+% \ex|code|{result}: a call, an arrow and its typeset result (the call is typed twice on purpose)
+\NewDocumentCommand\ex{v m}{\par\noindent\hspace*{1em}\texttt{#1}\quad$\Rightarrow$\quad#2}
+\newcommand\iso[1]{\lr{#1}}            % numeric dates must stay left to right
+\newcommand\pkg[1]{\textsf{#1}}
+\newcommand\cs[1]{\texttt{\textbackslash #1}}
+\newcommand\gap{\par\smallskip}
+\newcount\jd \newcount\wd
+% table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four
+\newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\texttt{\mm}\quad\pcalendarmonthname{\mm}}
+\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\texttt{\yy}\quad\pcalendaryearname{\yy}}
+\newcommand\MROW[1]{\mc{#1}&\mc{#1+3}&\mc{#1+6}&\mc{#1+9}}
+\newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}}
+
+% The prose uses the Latin font, so the macros that print Persian text switch to the Persian font.
+\def\fa@wrap#1{\expandafter\let\csname fa@orig@\string#1\endcsname#1%
+  \def#1##1{{\setpersianfont\csname fa@orig@\string#1\endcsname{##1}}}}
+\fa@wrap\pdate \fa@wrap\gdate \fa@wrap\pcalendarmonthname \fa@wrap\pcalendargregorianmonthname
+\fa@wrap\pcalendarweekdayname \fa@wrap\pcalendarweekdayshortname \fa@wrap\pcalendaryearname
+
+\title{The \pkg{pcalendar} package}
+\author{Javad Razavian\\\texttt{javadr@gmail.com}}
+\date{Version \pcalendarversion\quad(\pcalendardate)}
+
+\begin{document}
+\latin % the text is English (Latin font, left to right); the typeset results are Persian
+
+\maketitle
+
+\begin{abstract}\noindent
+\pkg{pcalendar} converts dates between the Persian (Jalali, Solar Hijri) and Gregorian calendars
+inside \LaTeX{}. It prints dates with Persian month names, gives day numbers you can do arithmetic
+on, and provides Persian month, weekday and year-animal names. It is built on the \pkg{pgfcalendar}
+package and is meant to be used with \pkg{xepersian} under XeLaTeX.
+\end{abstract}
+
+\tableofcontents
+
+% ---------------------------------------------------------------------------
+\section{What the package does and does not do}\label{sec:what1}
+
+The package is a date converter and a set of name tables. It provides:
+\begin{itemize}
+  \item Gregorian $\to$ Jalali and Jalali $\to$ Gregorian conversion, printed as text or as numbers;
+  \item Julian day numbers for Jalali dates, so you can add days, subtract dates or loop over days;
+  \item Persian names of the Jalali and Gregorian months and of the weekdays;
+  \item the animal name of a year in the twelve-animal cycle.
+\end{itemize}
+It does \emph{not} typeset a month grid or a wall calendar, it has no holidays, and it has no macro
+that returns the weekday of a date (section~\ref{sec:names6} shows how to get one in three lines).
+
+\paragraph{Requirements.} XeLaTeX, the \pkg{pgf} bundle (which contains \pkg{pgfcalendar}), and
+\pkg{xepersian} with a font that has Persian letters. The names are stored as Persian text in the
+source file, which is UTF-8.
+
+% ---------------------------------------------------------------------------
+\section{Installation}\label{sec:installation2}
+
+From a TeX distribution that includes the package, nothing needs doing. To install it by hand, copy
+\texttt{pcalendar.sty} into a directory that TeX searches, for example the local tree
+\texttt{texmf/tex/latex/pcalendar/}, and refresh the file database with \texttt{mktexlsr}. In the
+source repository, \texttt{make dev} does this for you. You can also keep \texttt{pcalendar.sty}
+next to your document.
+
+Load the package in the preamble. In the examples here it is loaded before \pkg{xepersian}:
+\begin{verbatim}
+\usepackage{pcalendar}
+\usepackage{xepersian}
+\settextfont{Parisa}
+\end{verbatim}
+The package takes no options.
+
+% ---------------------------------------------------------------------------
+\section{Quick start}\label{sec:quick3}
+
+\begin{verbatim}
+\pdate{2015-03-21}          % Gregorian date in, Jalali text out
+\gdate{1394-01-01}          % Jalali date in, Gregorian text out
+\pisodate{2015-03-21}       % Gregorian in, Jalali as DD/MM/YYYY
+\gisodate{1394-01-01}       % Jalali in, Gregorian as DD/MM/YYYY
+\end{verbatim}
+which print:
+\ex|\pdate{2015-03-21}|{\pdate{2015-03-21}}
+\ex|\gdate{1394-01-01}|{\gdate{1394-01-01}}
+\ex|\pisodate{2015-03-21}|{\iso{\pisodate{2015-03-21}}}
+\ex|\gisodate{1394-01-01}|{\iso{\gisodate{1394-01-01}}}
+\gap
+Today's date, in the Jalali calendar, is \cs{pdate}\texttt{\{\cs{year}-\cs{month}-\cs{day}\}}, which
+prints \pdate{\year-\month-\day}.
+
+% ---------------------------------------------------------------------------
+\section{Date conversion}\label{sec:date4}
+
+All four macros take one argument, a date written \texttt{Y-M-D}: a year, a month number and a day
+number joined by hyphens. The month and day may have a leading zero or not
+(\texttt{2015-3-21} and \texttt{2015-03-21} are the same).
+
+\macro|\pdate{Y-M-D}|
+The argument is a \emph{Gregorian} date. Prints the \emph{Jalali} date as ``day month-name year'',
+for example \pdate{2024-03-20}.
+
+\macro|\gdate{Y-M-D}|
+The argument is a \emph{Jalali} date. Prints the \emph{Gregorian} date as ``day month-name year'',
+using the Persian transliteration of the Gregorian month, for example \gdate{1403-01-01}.
+
+\macro|\pisodate{Y-M-D}|
+Like \cs{pdate} (Gregorian in, Jalali out) but prints numbers: day, month and year, each day and
+month padded to two digits and separated by a slash, so \iso{\pisodate{2024-03-20}}. Note the order:
+this is day/month/year, not the ISO order year-month-day.
+
+\macro|\gisodate{Y-M-D}|
+Like \cs{gdate} (Jalali in, Gregorian out) but prints numbers in the same day/month/year form, for
+example \iso{\gisodate{1403-01-01}}.
+
+\paragraph{Leap years.} Esfand, the last Jalali month, has 30 days in a leap year:
+\ex|\pdate{2025-03-20}|{\pdate{2025-03-20}}
+\ex|\gdate{1403-12-30}|{\gdate{1403-12-30}}
+\ex|\gdate{1404-12-30}|{\gdate{1404-12-30}}
+The last line is an invalid date, since 1404 is not a leap year; the package does not check this
+(section~\ref{sec:limitations9}).
+
+\paragraph{Wrap the numeric forms.} Digits in Persian text are reordered by the bidirectional
+algorithm. To keep \cs{pisodate} and \cs{gisodate} in day/month/year order inside Persian text, put
+them in an \cs{lr} box, as this document does.
+
+% ---------------------------------------------------------------------------
+\section{Day numbers and date arithmetic}\label{sec:day5}
+
+The conversion macros above cannot add days. For that, the package works with Julian day numbers as
+defined by \pkg{pgfcalendar}: whole days counted from a fixed origin, so subtracting two numbers gives
+the number of days between two dates.
+
+\macro|\pcalendardatetojulian{Y-M-D}{\count}|
+Stores the day number of the \emph{Jalali} date \texttt{Y-M-D} in the count register \cs{count}. Append
+\texttt{+N} to the date to add \texttt{N} days first: \texttt{1394-01-01+10} is ten days after
+1 Farvardin 1394.
+
+\macro|\pcalendarjuliantodate{\count}{\y}{\m}{\d}|
+Converts the day number in \cs{count} back to a \emph{Jalali} date and puts the year, month and day
+into the macros \cs{y}, \cs{m} and \cs{d} (you may choose other names).
+
+\begin{verbatim}
+\newcount\jd
+\pcalendardatetojulian{1394-01-01+10}\jd
+\pcalendarjuliantodate\jd\y\m\d
+\number\y-\number\m-\number\d
+\end{verbatim}
+\pcalendardatetojulian{1394-01-01+10}\jd%
+\pcalendarjuliantodate\jd\y\m\d%
+prints \iso{\number\y-\number\m-\number\d}.
+
+\paragraph{Read \cs{y}, \cs{m}, \cs{d} immediately.} After \cs{pcalendarjuliantodate} the three macros
+are aliases of the package's internal result registers, not copies. Any later conversion
+(\cs{pdate}, \cs{gisodate}, and so on) changes them. If you need the values later, store them in your
+own counters first: \texttt{\cs{newcount}\cs{myyear}\ \cs{myyear=\cs{y}}}.
+
+\paragraph{Offsets across a year end.} Day arithmetic knows about leap years:
+\pcalendardatetojulian{1403-12-29+1}\jd\pcalendarjuliantodate\jd\y\m\d%
+1403-12-29 plus one day is \iso{\number\y-\number\m-\number\d}, because 1403 is a leap year;
+\pcalendardatetojulian{1403-12-29+2}\jd\pcalendarjuliantodate\jd\y\m\d%
+plus two days is \iso{\number\y-\number\m-\number\d}.
+
+\paragraph{Counts used internally.} \cs{pcalendardatetojulian} uses \cs{count1}, \cs{count2},
+\cs{count3} and \cs{count8} as scratch registers. Do not keep values in those.
+
+% ---------------------------------------------------------------------------
+\section{Names}\label{sec:names6}
+
+\macro|\pcalendarmonthname{n}|
+Persian month name, \texttt{n} from 1 to 12. An argument outside this range prints nothing.
+\ex|\pcalendarmonthname{1}|{\pcalendarmonthname{1}}
+\gap
+All twelve, in order:\gap
+\gap
+\begin{tabular}{llll}
+\MROW{1}\\
+\MROW{2}\\
+\MROW{3}
+\end{tabular}
+
+\macro|\pcalendargregorianmonthname{n}|
+Persian transliteration of the Gregorian month name, \texttt{n} from 1 to 12.
+\ex|\pcalendargregorianmonthname{3}|{\pcalendargregorianmonthname{3}}
+
+\macro|\pcalendarweekdayname{n}|
+Weekday name, \texttt{n} from 0 to 6, where \textbf{0 is Saturday} (the first day of the Persian
+week) and 6 is Friday.
+\gap
+\foreach \w in {0,...,6}{\texttt{\w}~\pcalendarweekdayname{\w}\quad}
+
+\macro|\pcalendarweekdayshortname{n}|
+One-letter weekday abbreviation, same numbering.
+\gap
+\foreach \w in {0,...,6}{\texttt{\w}~\pcalendarweekdayshortname{\w}\quad}
+
+\macro|\pcalendaryearname{year}|
+Name of a Jalali year in the twelve-animal cycle. \texttt{year} must be between 0 and 2099;
+other values print nothing.
+\ex|\pcalendaryearname{1403}|{\pcalendaryearname{1403}}
+\gap
+The twelve animals in order, starting from year 1380:\gap
+\gap
+\begin{tabular}{llll}
+\YROW{1380}\\
+\YROW{1381}\\
+\YROW{1382}
+\end{tabular}
+
+\paragraph{The weekday of a date.} The package has no weekday macro, but the day number gives you
+one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalendarweekdayname} numbers Saturday as 0, so
+shift by two:
+\begin{verbatim}
+\newcount\jd \newcount\wd
+\pcalendardatetojulian{1403-01-01}\jd
+\pgfcalendarjuliantoweekday{\jd}{\wd}
+\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
+\pcalendarweekdayname{\wd}
+\end{verbatim}
+\pcalendardatetojulian{1403-01-01}\jd%
+\pgfcalendarjuliantoweekday{\jd}{\wd}%
+\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi%
+gives \pcalendarweekdayname{\wd} (1 Farvardin 1403 was a Wednesday).
+
+% ---------------------------------------------------------------------------
+\section{Recipes}\label{sec:recipes7}
+
+\paragraph{Days between two Jalali dates.}
+\begin{verbatim}
+\newcount\a \newcount\b
+\pcalendardatetojulian{1403-01-01}\a
+\pcalendardatetojulian{1404-01-01}\b
+\advance\b by -\a
+\number\b
+\end{verbatim}
+\pcalendardatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
+\pcalendardatetojulian{1404-01-01}\jd\advance\jd by -\ja
+prints \number\jd{} days (1403 is a leap year).
+
+\paragraph{A list of consecutive days.} Typeset the 5 days after 1 Farvardin 1403 with a loop. Each date
+is converted and printed right away, because the result macros are overwritten by the next
+conversion:
+\begin{verbatim}
+\newcount\jd
+\foreach \x in {0,...,4}{%
+  \pcalendardatetojulian{1403-01-01+\x}\jd
+  \pcalendarjuliantodate\jd\y\m\d
+  \number\y-\number\m-\number\d\par
+}
+\end{verbatim}
+\foreach \x in {0,...,4}{%
+  \pcalendardatetojulian{1403-01-01+\x}\jd
+  \pcalendarjuliantodate\jd\y\m\d
+  \par\noindent\hspace*{1em}\iso{\number\y-\number\m-\number\d}%
+}
+\par\medskip
+Using \texttt{\cs{x}} inside \cs{pcalendardatetojulian} works, because that macro expands its argument.
+The sample file \texttt{phd-study.tex} in the repository uses this to number 145 days of a study
+schedule.
+
+\paragraph{Declare registers once.} \cs{newcount} inside a loop allocates a new register at every
+iteration and eventually fails with ``No room for a new \cs{count}''. Declare your counters before the
+loop.
+
+% ---------------------------------------------------------------------------
+\section{How it works}\label{sec:how8}
+
+The conversions are plain TeX register arithmetic, with no external program and no Lua. Two internal
+macros do all the work. Every public macro calls one of them and then prints or copies the result
+registers.
+
+\begin{description}
+  \item[\texttt{\textbackslash pcal@gregoriantojalali\{Y-M-D\}}] Gregorian to Jalali. It first decides
+    whether the Gregorian year is a leap year, builds the month-length tables of both calendars, and
+    counts the days from the start of the Gregorian year to the date. It then walks the Jalali month
+    lengths until that day count is used up. The Jalali leap year rule is the common
+    \emph{33-year cycle}: eight leap years in every 33.
+  \item[\texttt{\textbackslash pcal@jalalitogregorian\{Y-M-D\}}] Jalali to Gregorian. It computes the
+    number of days since a fixed epoch from the year (365 days per year, plus 8 leap days per 33 years,
+    plus the leap days of the partial cycle), adds the days of the preceding months, and then splits
+    that total into 400-year, 100-year, 4-year and 1-year Gregorian blocks.
+\end{description}
+
+\paragraph{Result registers.} Jalali results are in \cs{pcal@y}, \cs{pcal@m}, \cs{pcal@d}. Gregorian
+results are in \cs{pcal@gy}, \cs{pcal@gm}, \cs{pcal@gd}. The leap flags are \cs{ifpcal@leap}
+(Gregorian) and \cs{ifpcal@kabiseh} (Jalali). The month lengths are held in registers whose names end in
+roman numerals (\cs{pcal@latini} to \cs{pcal@latinxii} and \cs{pcal@persiani} to
+\cs{pcal@persianxiii}). Dey appears twice: the first slot is the part of Dey left in the Gregorian year, the last is
+the whole month, which is why there are thirteen.
+
+\paragraph{Julian day bridge.} \cs{pcalendardatetojulian} converts the Jalali date to Gregorian with the
+Jalali-to-Gregorian macro above and hands the result to \cs{pgfcalendardatetojulian}.
+\cs{pcalendarjuliantodate} does the reverse: \cs{pgfcalendarjuliantodate} gives a Gregorian date, which the
+Gregorian-to-Jalali macro turns into the Jalali date.
+
+\paragraph{Year names.} The twelve animals repeat every 12 years. A second, three-step shift is applied
+once per century, so that year 0 starts the cycle at a different animal than year 100. This is why the
+macro stops at 2099.
+
+\paragraph{No register leaks.} All registers are allocated once when the package loads, so any number of
+conversions can be made in one document. A test in the repository (\texttt{leaks.lvt}) checks this.
+
+% ---------------------------------------------------------------------------
+\section{Limitations and known issues}\label{sec:limitations9}
+
+\begin{itemize}
+  \item \textbf{No input checking.} A month 13, day 40 or malformed string gives wrong output or a TeX
+    error, not a package message.
+  \item \textbf{Literal dates only.} The date argument of \cs{pdate}, \cs{gdate}, \cs{pisodate} and
+    \cs{gisodate} is split at the hyphens as it stands; a macro holding a date is not expanded. Write
+    \cs{pdate}\texttt{\{2015-03-21\}}, not \cs{pdate}\cs{mydate}. (\cs{pcalendardatetojulian} does
+    expand its date.)
+  \item \textbf{Approximate Jalali leap rule.} The 33-year rule is an arithmetic approximation of the
+    official calendar, which is defined by astronomical observation. The two agree for the years in
+    ordinary use, but not necessarily for all years. For distant years, check against an authoritative
+    table.
+  \item \textbf{A known crash.} \cs{pcal@jalalitogregorian}\texttt{\{1279-10-11\}} stops with ``Missing
+    number, treated as zero''; neighbouring dates work. The cause has not been found.
+  \item \textbf{Nested loops.} The conversions use \cs{loop} from the \LaTeX{} kernel internally. A
+    \cs{loop}\ldots\cs{repeat} of your own that calls them must run its body inside a group
+    (\cs{begingroup}\ldots\cs{endgroup}), otherwise it stops after one pass. \cs{foreach} is not affected.
+  \item \textbf{Shared registers.} Every conversion overwrites the result registers, as described in
+    section~\ref{sec:day5}.
+  \item \textbf{Year names} work for 0 to 2099 only.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+\section{Version history}\label{sec:version11}
+
+\begin{description}
+  \item[0.5 (2026-11-01)] Fixed the register leak (several \cs{newcount} per call) and the undeclared
+    month-length register; added this manual and
+    \cs{pcalendardate}/\cs{pcalendarversion}.
+  \item[0.4 (2023-11-07)] Ready for CTAN.
+  \item[0.3 (2015-08-14)] Animal name of a Jalali year, 0 to 2099.
+  \item[0.2 (2015-08-09)] Jalali to Gregorian conversion.
+  \item[0.1 (2015-07-25)] Initial version.
+\end{description}
+
+% ---------------------------------------------------------------------------
+\section{License}\label{sec:license12}
+
+This work may be distributed and/or modified under
+the conditions of the \LaTeX{} Project Public License, either version 1.3 of this license or (at your
+option) any later version. The latest version is at \texttt{http://www.latex-project.org/lppl.txt}. This
+work has the LPPL maintenance status ``author-maintained''.
+
+\end{document}

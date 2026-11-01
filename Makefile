@@ -27,14 +27,12 @@ test: sample
 check:
 	l3build check
 
-# There is no pcalendar-doc.tex yet (the .sty header mentions it); builds it once it exists.
+# Build the English and Persian manuals (need xepersian and the Parisa font).
 .PHONY: doc
 doc:
-	@if [ -f $(PKG)-doc.tex ]; then \
-	  xelatex $(PKG)-doc && xelatex $(PKG)-doc; \
-	else \
-	  echo "$(PKG)-doc.tex not found: skipping doc"; \
-	fi
+	for f in $(PKG)-doc $(PKG)-doc-fa; do \
+	  for i in 1 2; do xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; done; \
+	done
 
 # Install the package into the local texmf tree for use from any document.
 .PHONY: dev
@@ -55,7 +53,7 @@ cleanup: clean
 
 # CTAN layout: pcalendar/{README,tex/,doc/}, zipped as pcalendar.zip (no version in the name).
 .PHONY: ctan
-ctan: readme
+ctan: readme doc
 	(cd sample && for i in 1 2; do \
 	  TEXINPUTS=..: xelatex -interaction=nonstopmode -halt-on-error pcalendar-test || exit 1; \
 	done)
@@ -64,7 +62,7 @@ ctan: readme
 	cp -v README $(PKG)
 	cp -v $(PKG).sty $(PKG)/tex
 	cp -v sample/pcalendar-test.tex sample/pcalendar-test.pdf $(PKG)/doc
-	@if [ -f $(PKG)-doc.tex ]; then cp -v $(PKG)-doc.tex $(PKG)-doc.pdf $(PKG)/doc; fi
+	cp -v $(PKG)-doc.tex $(PKG)-doc.pdf $(PKG)-doc-fa.tex $(PKG)-doc-fa.pdf $(PKG)/doc
 	zip -r $(PKG).zip $(PKG)
 	rm -rf $(PKG)
 	$(MAKE) cleanup

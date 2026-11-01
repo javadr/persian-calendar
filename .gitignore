@@ -28,3 +28,5 @@ build/
 
 # CTAN release archive
 /pcalendar.zip
+/pcalendar-doc.pdf
+/pcalendar-doc-fa.pdf

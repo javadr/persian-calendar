@@ -1,5 +1,6 @@
 %% Change Logs
 %% ver 0.5 ## Nov 1, 2026
+%% added the manual, pcalendar-doc.tex, with a Persian version, pcalendar-doc-fa.tex, and README.md for GitHub
 %% fixed per-call \newcount register leak and the undeclared \pcal@persianxiii register
 %% added l3build regression tests (testfiles/), Makefile, generated README, .gitignore, sample/pcalendar-test.tex
 %% ver 0.4 ## Nov 7, 2023
