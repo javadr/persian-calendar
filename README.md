@@ -74,4 +74,4 @@ Change `\pcalendardate` and `\pcalendarversion` at the top of `package/tex/pcale
 
 ## License
 
-Copyright 2015-2026. Distributed under the LaTeX Project Public License, version 1.3 or later (see <http://www.latex-project.org/lppl.txt>). The work has the LPPL maintenance status "author-maintained".
+Copyright 2015-2026. Distributed under the LaTeX Project Public License, version 1.3c or later (see <http://www.latex-project.org/lppl.txt>). The work has the LPPL maintenance status "author-maintained".
