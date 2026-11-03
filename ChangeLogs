@@ -1,5 +1,8 @@
 %% Change Logs
-%% unreleased
+%% ver 0.6 ## Nov 3, 2026
+%% removed the e-mail address from the package, manuals and README
+%% manuals and sample: a year by season, one row of three Jalali months per season
+%% added the jalali month label above centered style, which centres month labels at any font size
 %% renamed the package from pcalendar to persian-calendar at the request of CTAN (files and package name only; macro names unchanged)
 %% stated the license as LPPL 1.3c everywhere
 %% added Jalali calendars for the TikZ calendar library: jalali dates, jalali, jalali week list, jalali equals, jalali day of month

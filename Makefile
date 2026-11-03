@@ -84,7 +84,6 @@ readme:
 	  "Release Date of the Current Version: $(DATE)" \
 	  "___________________" \
 	  "Javad Razavian" \
-	  "javadr@gmail.com" \
 	  "" \
 	  "Copyright © 2015-$(YEAR)" \
 	  "This package may be distributed and/or modified under the terms of the LaTeX Project Public License," \

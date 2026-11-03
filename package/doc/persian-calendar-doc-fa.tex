@@ -33,7 +33,7 @@
 \newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}}
 
 \title{بستهٔ \pkg{persian-calendar}}
-\author{جواد رضویان\\\tx{javadr@gmail.com}}
+\author{جواد رضویان}
 \date{نسخهٔ \lr{\pcalendarversion}\quad(\lr{\pcalendardate})}
 
 \begin{document}
@@ -218,13 +218,13 @@
 \usetikzlibrary{calendar}
 \usepackage{persian-calendar}
 ...
-\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last,
-               jalali week list, day xshift=-3em, month label above centered]
+\tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
+               jalali week list, day xshift=-3em, jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 \end{verbatim}\end{latin}
 \begin{center}
-\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last,
-               jalali week list, day xshift=-3em, month label above centered]
+\tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
+               jalali week list, day xshift=-3em, jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 \end{center}
 
@@ -237,10 +237,41 @@
 \macro|jalali week list|
 مثل \tx{week list} کتابخانه، اما برای ماه‌های شمسی: \tx{jalali} را هم شامل می‌شود، هر هفته از شنبه تا جمعه است و هر ماه از سطر تازه‌ای شروع می‌شود. با \tx{day xshift} مثبت (پیش‌فرض) شنبه در سمت چپ است؛ با مقدار منفی، مثل نمونهٔ بالا، شنبه به سمت راست می‌رود.
 
+\macro|jalali month label above centered|
+مثل \tx{month label above centered} کتابخانه، که عنوان را با فاصلهٔ ثابت \tx{1.5ex} جا می‌دهد و برای همین کمی از وسط کنار می‌رود. این سبک پهنای یک روز دورقمی (\tx{30}) را با قلم جاری اندازه می‌گیرد و فاصلهٔ داخلی (\tx{inner sep}) گره‌های روز را هم به آن اضافه می‌کند؛ پس عنوان با هر اندازهٔ قلم درست بالای وسط هفته می‌نشیند. این سبک فرض می‌کند لنگر \tx{every day} همان پیش‌فرض کتابخانه (\tx{base east}) است.
+
 \macro|jalali equals=M-D|
 شرطی که در هر سال با یک ماه و روز شمسی جور درمی‌آید؛ مثلاً \tx{jalali equals=1-1} برای نوروز. این شرط و \tx{jalali day of month=n} را می‌توان در \tx{if (...)} و با \cs{pgfcalendarifdate} به کار برد، حتی بیرون از تقویم‌های \tx{jalali}.
 
 \paragraph{چیدمان‌های دیگر.} \tx{day list downward}، \tx{day list upward}، \tx{day list right} و \tx{day list left} همراه با \tx{jalali} درست کار می‌کنند، چون فقط شرط \tx{day of month=1} را می‌سنجند. اما \tx{week list} و \tx{month list} کتابخانه از روز و روز هفتهٔ میلادی استفاده می‌کنند؛ به‌جای آن‌ها \tx{jalali week list} را به کار ببرید.
+
+\paragraph{یک سال، فصل به فصل.} با \cs{foreach} برای هر ماه یک تقویم رسم کنید و جای آن را با \tx{at} تعیین کنید: شمارهٔ ماه در فصل ستون را مشخص می‌کند و شمارهٔ فصل سطر را. علامت منفی در \tx{-\textbackslash col} ماه‌های بعدی را به چپ می‌برد تا صفحه از راست به چپ خوانده شود؛ برای چپ به راست، این علامت و علامت منفی \tx{day xshift} را بردارید. فاصلهٔ افقی باید از پهنای هفت روز و فاصلهٔ عمودی از ارتفاع شش هفته و عنوان ماه بیشتر باشد. \tx{1405-\textbackslash m-01} کار می‌کند چون خط‌های تیره نوشته شده‌اند و \cs{m} فقط به‌عنوان عدد خوانده می‌شود؛ اما ماکرویی که کل تاریخ را نگه دارد کار نمی‌کند. چون همهٔ ماه‌ها در یک سال‌اند، \tx{month text} عنوان پیش‌فرض (ماه و سال) را با نام ماه به‌تنهایی عوض می‌کند؛ آن را بعد از \tx{jalali week list} بنویسید، چون آن سبک عنوان خودش را تنظیم می‌کند.
+\begin{latin}\begin{verbatim}
+\begin{tikzpicture}
+\foreach \m in {1,...,12} {
+  \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
+  \pgfmathtruncatemacro\row{div(\m-1,3)}% season
+  \calendar at (-\col*5.8cm, -\row*4.6cm)
+    [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
+     day xshift=-0.75cm, day yshift=0.5cm, jalali month label above centered,
+     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+    if (Friday) [red];
+}
+\end{tikzpicture}
+\end{verbatim}\end{latin}
+\begin{center}
+\begin{tikzpicture}
+\foreach \m in {1,...,12} {
+  \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
+  \pgfmathtruncatemacro\row{div(\m-1,3)}% season
+  \calendar at (-\col*5.8cm, -\row*4.6cm)
+    [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
+     day xshift=-0.75cm, day yshift=0.5cm, jalali month label above centered,
+     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+    if (Friday) [red];
+}
+\end{tikzpicture}
+\end{center}
 
 % ---------------------------------------------------------------------------
 \section{نمونه‌های کاربردی}\label{sec:recipes}
@@ -339,7 +370,7 @@
 \section{تاریخچهٔ نسخه‌ها}\label{sec:history}
 
 \begin{description}
-  \item[منتشرنشده] تغییر نام از \pkg{pcalendar} به \pkg{persian-calendar} به درخواست \lr{CTAN} (فقط نام فایل‌ها و بسته؛ نام فرمان‌ها تغییری نکرده است). رسم جدول ماه‌های شمسی با کتابخانهٔ \tx{calendar} در \pkg{TikZ} (بخش~\ref{sec:tikz}). ذکر مجوز به‌صورت \lr{LPPL 1.3c} در همه‌جا.
+  \item[\lr{0.6 (2026-11-03)}] تغییر نام از \pkg{pcalendar} به \pkg{persian-calendar} به درخواست \lr{CTAN} (فقط نام فایل‌ها و بسته؛ نام فرمان‌ها تغییری نکرده است). رسم جدول ماه‌های شمسی با کتابخانهٔ \tx{calendar} در \pkg{TikZ} (بخش~\ref{sec:tikz}). ذکر مجوز به‌صورت \lr{LPPL 1.3c} در همه‌جا.
   \item[\lr{0.51 (2026-11-01)}] فقط مستندات: راهنماها حالا توضیح می‌دهند که تنها چاپ نام‌های فارسی به موتور یونیکد
     و قلم فارسی نیاز دارد؛ راهنمای فارسی هم بازنویسی شد.
   \item[\lr{0.5 (2026-11-01)}] رفع نشتی شمارنده (چند \cs{newcount} در هر فراخوانی) و شمارندهٔ تعریف‌نشدهٔ طول

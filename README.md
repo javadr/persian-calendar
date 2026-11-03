@@ -36,11 +36,11 @@ Load `persian-calendar` in the preamble. The example below uses `xepersian` and 
 \number\y-\number\m-\number\d         % 1394-1-11
 ```
 
-With `tikz` and `\usetikzlibrary{calendar}` loaded, a Jalali month grid, Saturday to Friday, right to left:
+With `tikz` and `\usetikzlibrary{calendar}` loaded, three Jalali months, Saturday to Friday, right to left:
 
 ```latex
-\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last, jalali week list,
-               day xshift=-3em, month label above centered]
+\tikz\calendar[jalali dates=1405-01-01 to 1405-03-last, jalali week list,
+               day xshift=-3em, jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 ```
 

@@ -51,6 +51,23 @@
     if (jalali equals=1-13) [/utils/exec={\xdef\acc{\acc\pcalendarcurrentday}}];%
   \ASSERT{\acc}{13}
 }
+\newdimen\lab \newdimen\sat \newdimen\fri
+\TEST{jalali month label above centered centres the label over a full week (|offset| < 0.5pt)}{
+  % the label centre must be halfway between the outer edges of Saturday 22 and Friday 28 Farvardin
+  \def\one#1{%
+    \tikz{\calendar (cal) [jalali dates=1405-01-01 to 1405-01-last, jalali week list, day xshift=#1,
+      jalali month label above centered, month code={\node[every month,name=lab]{\tikzmonthtext};}];
+      \pgfextractx\lab{\pgfpointanchor{lab}{center}}%
+      \ifdim#1<0pt
+        \pgfextractx\sat{\pgfpointanchor{cal-2026-04-11}{east}}\pgfextractx\fri{\pgfpointanchor{cal-2026-04-17}{west}}%
+      \else
+        \pgfextractx\sat{\pgfpointanchor{cal-2026-04-11}{west}}\pgfextractx\fri{\pgfpointanchor{cal-2026-04-17}{east}}%
+      \fi
+      \lab=\dimexpr\lab-(\sat+\fri)/2\relax
+      \xdef\r{\ifdim\lab<0.5pt \ifdim\lab>-0.5pt ok\else off\fi\else off\fi}}%
+    \ASSERT{\r}{ok}}%
+  \one{-3em}\one{3em}{\Large\one{-3em}}
+}
 \TEST{inside jalali, day of month= means the Jalali day}{
   \gdef\acc{}%
   \tikz\calendar[dates=2026-03-20 to 2026-03-22, jalali,

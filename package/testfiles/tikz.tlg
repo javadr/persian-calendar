@@ -42,8 +42,39 @@ TEST 7: if (jalali equals=M-D) applies options to that day only
 ============================================================
 PASSED
 ============================================================
+\lab=\dimen...
+\sat=\dimen...
+\fri=\dimen...
 ============================================================
-TEST 8: inside jalali, day of month= means the Jalali day
+TEST 8: jalali month label above centered centres the label over a full week (|offset| < 0.5pt)
+============================================================
+Missing character: There is no ف (U+0641) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ر (U+0631) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no و (U+0648) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ر (U+0631) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no د (U+062F) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ی (U+06CC) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ن (U+0646) in font [lmroman10-regular]:mapping=tex-text;!
+PASSED
+Missing character: There is no ف (U+0641) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ر (U+0631) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no و (U+0648) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ر (U+0631) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no د (U+062F) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ی (U+06CC) in font [lmroman10-regular]:mapping=tex-text;!
+Missing character: There is no ن (U+0646) in font [lmroman10-regular]:mapping=tex-text;!
+PASSED
+Missing character: There is no ف (U+0641) in font [lmroman12-regular]:mapping=tex-text;!
+Missing character: There is no ر (U+0631) in font [lmroman12-regular]:mapping=tex-text;!
+Missing character: There is no و (U+0648) in font [lmroman12-regular]:mapping=tex-text;!
+Missing character: There is no ر (U+0631) in font [lmroman12-regular]:mapping=tex-text;!
+Missing character: There is no د (U+062F) in font [lmroman12-regular]:mapping=tex-text;!
+Missing character: There is no ی (U+06CC) in font [lmroman12-regular]:mapping=tex-text;!
+Missing character: There is no ن (U+0646) in font [lmroman12-regular]:mapping=tex-text;!
+PASSED
+============================================================
+============================================================
+TEST 9: inside jalali, day of month= means the Jalali day
 ============================================================
 PASSED
 ============================================================

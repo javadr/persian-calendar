@@ -137,7 +137,26 @@ puts Saturday on the right. Fridays are red and 13 Farvardin (Sizdah Bedar) is b
 leap month, so it ends on the 30th.}
 \begin{center}
 \tikz\calendar[jalali dates=1403-12-01 to 1404-01-last, jalali week list, day xshift=-2.5em,
-  month label above centered] if (Friday) [red] if (jalali equals=1-13) [blue];
+  jalali month label above centered] if (Friday) [red] if (jalali equals=1-13) [blue];
+\end{center}
+
+\clearpage
+\subsection*{\lr{10. A year by season}}
+\note{One \texttt{\textbackslash calendar} per month in a \texttt{\textbackslash foreach}, placed with
+\texttt{at}: each season is a row of three months, read right to left. The labels show the month name only (\texttt{month text}), since all months are in 1405.
+1405 is not a leap year, so Esfand ends on the 29th.}
+\begin{center}
+\begin{tikzpicture}
+\foreach \m in {1,...,12} {
+  \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
+  \pgfmathtruncatemacro\row{div(\m-1,3)}% season
+  \calendar at (-\col*6.2cm, -\row*5cm)
+    [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
+     day xshift=-0.8cm, day yshift=0.55cm, jalali month label above centered,
+     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+    if (Friday) [red];
+}
+\end{tikzpicture}
 \end{center}
 
 \subsection*{\lr{Limits}}
