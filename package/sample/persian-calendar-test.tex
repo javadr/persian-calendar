@@ -159,6 +159,18 @@ leap month, so it ends on the 30th.}
 \end{tikzpicture}
 \end{center}
 
+\clearpage
+\subsection*{\lr{11. A boxed grid with weekday initials}}
+\note{\texttt{jalali day boxes} draws each day as a box one step wide and high, so the boxes join into a
+grid, and empty boxes complete the first and last weeks; \texttt{jalali weekday initials} adds the initials above each month. Fridays are filled through their
+\texttt{every day} style.}
+\begin{center}
+\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list,
+  jalali day boxes, jalali weekday initials,
+  day xshift=-0.9cm, day yshift=0.7cm, jalali month label above centered]
+  if (Friday) [red, every day/.append style={fill=red!10}];
+\end{center}
+
 \subsection*{\lr{Limits}}
 \note{The date arguments must be literal \texttt{Y-M-D} text. A macro holding a date, such as
 \texttt{\textbackslash pdate\{\textbackslash mydate\}}, is not expanded and fails. The Jalali leap rule is the

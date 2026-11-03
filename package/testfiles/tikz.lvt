@@ -56,7 +56,7 @@
   % the label centre must be halfway between the outer edges of Saturday 22 and Friday 28 Farvardin
   \def\one#1{%
     \tikz{\calendar (cal) [jalali dates=1405-01-01 to 1405-01-last, jalali week list, day xshift=#1,
-      jalali month label above centered, month code={\node[every month,name=lab]{\tikzmonthtext};}];
+      jalali month label above centered, month text={Farvardin}, month code={\node[every month,name=lab]{\tikzmonthtext};}];
       \pgfextractx\lab{\pgfpointanchor{lab}{center}}%
       \ifdim#1<0pt
         \pgfextractx\sat{\pgfpointanchor{cal-2026-04-11}{east}}\pgfextractx\fri{\pgfpointanchor{cal-2026-04-17}{west}}%
@@ -67,6 +67,61 @@
       \xdef\r{\ifdim\lab<0.5pt \ifdim\lab>-0.5pt ok\else off\fi\else off\fi}}%
     \ASSERT{\r}{ok}}%
   \one{-3em}\one{3em}{\Large\one{-3em}}
+}
+\newdimen\ya \newdimen\yb
+% Latin stand-ins: the test font has no Persian letters
+\def\pcalendarweekdayshortname#1{w#1}
+% \NEAR\result{dimen}{target}: \result is `ok' when the two are within 0.05pt
+\def\NEAR#1#2#3{\dimen@=\dimexpr#2-(#3)\relax\ifdim\dimen@<0pt \dimen@=-\dimen@\fi
+  \ifdim\dimen@<0.05pt \gdef#1{ok}\else\xdef#1{off(\the\dimexpr#2\relax)}\fi}
+\TEST{jalali day boxes: one step wide and high, neighbours share one border line (anchors include the 0.4pt line)}{
+  \tikz{\calendar (cal) [jalali dates=1405-01-22 to 1405-01-23, jalali week list, jalali day boxes,
+      day xshift=-1cm, day yshift=0.6cm];
+    \pgfextractx\sat{\pgfpointanchor{cal-2026-04-11}{east}}\pgfextractx\fri{\pgfpointanchor{cal-2026-04-11}{west}}%
+    \advance\sat by-\fri \NEAR\r\sat{1cm+0.4pt}%
+    \pgfextracty\ya{\pgfpointanchor{cal-2026-04-11}{north}}\pgfextracty\yb{\pgfpointanchor{cal-2026-04-11}{south}}%
+    \advance\ya by-\yb \NEAR\s\ya{0.6cm+0.4pt}%
+    \pgfextractx\ya{\pgfpointanchor{cal-2026-04-12}{east}}\advance\ya by-\fri \NEAR\t\ya{0.4pt}}%
+  \ASSERT{\r}{ok}\ASSERT{\s}{ok}\ASSERT{\t}{ok}
+}
+\TEST{jalali month label above centered centres over a row of boxes (|offset| < 0.5pt)}{
+  \tikz{\calendar (cal) [jalali dates=1405-01-01 to 1405-01-last, jalali week list, jalali day boxes,
+      day xshift=-1cm, day yshift=0.6cm, jalali month label above centered,
+      month text={Farvardin}, month code={\node[every month,name=lab]{\tikzmonthtext};}];
+    \pgfextractx\lab{\pgfpointanchor{lab}{center}}%
+    \pgfextractx\sat{\pgfpointanchor{cal-2026-04-11}{east}}\pgfextractx\fri{\pgfpointanchor{cal-2026-04-17}{west}}%
+    \lab=\dimexpr\lab-(\sat+\fri)/2\relax
+    \xdef\r{\ifdim\lab<0.5pt \ifdim\lab>-0.5pt ok\else off\fi\else off\fi}}%
+  \ASSERT{\r}{ok}
+}
+\TEST{jalali weekday initials: seven initials per month, one row above the first week}{
+  \newcount\n \n=0
+  \tikz{\calendar (cal) [jalali dates=1405-01-01 to 1405-02-last, jalali week list, jalali weekday initials,
+      day yshift=0.6cm, every jalali weekday/.append style={/utils/exec={\global\advance\n 1}},
+      month code={}];}%
+  \ASSERT{\the\n}{14}
+}
+\TEST{with boxes and initials a new month starts at least four rows below an unfinished week}{
+  % 31 Farvardin 1405 is a Monday, so its week is unfinished; month yshift is far too small on purpose
+  \tikz{\calendar (cal) [jalali dates=1405-01-31 to 1405-02-01, jalali week list, jalali day boxes,
+      jalali weekday initials, day yshift=0.6cm, month yshift=1pt];
+    \pgfextracty\ya{\pgfpointanchor{cal-2026-04-20}{base}}\pgfextracty\yb{\pgfpointanchor{cal-2026-04-21}{base}}%
+    \advance\ya by-\yb \NEAR\r\ya{2.4cm}}%
+  \ASSERT{\r}{ok}
+}
+\TEST{jalali day boxes fill every month to whole weeks with empty boxes}{
+  % Farvardin 1405: Saturday to Monday, 5 weeks; Ordibehesht: Tuesday to Wednesday, 5 weeks
+  \n=0 \tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list, jalali day boxes,
+    every day/.append style={/utils/exec={\global\advance\n 1}}, month code={}];%
+  \ASSERT{\the\n}{70}
+  % a range that starts on a Wednesday and ends on a Sunday is padded to two whole weeks too
+  \n=0 \tikz\calendar[jalali dates=1405-01-05 to 1405-01-09, jalali week list, jalali day boxes,
+    every day/.append style={/utils/exec={\global\advance\n 1}}];%
+  \ASSERT{\the\n}{14}
+  % without boxes nothing is added
+  \n=0 \tikz\calendar[jalali dates=1405-01-05 to 1405-01-09, jalali week list,
+    every day/.append style={/utils/exec={\global\advance\n 1}}];%
+  \ASSERT{\the\n}{5}
 }
 \TEST{inside jalali, day of month= means the Jalali day}{
   \gdef\acc{}%

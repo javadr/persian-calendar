@@ -290,6 +290,36 @@ offset and so leaves it slightly off centre. This one measures a two-digit day (
 font and adds the inner sep of the day nodes, so the label is centred over the week at any font size.
 It assumes the library's default \texttt{every day} anchor (\texttt{base east}).
 
+\macro|jalali day boxes|
+Draws every day as a box one day step wide (\texttt{day xshift}) and high (\texttt{day yshift}), so the boxes
+join into a grid. With \texttt{jalali week list}, empty boxes fill the days before the first and after the last
+day of each month (or of the range), so every month is a full rectangle of whole weeks. The text height and depth are fixed in \texttt{ex}, so all rows are level at any font size.
+\texttt{jalali month label above centered} then centres over the boxes. To fill some days, append to their
+\texttt{every day} style, as in the example below; a plain \texttt{fill=} in \texttt{if (\ldots)} does not
+reach the box.
+
+\macro|jalali weekday initials|
+Adds a row of weekday initials (\pcalendarweekdayshortname{0}, \pcalendarweekdayshortname{1}, \ldots,
+\pcalendarweekdayshortname{6}, from \cs{pcalendarweekdayshortname}) one row above each month, in boxes
+when \texttt{jalali day boxes} is on. It works with \texttt{jalali week list}, and the month label moves
+up above it. Style the initials with \texttt{every jalali weekday}, for example
+\texttt{every jalali weekday/.style=\{font=\textbackslash bfseries\}}.
+
+With either key, a new month starts at least three rows (four with initials) below the previous one,
+however small \texttt{month yshift} is, so an unfinished last week never runs into the next label.
+\begin{verbatim}
+\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list,
+  jalali day boxes, jalali weekday initials,
+  day xshift=-0.9cm, day yshift=0.7cm, jalali month label above centered]
+  if (Friday) [red, every day/.append style={fill=red!10}];
+\end{verbatim}
+\begin{center}
+\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list,
+  jalali day boxes, jalali weekday initials,
+  day xshift=-0.9cm, day yshift=0.7cm, jalali month label above centered]
+  if (Friday) [red, every day/.append style={fill=red!10}];
+\end{center}
+
 \macro|jalali equals=M-D|
 A date test that matches one Jalali month and day in every year, for example \texttt{jalali equals=1-1}
 for Nowruz. It can be used in \texttt{if (\ldots)} and with \cs{pgfcalendarifdate}, also outside
@@ -446,6 +476,10 @@ and the others in front of every day, ahead of the library's own per-day code, a
     weekday names; draw it yourself if you need one.
   \item \textbf{\texttt{jalali dates} and \texttt{dates}} set the same range, so the later one wins. The
     dates of \texttt{jalali dates} must be literal, like those of \cs{pdate}.
+  \item \textbf{Boxes and labels assume right-aligned days.} \texttt{jalali day boxes} and
+    \texttt{jalali month label above centered} expect the library's default \texttt{every day} anchor
+    (\texttt{base east}). The initials are one style for all seven days, so a Friday initial cannot be
+    coloured on its own.
   \item \textbf{TikZ internals.} \texttt{jalali} adds its code to the library's internal macro
     \cs{tikz@before@day}. A future \pkg{TikZ} that renames it would break the Jalali calendars; the
     regression test \texttt{tikz.lvt} would catch it.
@@ -457,6 +491,7 @@ and the others in front of every day, ahead of the library's own per-day code, a
 \section{Version history}\label{sec:version11}
 
 \begin{description}
+  \item[0.61 (2026-11-03)] \texttt{jalali day boxes} (a grid of boxes) and \texttt{jalali weekday initials}.
   \item[0.6 (2026-11-03)] Renamed from \pkg{pcalendar} to \pkg{persian-calendar} at the request of CTAN (file
     and package names only, the macros keep their names). Jalali month grids with the \pkg{TikZ}
     \texttt{calendar} library (section~\ref{sec:tikz}). License stated as LPPL 1.3c everywhere.

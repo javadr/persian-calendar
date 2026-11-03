@@ -44,6 +44,8 @@ With `tikz` and `\usetikzlibrary{calendar}` loaded, three Jalali months, Saturda
   if (Friday) [red] if (jalali equals=1-13) [blue];
 ```
 
+Add `jalali day boxes` for a grid of boxes and `jalali weekday initials` for a row of weekday initials above each month.
+
 The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/persian-calendar-doc.tex`](package/doc/persian-calendar-doc.tex)) and Persian ([`package/doc/persian-calendar-doc-fa.tex`](package/doc/persian-calendar-doc-fa.tex)). `package/sample/persian-calendar-test.tex` shows every macro with its output.
 
 ## Installation

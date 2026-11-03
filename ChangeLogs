@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.61 ## Nov 3, 2026
+%% added jalali day boxes (a full grid of boxes, empty boxes complete the first and last weeks) and jalali weekday initials for TikZ calendars
 %% ver 0.6 ## Nov 3, 2026
 %% removed the e-mail address from the package, manuals and README
 %% manuals and sample: a year by season, one row of three Jalali months per season

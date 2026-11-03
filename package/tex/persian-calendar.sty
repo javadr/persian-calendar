@@ -21,7 +21,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \def\pcalendardate{2026/11/03}
-\def\pcalendarversion{0.6}
+\def\pcalendarversion{0.61}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -454,6 +454,45 @@
     \edef\pcalendarcurrentweekday{\the\pcal@temp}}%
 \def\pcal@iflast#1{\pgfutil@in@{last}{#1}}%
 \def\pcal@ifdatejalali{\pcal@tojalali\pgfcalendarifdateyear\pgfcalendarifdatemonth\pgfcalendarifdateday}%
+\newif\ifpcal@boxes \newif\ifpcal@initials
+% One cell: #1 node options, #2 text. A box is one day step wide and high, its right edge on the day's
+% position like a plain day (anchor base east); fixed text height and depth keep the rows level.
+\def\pcal@cell#1#2{\ifpcal@boxes
+    \node[every day,draw,anchor=base east,inner sep=0pt,text height=1.6ex,text depth=.4ex,
+      minimum width={abs(\tikz@lib@cal@xshift)},minimum height={abs(\tikz@lib@cal@yshift)},#1]{#2};%
+  \else\node[every day,#1]{#2};\fi}%
+% Drop to a new month: at least three rows (four with initials) so the label and the initials fit
+% below an unfinished last week; only with boxes or initials, so plain lists keep `month yshift'.
+\def\pcal@nextmonth{\pgfmathsetlength{\pgf@y}{\tikz@lib@cal@month@yshift}%
+    \ifpcal@boxes\pcal@roomfornext\else\ifpcal@initials\pcal@roomfornext\fi\fi
+    \pgftransformyshift{-\pgf@y}}%
+\def\pcal@roomfornext{\pgfmathsetlength{\pgf@ya}{\tikz@lib@cal@yshift}%
+    \ifpcal@initials\pgf@ya=4\pgf@ya\else\pgf@ya=3\pgf@ya\fi
+    \ifdim\pgf@y<\pgf@ya\pgf@y=\pgf@ya\fi}%
+% Empty boxes before the first day and after the last day of a month (or of the calendar's range),
+% so every month is a full rectangle. Runs at the start of the row, before the day is placed.
+\newcount\pcal@lo \newcount\pcal@hi \newif\ifpcal@last
+\def\pcal@pad{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}\edef\pcal@step{\the\pgf@x}%
+    \pcal@lo=0 \pcal@hi=\pcalendarcurrentweekday\advance\pcal@hi by -1
+    \ifnum\pcalendarcurrentday=1 \pcal@padrow\else
+      \ifnum\pgfcalendarcurrentjulian=\pgfcalendarbeginjulian\relax\pcal@padrow\fi\fi
+    \pcal@checklast
+    \ifpcal@last\pcal@lo=\pcalendarcurrentweekday\advance\pcal@lo by 1 \pcal@hi=6 \pcal@padrow\fi}%
+\def\pcal@padrow{\pcal@padcell0\pcal@padcell1\pcal@padcell2\pcal@padcell3\pcal@padcell4\pcal@padcell5\pcal@padcell6}%
+\def\pcal@padcell#1{\ifnum#1<\pcal@lo\else\ifnum#1>\pcal@hi\else
+    {\pgf@x=#1\dimexpr\pcal@step\relax\pgftransformxshift{\pgf@x}\pcal@cell{}{}}\fi\fi}%
+% \ifpcal@last: the day is the last of its Jalali month (tomorrow is the 1st) or of the calendar.
+\def\pcal@checklast{\pcal@lastfalse
+    \ifnum\pgfcalendarcurrentjulian=\pgfcalendarendjulian\relax\pcal@lasttrue\else
+      {\pgfutil@tempcnta=\pgfcalendarcurrentjulian\advance\pgfutil@tempcnta by 1
+       \pgfcalendarjuliantodate{\pgfutil@tempcnta}\pcal@ny\pcal@nm\pcal@nd
+       \pcal@tojalali\pcal@ny\pcal@nm\pcal@nd\ifnum\pcal@jd=1 \global\pcal@lasttrue\fi}\fi}%
+% The row of initials, one day step above the first week, Saturday in column 0.
+\def\pcal@initials{{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}\edef\pcal@step{\the\pgf@x}%
+    \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgftransformyshift{\pgf@y}%
+    \pcal@initial0\pcal@initial1\pcal@initial2\pcal@initial3\pcal@initial4\pcal@initial5\pcal@initial6}}%
+\def\pcal@initial#1{{\pgf@x=#1\dimexpr\pcal@step\relax\pgftransformxshift{\pgf@x}%
+    \pcal@cell{every jalali weekday}{\pcalendarweekdayshortname{#1}}}}%
 \pgfkeys{%
   /pgf/calendar/jalali day of month/.code={\pcal@ifdatejalali\ifnum#1=\pcal@jd\relax\pgfcalendarmatchestrue\fi},
   /pgf/calendar/jalali equals/.code args={#1-#2}{\pcal@ifdatejalali
@@ -475,23 +514,37 @@
       /tikz/month text={\pcalendarmonthname{\pcalendarcurrentmonth}\space\pcalendarcurrentyear}}},
   % Like TikZ's `week list', but weeks run Saturday to Friday. Use a negative `day xshift' for right to left.
   /tikz/jalali week list/.style={jalali,
-    execute before day scope={\ifdate{day of month=1}{\ifdate{equals=\pgfcalendarbeginiso}{}{%
-      \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@month@yshift}\pgftransformyshift{-\pgf@y}}}{}},
+    execute before day scope={\ifdate{day of month=1}{\ifdate{equals=\pgfcalendarbeginiso}{}{\pcal@nextmonth}%
+      \ifpcal@initials\pcal@initials\fi}{}%
+      \ifpcal@boxes\pcal@pad\fi},
     execute at begin day scope={\pgfmathsetlength\pgf@x{\tikz@lib@cal@xshift}%
       \pgf@x=\pcalendarcurrentweekday\pgf@x\pgftransformxshift{\pgf@x}},
     execute after day scope={\ifdate{Friday}{\pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgftransformyshift{-\pgf@y}}{}},
     tikz@lib@cal@width=7},
+  % Each day is a box one day step wide and high, so the boxes join into a grid.
+  /tikz/jalali day boxes/.code={\pcal@boxestrue
+    \pgfkeysalso{/tikz/day code={\pcal@cell{name=\pgfcalendarsuggestedname}{\tikzdaytext}}}},
+  % A row of weekday initials above each month (with `jalali week list').
+  /tikz/jalali weekday initials/.code={\pcal@initialstrue},
+  /tikz/every jalali weekday/.style={},
   % Like TikZ's `month label above centered', but centred on the days: the shift is half the width of
   % `30' in the current font plus the inner sep of a day node, not a fixed 1.5ex, so it follows the font size.
   /tikz/jalali month label above centered/.style={
     execute before day scope={\ifdate{day of month=1}{{%
       \pgfmathsetlength{\pgf@xa}{\tikz@lib@cal@xshift}%
       \pgf@xb=\tikz@lib@cal@width\pgf@xa\advance\pgf@xb by-\pgf@xa\pgf@xb=.5\pgf@xb
-      \pgfinterruptpicture\global\setbox\pgfutil@tempboxa\hbox{30}\endpgfinterruptpicture % TikZ draws in \nullfont
-      \advance\pgf@xb by-.5\wd\pgfutil@tempboxa
-      \pgfmathsetlength{\pgf@xa}{\pgfkeysvalueof{/pgf/inner xsep}}\advance\pgf@xb by-\pgf@xa
+      \ifpcal@boxes % a box is one step wide and ends at the day's position
+        \ifdim\pgf@xa<0pt \advance\pgf@xb by.5\pgf@xa\else\advance\pgf@xb by-.5\pgf@xa\fi
+      \else
+        \pgfinterruptpicture\global\setbox\pgfutil@tempboxa\hbox{30}\endpgfinterruptpicture % TikZ draws in \nullfont
+        \advance\pgf@xb by-.5\wd\pgfutil@tempboxa
+        \pgfmathsetlength{\pgf@xa}{\pgfkeysvalueof{/pgf/inner xsep}}\advance\pgf@xb by-\pgf@xa
+      \fi
       \pgftransformxshift{\pgf@xb}%
-      \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgftransformyshift{1.25\pgf@y}%
+      \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgf@ya=1.25\pgf@y
+      \ifpcal@initials\advance\pgf@ya by\pgf@y\fi % above the row of initials
+      \ifpcal@boxes\advance\pgf@ya by.25\pgf@y\fi % clear of the box tops
+      \pgftransformyshift{\pgf@ya}%
       \tikzmonthcode}}{}},
     every month/.append style={anchor=base}}}%
 \endinput
