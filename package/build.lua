@@ -1,8 +1,8 @@
-module = "pcalendar"
+module = "persian-calendar"
 
 sourcefiledir = "tex"
 docfiledir    = "doc"
-sourcefiles   = {"pcalendar.sty"}
+sourcefiles   = {"persian-calendar.sty"}
 installfiles  = {"*.sty"}
 
 -- the package output is plain numbers, so one engine is enough

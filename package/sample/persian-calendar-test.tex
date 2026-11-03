@@ -1,9 +1,9 @@
-% Sample for pcalendar: every line shows the call (in monospace) followed by what it prints.
+% Sample for persian-calendar: every line shows the call (in monospace) followed by what it prints.
 % Build: make test   (XeLaTeX; xepersian and the font Parisa are needed only to print the Persian text)
 \documentclass[12pt]{article}
 
 \usepackage[a4paper,margin=2cm]{geometry}
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \usepackage{pgffor}
 \usepackage{xepersian}
 
@@ -36,9 +36,9 @@
 \begin{document}
 \setLTR % the explanations are English; only the results are Persian
 
-\section*{\lr{pcalendar: sample and manual test}}
+\section*{\lr{persian-calendar: sample and manual test}}
 
-\note{pcalendar converts dates between the Persian (Jalali) and Gregorian calendars and provides
+\note{persian-calendar converts dates between the Persian (Jalali) and Gregorian calendars and provides
 Persian month, weekday and year names. Each line below shows the call, an arrow, and the typeset result.
 Only printing the Persian text needs a Unicode engine and a Persian font; this sample uses XeLaTeX with
 \texttt{xepersian}. The conversions themselves work with any engine.}

@@ -1,6 +1,6 @@
 \documentclass{article}
 \input{regression-test}
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \makeatletter
 % \G2J{greg}{jalali} / \J2G{jalali}{greg}: run the internal macro, compare the result registers
 \def\gdmy{\the\pcal@gy-\the\pcal@gm-\the\pcal@gd}

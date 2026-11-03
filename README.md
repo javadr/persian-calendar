@@ -1,4 +1,4 @@
-# pcalendar
+# persian-calendar
 
 A LaTeX package for the Persian (Jalali, Solar Hijri) calendar. It converts dates between the Persian and Gregorian calendars, prints dates with Persian month names, gives day numbers for date arithmetic, and provides Persian month, weekday and year-animal names. It is built on `pgfcalendar`. The date conversions work with any engine (pdfLaTeX, XeLaTeX, LuaLaTeX); printing the Persian names needs a Unicode engine and a Persian font, for example XeLaTeX with `xepersian`.
 
@@ -6,10 +6,10 @@ It is a date converter and a set of name tables. It does not typeset a month gri
 
 ## Usage
 
-Load `pcalendar` in the preamble. The example below uses `xepersian` and a Persian font so that the Persian names print; any setup that can typeset Persian works. The numeric macros (`\pisodate`, `\gisodate`, the Julian day macros) need nothing else.
+Load `persian-calendar` in the preamble. The example below uses `xepersian` and a Persian font so that the Persian names print; any setup that can typeset Persian works. The numeric macros (`\pisodate`, `\gisodate`, the Julian day macros) need nothing else.
 
 ```latex
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \usepackage{xepersian}
 \settextfont{Parisa}
 ```
@@ -36,11 +36,11 @@ Load `pcalendar` in the preamble. The example below uses `xepersian` and a Persi
 \number\y-\number\m-\number\d         % 1394-1-11
 ```
 
-The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/pcalendar-doc.tex`](package/doc/pcalendar-doc.tex)) and Persian ([`package/doc/pcalendar-doc-fa.tex`](package/doc/pcalendar-doc-fa.tex)). `package/sample/pcalendar-test.tex` shows every macro with its output.
+The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/persian-calendar-doc.tex`](package/doc/persian-calendar-doc.tex)) and Persian ([`package/doc/persian-calendar-doc-fa.tex`](package/doc/persian-calendar-doc-fa.tex)). `package/sample/persian-calendar-test.tex` shows every macro with its output.
 
 ## Installation
 
-Copy `package/tex/pcalendar.sty` into a directory TeX searches, for example `texmf/tex/latex/pcalendar/`, and run `mktexlsr`. `make dev` does this for you. You can also keep `pcalendar.sty` next to your document.
+Copy `package/tex/persian-calendar.sty` into a directory TeX searches, for example `texmf/tex/latex/persian-calendar/`, and run `mktexlsr`. `make dev` does this for you. You can also keep `persian-calendar.sty` next to your document.
 
 ## Limitations
 
@@ -61,7 +61,7 @@ The `Makefile` has these targets:
 | `make doc` | builds the English and Persian manuals |
 | `make readme` | regenerates the CTAN `README` from the version and date in the package |
 | `make dev` | installs the package into the local TeX tree (uses `sudo`) |
-| `make ctan` | builds `pcalendar.zip` for upload: `README`, `tex/` and `doc/` |
+| `make ctan` | builds `persian-calendar.zip` for upload: `README`, `tex/` and `doc/` |
 | `make clean` | removes build files |
 
 The package itself needs only `pgf`. The samples and manuals typeset Persian text, so they need XeLaTeX, `xepersian` and the Parisa font; the Persian manual also uses XB Niloofar.
@@ -70,7 +70,7 @@ The tests in `package/testfiles/` are `l3build` test files. They check known dat
 
 ### Releasing
 
-Change `\pcalendardate` and `\pcalendarversion` at the top of `package/tex/pcalendar.sty`, add an entry to `ChangeLogs`, then run `make readme` and `make ctan`. The `Makefile` reads the version and date from those two macros. The CTAN `package/README` is generated, so do not edit it by hand; this `README.md` is for GitHub and is not part of the CTAN archive.
+Change `\pcalendardate` and `\pcalendarversion` at the top of `package/tex/persian-calendar.sty`, add an entry to `ChangeLogs`, then run `make readme` and `make ctan`. The `Makefile` reads the version and date from those two macros. The CTAN `package/README` is generated, so do not edit it by hand; this `README.md` is for GitHub and is not part of the CTAN archive.
 
 ## License
 

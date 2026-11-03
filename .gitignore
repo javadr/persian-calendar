@@ -32,5 +32,5 @@ graphify-out/
 /package/build/
 
 # CTAN release archive
-/pcalendar.zip
+/persian-calendar.zip
 /package/doc/*.pdf

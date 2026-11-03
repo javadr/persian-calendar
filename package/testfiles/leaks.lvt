@@ -1,6 +1,6 @@
 \documentclass{article}
 \input{regression-test}
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \makeatletter
 \newcount\iter \newcount\jd \newcount\before
 \begin{document}

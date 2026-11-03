@@ -1,8 +1,8 @@
-% Documentation of the pcalendar package. Build: make doc   (XeLaTeX, font Parisa)
+% Documentation of the persian-calendar package. Build: make doc   (XeLaTeX, font Parisa)
 \documentclass[11pt]{article}
 
 \usepackage[a4paper,margin=2.5cm]{geometry}
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \usepackage{pgffor}
 \usepackage[colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 \usepackage{xepersian}
@@ -33,7 +33,7 @@
 \fa@wrap\pdate \fa@wrap\gdate \fa@wrap\pcalendarmonthname \fa@wrap\pcalendargregorianmonthname
 \fa@wrap\pcalendarweekdayname \fa@wrap\pcalendarweekdayshortname \fa@wrap\pcalendaryearname
 
-\title{The \pkg{pcalendar} package}
+\title{The \pkg{persian-calendar} package}
 \author{Javad Razavian\\\texttt{javadr@gmail.com}}
 \date{Version \pcalendarversion\quad(\pcalendardate)}
 
@@ -43,7 +43,7 @@
 \maketitle
 
 \begin{abstract}\noindent
-\pkg{pcalendar} converts dates between the Persian (Jalali, Solar Hijri) and Gregorian calendars
+\pkg{persian-calendar} converts dates between the Persian (Jalali, Solar Hijri) and Gregorian calendars
 inside \LaTeX{}. It prints dates with Persian month names, gives day numbers you can do arithmetic
 on, and provides Persian month, weekday and year-animal names. It is built on the \pkg{pgfcalendar}
 package. The conversions work with any engine; printing the Persian names needs a Unicode
@@ -77,15 +77,15 @@ macros \cs{pisodate} and \cs{gisodate}, which print only digits.
 \section{Installation}\label{sec:installation2}
 
 From a TeX distribution that includes the package, nothing needs doing. To install it by hand, copy
-\texttt{pcalendar.sty} into a directory that TeX searches, for example the local tree
-\texttt{texmf/tex/latex/pcalendar/}, and refresh the file database with \texttt{mktexlsr}. In the
-source repository, \texttt{make dev} does this for you. You can also keep \texttt{pcalendar.sty}
+\texttt{persian-calendar.sty} into a directory that TeX searches, for example the local tree
+\texttt{texmf/tex/latex/persian-calendar/}, and refresh the file database with \texttt{mktexlsr}. In the
+source repository, \texttt{make dev} does this for you. You can also keep \texttt{persian-calendar.sty}
 next to your document.
 
 Load the package in the preamble. The examples here use \pkg{xepersian} for the Persian text and load
-\pkg{pcalendar} before it:
+\pkg{persian-calendar} before it:
 \begin{verbatim}
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \usepackage{xepersian}
 \settextfont{Parisa}
 \end{verbatim}

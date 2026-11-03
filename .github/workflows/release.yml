@@ -6,7 +6,7 @@ on:
     tags:
       - 'v*'
   # Rebuild a release without moving the tag: run it from the Actions tab and
-  # give the tag to build (empty = the version declared in pcalendar.sty).
+  # give the tag to build (empty = the version declared in persian-calendar.sty).
   workflow_dispatch:
     inputs:
       ref:
@@ -29,7 +29,7 @@ jobs:
       - name: Resolve release tag
         id: tag
         run: |
-          VERSION=$(sed -n 's/.*pcalendarversion{\([^}]*\)}.*/\1/p' package/tex/pcalendar.sty)
+          VERSION=$(sed -n 's/.*pcalendarversion{\([^}]*\)}.*/\1/p' package/tex/persian-calendar.sty)
           TAG="${{ inputs.ref }}"
           [ -n "$TAG" ] || TAG="${{ github.ref_name }}"
           # Refuse to publish a tag that disagrees with the package version.
@@ -85,6 +85,6 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           files: |
-            package/doc/pcalendar-doc.pdf
-            package/doc/pcalendar-doc-fa.pdf
-            pcalendar.zip
+            package/doc/persian-calendar-doc.pdf
+            package/doc/persian-calendar-doc-fa.pdf
+            persian-calendar.zip

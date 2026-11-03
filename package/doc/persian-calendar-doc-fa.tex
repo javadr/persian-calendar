@@ -1,8 +1,8 @@
-% Persian manual of the pcalendar package. Build: make doc   (XeLaTeX, font XB Niloofar)
+% Persian manual of the persian-calendar package. Build: make doc   (XeLaTeX, font XB Niloofar)
 \documentclass[11pt]{article}
 
 \usepackage[a4paper,margin=2.5cm]{geometry}
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \usepackage{pgffor}
 \usepackage[colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 \usepackage{xepersian}
@@ -30,7 +30,7 @@
 \newcommand\MROW[1]{\mc{#1}&\mc{#1+3}&\mc{#1+6}&\mc{#1+9}}
 \newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}}
 
-\title{بستهٔ \pkg{pcalendar}}
+\title{بستهٔ \pkg{persian-calendar}}
 \author{جواد رضویان\\\tx{javadr@gmail.com}}
 \date{نسخهٔ \lr{\pcalendarversion}\quad(\lr{\pcalendardate})}
 
@@ -39,10 +39,10 @@
 \maketitle
 
 \begin{abstract}\noindent
-\pkg{pcalendar} بسته‌ای برای کار با تقویم هجری شمسی در \lr{\LaTeX} است. با آن می‌توانید تاریخ شمسی را به
+\pkg{persian-calendar} بسته‌ای برای کار با تقویم هجری شمسی در \lr{\LaTeX} است. با آن می‌توانید تاریخ شمسی را به
 میلادی و تاریخ میلادی را به شمسی تبدیل کنید، تاریخ را با نام فارسی ماه‌ها چاپ کنید و به تاریخ‌ها روز
 اضافه کنید یا از آن‌ها روز کم کنید. نام ماه‌ها، روزهای هفته و سال‌های دوازده‌حیوانی هم در همین بسته آماده
-است. \pkg{pcalendar} بر پایهٔ \pkg{pgfcalendar} نوشته شده است. تبدیل تاریخ با هر موتور \TeX{} کار می‌کند؛
+است. \pkg{persian-calendar} بر پایهٔ \pkg{pgfcalendar} نوشته شده است. تبدیل تاریخ با هر موتور \TeX{} کار می‌کند؛
 فقط برای چاپ نام‌های فارسی به موتوری با پشتیبانی یونیکد و یک قلم فارسی نیاز دارید، مثلاً \lr{XeLaTeX}
 همراه با \pkg{xepersian}.
 \end{abstract}
@@ -52,7 +52,7 @@
 % ---------------------------------------------------------------------------
 \section{معرفی}\label{sec:what}
 
-با \pkg{pcalendar} می‌توانید:
+با \pkg{persian-calendar} می‌توانید:
 \begin{itemize}
   \item تاریخ میلادی را به شمسی و تاریخ شمسی را به میلادی تبدیل کنید، چه به‌صورت متن (مثل «۱ فروردین ۱۳۹۴») و چه به‌صورت عدد (مثل ۰۱/۰۱/۱۳۹۴)؛
   \item شمارهٔ روز ژولین یک تاریخ شمسی را بگیرید، چند روز به آن اضافه یا از آن کم کنید و دوباره به تاریخ
@@ -67,11 +67,11 @@
 % ---------------------------------------------------------------------------
 \section{نصب}\label{sec:install}
 
-اگر توزیع \TeX{} شما این بسته را دارد، نیازی به نصب نیست. در غیر این صورت فایل \tx{pcalendar.sty} را در یکی از پوشه‌هایی بگذارید که \TeX{} فایل‌ها را در آن‌ها پیدا می‌کند (مثلاً \tx{texmf/tex/latex/pcalendar/}) و \tx{mktexlsr} را اجرا کنید. اگر مخزن پروژه را دارید، دستور \tx{make dev} همین کار را برایتان می‌کند. اگر هم نمی‌خواهید چیزی نصب کنید، کافی است \tx{pcalendar.sty} را کنار سندتان بگذارید.
+اگر توزیع \TeX{} شما این بسته را دارد، نیازی به نصب نیست. در غیر این صورت فایل \tx{persian-calendar.sty} را در یکی از پوشه‌هایی بگذارید که \TeX{} فایل‌ها را در آن‌ها پیدا می‌کند (مثلاً \tx{texmf/tex/latex/persian-calendar/}) و \tx{mktexlsr} را اجرا کنید. اگر مخزن پروژه را دارید، دستور \tx{make dev} همین کار را برایتان می‌کند. اگر هم نمی‌خواهید چیزی نصب کنید، کافی است \tx{persian-calendar.sty} را کنار سندتان بگذارید.
 
-بسته را در مقدمهٔ سند بارگذاری کنید. در این راهنما برای متن فارسی از \pkg{xepersian} استفاده شده و \pkg{pcalendar} پیش از آن بارگذاری می‌شود:
+بسته را در مقدمهٔ سند بارگذاری کنید. در این راهنما برای متن فارسی از \pkg{xepersian} استفاده شده و \pkg{persian-calendar} پیش از آن بارگذاری می‌شود:
 \begin{latin}\begin{verbatim}
-\usepackage{pcalendar}
+\usepackage{persian-calendar}
 \usepackage{xepersian}
 \settextfont{XB Niloofar}
 \end{verbatim}\end{latin}

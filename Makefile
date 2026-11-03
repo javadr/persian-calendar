@@ -2,7 +2,7 @@
 
 .ONESHELL:
 
-PKG     := pcalendar
+PKG     := persian-calendar
 DIR     := package
 STY     := $(DIR)/tex/$(PKG).sty
 DEMOS   := $(basename $(notdir $(wildcard $(DIR)/sample/*.tex)))
@@ -53,17 +53,17 @@ clean:
 .PHONY: cleanup
 cleanup: clean
 
-# CTAN archive: pcalendar/{README,tex/,doc/}, built from package/, zipped as pcalendar.zip (no version in the name).
+# CTAN archive: persian-calendar/{README,tex/,doc/}, built from package/, zipped as persian-calendar.zip (no version in the name).
 .PHONY: ctan
 ctan: readme doc
 	(cd $(DIR)/sample && for i in 1 2; do \
-	  TEXINPUTS=../tex: xelatex -interaction=nonstopmode -halt-on-error pcalendar-test || exit 1; \
+	  TEXINPUTS=../tex: xelatex -interaction=nonstopmode -halt-on-error persian-calendar-test || exit 1; \
 	done)
 	rm -rf $(PKG) $(PKG).zip
 	mkdir -p $(PKG)/tex $(PKG)/doc
 	cp -v $(DIR)/README $(PKG)
 	cp -v $(STY) $(PKG)/tex
-	cp -v $(DIR)/sample/pcalendar-test.tex $(DIR)/sample/pcalendar-test.pdf $(PKG)/doc
+	cp -v $(DIR)/sample/persian-calendar-test.tex $(DIR)/sample/persian-calendar-test.pdf $(PKG)/doc
 	cp -v $(DIR)/doc/*.tex $(DIR)/doc/*.pdf $(PKG)/doc
 	zip -r $(PKG).zip $(PKG)
 	rm -rf $(PKG)
