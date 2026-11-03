@@ -26,11 +26,12 @@
 \emergencystretch=3em
 \newcount\jd \newcount\wday
 \makeatletter\renewcommand*\l@section{\@dottedtocline{1}{0em}{2.3em}}\makeatother
-% table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four
-\newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\tx{\mm}\quad\pcalendarmonthname{\mm}}
-\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\tx{\yy}\quad\pcalendaryearname{\yy}}
+% table cells for the name lists: \mc{n} month n, \yc{y} year y, each a number cell and a name cell,
+% so both line up in right-to-left tables; \MROW/\YROW{first} fill a row of four/six pairs
+\newcommand\mc[1]{\tx{\number\numexpr#1\relax}&\pcalendarmonthname{\number\numexpr#1\relax}}
+\newcommand\yc[1]{\tx{\number\numexpr#1\relax}&\pcalendaryearname{\number\numexpr#1\relax}}
 \newcommand\MROW[1]{\mc{#1}&\mc{#1+3}&\mc{#1+6}&\mc{#1+9}}
-\newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}}
+\newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}&\yc{#1+12}&\yc{#1+15}}
 
 \title{بستهٔ \pkg{persian-calendar}}
 \author{جواد رضویان}
@@ -165,7 +166,7 @@
 \ex|\pcalendarmonthname{1}|{\pcalendarmonthname{1}}
 \gap
 نام هر دوازده ماه به ترتیب:\gap
-\begin{tabular}{llll}
+\begin{tabular}{*{4}{rr@{\hspace{1.5em}}}}
 \MROW{1}\\
 \MROW{2}\\
 \MROW{3}
@@ -190,11 +191,12 @@
 \ex|\pcalendaryearname{1403}|{\pcalendaryearname{1403}}
 \gap
 حیوان‌های سال به ترتیب، از سال ۱۳۸۰:\gap
-\begin{tabular}{llll}
+{\setlength\tabcolsep{4pt}% six columns fit the text width
+\begin{tabular}{*{6}{rr@{\hspace{1em}}}}
 \YROW{1380}\\
 \YROW{1381}\\
 \YROW{1382}
-\end{tabular}
+\end{tabular}}
 
 \paragraph{روز هفتهٔ یک تاریخ.} فرمان آماده‌ای برای این کار نداریم، اما از روی شمارهٔ روز می‌شود آن را حساب کرد. \pkg{pgfcalendar} دوشنبه را ۰ می‌گیرد و \cs{pcalendarweekdayname} شنبه را؛ پس نتیجه را دو واحد جابه‌جا می‌کنیم:
 \begin{latin}\begin{verbatim}
@@ -219,12 +221,14 @@
 \usepackage{persian-calendar}
 ...
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
-               jalali week list, day xshift=-3em, jalali month label above centered]
+               jalali week list, day xshift=-2.2em, day yshift=2.5ex,
+               jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 \end{verbatim}\end{latin}
 \begin{center}
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
-               jalali week list, day xshift=-3em, jalali month label above centered]
+               jalali week list, day xshift=-2.2em, day yshift=2.5ex,
+               jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 \end{center}
 
@@ -240,6 +244,9 @@
 \macro|jalali month label above centered|
 مثل \tx{month label above centered} کتابخانه، که عنوان را با فاصلهٔ ثابت \tx{1.5ex} جا می‌دهد و برای همین کمی از وسط کنار می‌رود. این سبک پهنای یک روز دورقمی (\tx{30}) را با قلم جاری اندازه می‌گیرد و فاصلهٔ داخلی (\tx{inner sep}) گره‌های روز را هم به آن اضافه می‌کند؛ پس عنوان با هر اندازهٔ قلم درست بالای وسط هفته می‌نشیند. این سبک فرض می‌کند لنگر \tx{every day} همان پیش‌فرض کتابخانه (\tx{base east}) است.
 
+\macro|jalali week columns|
+چیدمان برعکس، مثل \pkg{calxxxx-yyyy}: هر روز هفته یک سطر (شنبه بالا) و بعد از هر جمعه یک ستون تازه؛ پس هر ماه چهار تا شش ستون پهنا دارد. با \tx{day xshift} منفی، هفتهٔ اول سمت راست قرار می‌گیرد. \tx{jalali day boxes} ستون‌های اول و آخر را کامل می‌کند، \tx{jalali weekday initials} حرف‌های روزهای هفته را در ستونی کنار ماه می‌گذارد و \tx{jalali month label above centered} عنوان را بالای وسط ستون‌های همان ماه می‌نشاند. نمونهٔ \tx{persian-calendar-years.tex} با همین کلید تقویم چند سال را، نُه سال در هر صفحهٔ \lr{A4}، چاپ می‌کند؛ کافی است \cs{FirstYear} و \cs{LastYear} را در ابتدای آن تنظیم کنید.
+
 \macro|jalali day boxes|
 هر روز را در خانه‌ای به پهنای یک گام روز (\tx{day xshift}) و به ارتفاع \tx{day yshift} رسم می‌کند تا خانه‌ها به هم بچسبند و جدول بسازند. همراه با \tx{jalali week list}، خانه‌های خالی جای روزهای پیش از روز اول و پس از روز آخر هر ماه (یا بازه) را پر می‌کنند تا هر ماه یک مستطیل کامل از هفته‌های کامل باشد. ارتفاع و عمق متن با واحد \tx{ex} ثابت شده است، پس سطرها با هر اندازهٔ قلم هم‌تراز می‌مانند. در این حالت \tx{jalali month label above centered} عنوان را بالای وسط خانه‌ها می‌گذارد. برای رنگ کردن زمینهٔ برخی روزها، مثل نمونهٔ زیر به سبک \tx{every day} آن‌ها چیزی اضافه کنید؛ \tx{fill=} ساده در \tx{if (...)} به خانه نمی‌رسد.
 
@@ -248,15 +255,17 @@
 
 با هر کدام از این دو کلید، هر ماه دست‌کم سه سطر (با حرف‌های هفته چهار سطر) پایین‌تر از ماه قبل شروع می‌شود، هرچقدر هم \tx{month yshift} کوچک باشد؛ پس هفتهٔ ناتمام آخر ماه هیچ‌وقت روی عنوان ماه بعد نمی‌افتد.
 \begin{latin}\begin{verbatim}
-\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list,
-  jalali day boxes, jalali weekday initials,
-  day xshift=-0.9cm, day yshift=0.7cm, jalali month label above centered]
+\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last,
+  jalali week list, jalali day boxes, jalali weekday initials,
+  day xshift=-0.9cm, day yshift=0.7cm,
+  jalali month label above centered]
   if (Friday) [red, every day/.append style={fill=red!10}];
 \end{verbatim}\end{latin}
 \begin{center}
-\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list,
-  jalali day boxes, jalali weekday initials,
-  day xshift=-0.9cm, day yshift=0.7cm, jalali month label above centered]
+\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last,
+  jalali week list, jalali day boxes, jalali weekday initials,
+  day xshift=-0.9cm, day yshift=0.7cm,
+  jalali month label above centered]
   if (Friday) [red, every day/.append style={fill=red!10}];
 \end{center}
 
@@ -271,9 +280,10 @@
 \foreach \m in {1,...,12} {
   \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
   \pgfmathtruncatemacro\row{div(\m-1,3)}% season
-  \calendar at (-\col*5.8cm, -\row*4.6cm)
+  \calendar at (-\col*5.4cm, -\row*4.6cm)
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
-     day xshift=-0.75cm, day yshift=0.5cm, jalali month label above centered,
+     day xshift=-0.7cm, day yshift=0.5cm,
+     jalali month label above centered,
      month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
     if (Friday) [red];
 }
@@ -284,12 +294,51 @@
 \foreach \m in {1,...,12} {
   \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
   \pgfmathtruncatemacro\row{div(\m-1,3)}% season
-  \calendar at (-\col*5.8cm, -\row*4.6cm)
+  \calendar at (-\col*5.4cm, -\row*4.6cm)
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
-     day xshift=-0.75cm, day yshift=0.5cm, jalali month label above centered,
+     day xshift=-0.7cm, day yshift=0.5cm,
+     jalali month label above centered,
      month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
     if (Friday) [red];
 }
+\end{tikzpicture}
+\end{center}
+
+\paragraph{تقویم چند سال.} سند \pkg{calxxxx-yyyy} در \lr{CTAN} تقویم میلادی چند سال را چاپ می‌کند: نُه سال در هر صفحه، هر سال در چهار سطر سه‌ماهه، و هر ماه با یک ستون برای هر هفته و یک سطر برای هر روز هفته. \tx{jalali week columns} همین چیدمان را برای ماه‌های شمسی می‌سازد و نمونهٔ \tx{persian-calendar-years.tex}، که همراه بسته است، معادل شمسی \pkg{calxxxx-yyyy} است: \cs{FirstYear} و \cs{LastYear} را در ابتدای آن تنظیم کنید (مثلاً \tx{1405} و \tx{1413}) و آن را با \lr{XeLaTeX} اجرا کنید. کنار هر سال نام حیوان آن (\cs{pcalendaryearname}) هم می‌آید. کد زیر یک سال را رسم می‌کند؛ نمونه آن را در یک ماکرو می‌گذارد و روی سال‌ها می‌چرخد، سه سال در هر سطر:
+\begin{latin}\begin{verbatim}
+\begin{tikzpicture}[font=\tiny]
+  \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
+    {1405\quad\pcalendaryearname{1405}};
+  \foreach \m in {1,...,12} {
+    \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
+    \pgfmathtruncatemacro\row{div(\m-1,3)}% season
+    \calendar at (-\col*2.15cm, -0.55cm-\row*2.1cm)
+      [jalali dates=1405-\m-01 to 1405-\m-last,
+       jalali week columns, jalali weekday initials,
+       day xshift=-0.3cm, day yshift=0.235cm,
+       jalali month label above centered,
+       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       every jalali weekday/.style={gray}]
+      if (Friday) [red];
+  }
+\end{tikzpicture}
+\end{verbatim}\end{latin}
+\begin{center}
+\begin{tikzpicture}[font=\tiny]
+  \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
+    {1405\quad\pcalendaryearname{1405}};
+  \foreach \m in {1,...,12} {
+    \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
+    \pgfmathtruncatemacro\row{div(\m-1,3)}% season
+    \calendar at (-\col*2.15cm, -0.55cm-\row*2.1cm)
+      [jalali dates=1405-\m-01 to 1405-\m-last,
+       jalali week columns, jalali weekday initials,
+       day xshift=-0.3cm, day yshift=0.235cm,
+       jalali month label above centered,
+       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       every jalali weekday/.style={gray}]
+      if (Friday) [red];
+  }
 \end{tikzpicture}
 \end{center}
 
@@ -380,7 +429,7 @@
   \item \textbf{شمارنده‌های مشترک.} هر تبدیل شمارنده‌های نتیجه را از نو می‌نویسد، همان‌طور که در
     بخش~\ref{sec:julian} گفته شد.
   \item \textbf{نام سال} فقط برای ۰ تا ۲۰۹۹ کار می‌کند.
-  \item \textbf{چیدمان‌های \lr{TikZ}.} فقط \tx{jalali week list} و سبک‌های \tx{day list} از ماه‌های شمسی پیروی می‌کنند؛ \tx{week list} و \tx{month list} کتابخانه میلادی می‌مانند. سطری برای نام روزهای هفته ساخته نمی‌شود؛ اگر لازم دارید، خودتان آن را رسم کنید.
+  \item \textbf{چیدمان‌های \lr{TikZ}.} فقط \tx{jalali week list}، \tx{jalali week columns} و سبک‌های \tx{day list} از ماه‌های شمسی پیروی می‌کنند؛ \tx{week list} و \tx{month list} کتابخانه میلادی می‌مانند.
   \item \textbf{\tx{jalali dates} و \tx{dates}} هر دو یک بازه را تنظیم می‌کنند، پس هر کدام که بعدتر بیاید اعمال می‌شود. تاریخ‌های \tx{jalali dates} هم مثل ورودی \cs{pdate} باید خودِ تاریخ باشند.
   \item \textbf{خانه‌ها و عنوان روزهای راست‌چین را فرض می‌کنند.} \tx{jalali day boxes} و \tx{jalali month label above centered} لنگر پیش‌فرض \tx{every day} کتابخانه (\tx{base east}) را فرض می‌کنند. حرف‌های روزهای هفته همه یک سبک دارند، پس نمی‌شود فقط حرف جمعه را رنگی کرد.
   \item \textbf{وابستگی به جزئیات داخلی \lr{TikZ}.} \tx{jalali} کد خود را به ماکروی داخلی \cs{tikz@before@day} کتابخانه اضافه می‌کند. اگر نسخهٔ آیندهٔ \pkg{TikZ} نام آن را عوض کند، تقویم‌های شمسی از کار می‌افتند؛ آزمون \tx{tikz.lvt} این را نشان می‌دهد.
@@ -391,6 +440,7 @@
 \section{تاریخچهٔ نسخه‌ها}\label{sec:history}
 
 \begin{description}
+  \item[\lr{0.62 (2026-11-04)}] \tx{jalali week columns} و نمونهٔ \tx{persian-calendar-years.tex}.
   \item[\lr{0.61 (2026-11-03)}] \tx{jalali day boxes} (جدول خانه‌دار) و \tx{jalali weekday initials} (حرف اول روزهای هفته).
   \item[\lr{0.6 (2026-11-03)}] تغییر نام از \pkg{pcalendar} به \pkg{persian-calendar} به درخواست \lr{CTAN} (فقط نام فایل‌ها و بسته؛ نام فرمان‌ها تغییری نکرده است). رسم جدول ماه‌های شمسی با کتابخانهٔ \tx{calendar} در \pkg{TikZ} (بخش~\ref{sec:tikz}). ذکر مجوز به‌صورت \lr{LPPL 1.3c} در همه‌جا.
   \item[\lr{0.51 (2026-11-01)}] فقط مستندات: راهنماها حالا توضیح می‌دهند که تنها چاپ نام‌های فارسی به موتور یونیکد

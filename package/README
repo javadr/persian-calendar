@@ -1,12 +1,12 @@
 _____________________
 The persian-calendar package
-v0.61
+v0.62
 
 Provides Persian (Jalali) calendar support for LaTeX: conversion between
 Jalali and Gregorian dates, Persian month, weekday and year names,
 and Julian-day arithmetic on top of pgfcalendar.
 
-Release Date of the Current Version: 2026/11/03
+Release Date of the Current Version: 2026/11/04
 ___________________
 Javad Razavian
 

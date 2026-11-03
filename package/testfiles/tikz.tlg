@@ -67,25 +67,42 @@ TEST 10: jalali month label above centered centres over a row of boxes (|offset|
 PASSED
 ============================================================
 ============================================================
-TEST 11: jalali weekday initials: seven initials per month, one row above the first week
+TEST 11: boxed initials share one border line with the first week, and sit inside their boxes
+============================================================
+PASSED
+PASSED
+============================================================
+============================================================
+TEST 12: jalali weekday initials: seven initials per month, one row above the first week
 ============================================================
 \n=\count...
 PASSED
 ============================================================
 ============================================================
-TEST 12: with boxes and initials a new month starts at least four rows below an unfinished week
+TEST 13: with boxes and initials a new month starts at least four rows below an unfinished week
 ============================================================
 PASSED
 ============================================================
 ============================================================
-TEST 13: jalali day boxes fill every month to whole weeks with empty boxes
+TEST 14: jalali day boxes fill every month to whole weeks with empty boxes
 ============================================================
 PASSED
 PASSED
 PASSED
 ============================================================
 ============================================================
-TEST 14: inside jalali, day of month= means the Jalali day
+TEST 15: jalali week columns: a row per weekday, Saturday on top, a new column after Friday (pt)
+============================================================
+PASSED
+============================================================
+============================================================
+TEST 16: jalali week columns: a month is as many columns wide as it has weeks
+============================================================
+PASSED
+PASSED
+============================================================
+============================================================
+TEST 17: inside jalali, day of month= means the Jalali day
 ============================================================
 PASSED
 ============================================================

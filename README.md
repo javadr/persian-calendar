@@ -40,13 +40,13 @@ With `tikz` and `\usetikzlibrary{calendar}` loaded, three Jalali months, Saturda
 
 ```latex
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last, jalali week list,
-               day xshift=-3em, jalali month label above centered]
+               day xshift=-2.2em, day yshift=2.5ex, jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 ```
 
-Add `jalali day boxes` for a grid of boxes and `jalali weekday initials` for a row of weekday initials above each month.
+Add `jalali day boxes` for a grid of boxes and `jalali weekday initials` for a row of weekday initials above each month. `jalali week columns` lays a month out the other way, a row per weekday and a column per week.
 
-The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/persian-calendar-doc.tex`](package/doc/persian-calendar-doc.tex)) and Persian ([`package/doc/persian-calendar-doc-fa.tex`](package/doc/persian-calendar-doc-fa.tex)). `package/sample/persian-calendar-test.tex` shows every macro with its output.
+The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/persian-calendar-doc.tex`](package/doc/persian-calendar-doc.tex)) and Persian ([`package/doc/persian-calendar-doc-fa.tex`](package/doc/persian-calendar-doc-fa.tex)). `package/sample/persian-calendar-test.tex` shows every macro with its output, and `package/sample/persian-calendar-years.tex` prints Jalali calendars for a range of years, nine to a page, like `calxxxx-yyyy`.
 
 ## Installation
 

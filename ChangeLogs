@@ -1,4 +1,8 @@
 %% Change Logs
+%% ver 0.62 ## Nov 4, 2026
+%% added jalali week columns (a row per weekday, a column per week) and sample/persian-calendar-years.tex, nine years to a page like calxxxx-yyyy
+%% boxed cells: digits and weekday initials are each centred in their boxes, measured in the node font; sample: year names 1380-1419 in five columns, one month in chapter 9
+%% manuals: calendars for a range of years (like calxxxx-yyyy) with an example year, six-column year-name table, Persian name tables aligned, compact examples
 %% ver 0.61 ## Nov 3, 2026
 %% added jalali day boxes (a full grid of boxes, empty boxes complete the first and last weeks) and jalali weekday initials for TikZ calendars
 %% ver 0.6 ## Nov 3, 2026

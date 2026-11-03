@@ -20,8 +20,8 @@
 %%
 %%
 \NeedsTeXFormat{LaTeX2e}
-\def\pcalendardate{2026/11/03}
-\def\pcalendarversion{0.61}
+\def\pcalendardate{2026/11/04}
+\def\pcalendarversion{0.62}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -454,12 +454,23 @@
     \edef\pcalendarcurrentweekday{\the\pcal@temp}}%
 \def\pcal@iflast#1{\pgfutil@in@{last}{#1}}%
 \def\pcal@ifdatejalali{\pcal@tojalali\pgfcalendarifdateyear\pgfcalendarifdatemonth\pgfcalendarifdateday}%
-\newif\ifpcal@boxes \newif\ifpcal@initials
-% One cell: #1 node options, #2 text. A box is one day step wide and high, its right edge on the day's
-% position like a plain day (anchor base east); fixed text height and depth keep the rows level.
-\def\pcal@cell#1#2{\ifpcal@boxes
-    \node[every day,draw,anchor=base east,inner sep=0pt,text height=1.6ex,text depth=.4ex,
-      minimum width={abs(\tikz@lib@cal@xshift)},minimum height={abs(\tikz@lib@cal@yshift)},#1]{#2};%
+\newif\ifpcal@boxes \newif\ifpcal@initials \newif\ifpcal@columns
+% Height and depth of #1 in the node font (TikZ draws in \nullfont), into \pcal@txtht and \pcal@txtdp.
+\def\pcal@measure#1{\pgfinterruptpicture\tikz@textfont\global\setbox\pgfutil@tempboxa\hbox{#1}\endpgfinterruptpicture
+    \xdef\pcal@txtht{\the\ht\pgfutil@tempboxa}\xdef\pcal@txtdp{\the\dp\pgfutil@tempboxa}}%
+\def\pcal@digits{0123456789}%
+\def\pcal@initialsample{\pcalendarweekdayshortname{0}\pcalendarweekdayshortname{1}\pcalendarweekdayshortname{2}%
+    \pcalendarweekdayshortname{3}\pcalendarweekdayshortname{4}\pcalendarweekdayshortname{5}\pcalendarweekdayshortname{6}}%
+% One cell: #1 node options, #2 text, #3 sample text whose height and depth the cell's text gets.
+% A box is one day step wide and high, its right edge on the day's position like a plain day. All boxes
+% share one centre line (where digits on the baseline are centred), so the rows touch; the text of each
+% kind (digits, initials) is centred in its box, so tall or deep letters stay off the borders.
+\def\pcal@cell#1#2#3{\ifpcal@boxes
+    \pcal@measure{\pcal@digits}\pgf@ya=\pcal@txtht\advance\pgf@ya by-\pcal@txtdp\pgf@ya=.5\pgf@ya
+    \edef\pcal@mid{\the\pgf@ya}\pcal@measure{#3}%
+    \node[every day,draw,anchor=east,inner sep=0pt,text height=\pcal@txtht,text depth=\pcal@txtdp,
+      minimum width={abs(\tikz@lib@cal@xshift)},minimum height={abs(\tikz@lib@cal@yshift)},#1]
+      at (0pt,\pcal@mid) {#2};%
   \else\node[every day,#1]{#2};\fi}%
 % Drop to a new month: at least three rows (four with initials) so the label and the initials fit
 % below an unfinished last week; only with boxes or initials, so plain lists keep `month yshift'.
@@ -472,7 +483,7 @@
 % Empty boxes before the first day and after the last day of a month (or of the calendar's range),
 % so every month is a full rectangle. Runs at the start of the row, before the day is placed.
 \newcount\pcal@lo \newcount\pcal@hi \newif\ifpcal@last
-\def\pcal@pad{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}\edef\pcal@step{\the\pgf@x}%
+\def\pcal@pad{\pcal@steps
     \pcal@lo=0 \pcal@hi=\pcalendarcurrentweekday\advance\pcal@hi by -1
     \ifnum\pcalendarcurrentday=1 \pcal@padrow\else
       \ifnum\pgfcalendarcurrentjulian=\pgfcalendarbeginjulian\relax\pcal@padrow\fi\fi
@@ -480,7 +491,12 @@
     \ifpcal@last\pcal@lo=\pcalendarcurrentweekday\advance\pcal@lo by 1 \pcal@hi=6 \pcal@padrow\fi}%
 \def\pcal@padrow{\pcal@padcell0\pcal@padcell1\pcal@padcell2\pcal@padcell3\pcal@padcell4\pcal@padcell5\pcal@padcell6}%
 \def\pcal@padcell#1{\ifnum#1<\pcal@lo\else\ifnum#1>\pcal@hi\else
-    {\pgf@x=#1\dimexpr\pcal@step\relax\pgftransformxshift{\pgf@x}\pcal@cell{}{}}\fi\fi}%
+    {\pcal@moveto{#1}\pcal@cell{}{}{\pcal@digits}}\fi\fi}%
+% Day steps, and a move to weekday #1 of the current week: along the row, or down the column.
+\def\pcal@steps{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}\edef\pcal@step{\the\pgf@x}%
+    \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\edef\pcal@ystep{\the\pgf@y}}%
+\def\pcal@moveto#1{\ifpcal@columns\pgf@y=-#1\dimexpr\pcal@ystep\relax\pgftransformyshift{\pgf@y}%
+    \else\pgf@x=#1\dimexpr\pcal@step\relax\pgftransformxshift{\pgf@x}\fi}%
 % \ifpcal@last: the day is the last of its Jalali month (tomorrow is the 1st) or of the calendar.
 \def\pcal@checklast{\pcal@lastfalse
     \ifnum\pgfcalendarcurrentjulian=\pgfcalendarendjulian\relax\pcal@lasttrue\else
@@ -488,11 +504,23 @@
        \pgfcalendarjuliantodate{\pgfutil@tempcnta}\pcal@ny\pcal@nm\pcal@nd
        \pcal@tojalali\pcal@ny\pcal@nm\pcal@nd\ifnum\pcal@jd=1 \global\pcal@lasttrue\fi}\fi}%
 % The row of initials, one day step above the first week, Saturday in column 0.
-\def\pcal@initials{{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}\edef\pcal@step{\the\pgf@x}%
-    \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgftransformyshift{\pgf@y}%
+\def\pcal@initials{{\pcal@steps
+    \ifpcal@columns\pgf@x=-\pcal@step\pgftransformxshift{\pgf@x}\else\pgftransformyshift{\pcal@ystep}\fi
     \pcal@initial0\pcal@initial1\pcal@initial2\pcal@initial3\pcal@initial4\pcal@initial5\pcal@initial6}}%
-\def\pcal@initial#1{{\pgf@x=#1\dimexpr\pcal@step\relax\pgftransformxshift{\pgf@x}%
-    \pcal@cell{every jalali weekday}{\pcalendarweekdayshortname{#1}}}}%
+\def\pcal@initial#1{{\pcal@moveto{#1}\pcal@cell{every jalali weekday}{\pcalendarweekdayshortname{#1}}{\pcal@initialsample}}}%
+% For `jalali week columns': on the first of a month, the number of week columns it needs.
+\def\pcal@countcolumns{{\pcal@temp=\pcalendarcurrentmonth\pcal@temptwo=\pcalendarcurrentyear
+    \ifnum\pcal@temp=12 \pcal@temp=1 \advance\pcal@temptwo by 1 \else\advance\pcal@temp by 1 \fi
+    \edef\pcal@arg{\the\pcal@temptwo-\the\pcal@temp-1}\expandafter\pcal@togregorian\expandafter{\pcal@arg}%
+    \pgfcalendardatetojulian{\pcal@iso}{\pgfutil@tempcnta}% first day of the next month
+    \advance\pgfutil@tempcnta by-\pgfcalendarcurrentjulian % days in this month
+    \advance\pgfutil@tempcnta by\pcalendarcurrentweekday\advance\pgfutil@tempcnta by 6
+    \divide\pgfutil@tempcnta by 7 \xdef\tikz@lib@cal@width{\the\pgfutil@tempcnta}}}%
+% A new month in `jalali week columns': a new column if the last week was unfinished, then month xshift.
+\def\pcal@nextmonthcolumn{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}%
+    \pgfmathsetlength{\pgf@xa}{\tikz@lib@cal@month@xshift}\ifdim\pgf@x<0pt \pgf@xa=-\pgf@xa\fi
+    \ifnum\pcalendarcurrentweekday>0 \advance\pgf@xa by\pgf@x\fi
+    \pgftransformxshift{\pgf@xa}}%
 \pgfkeys{%
   /pgf/calendar/jalali day of month/.code={\pcal@ifdatejalali\ifnum#1=\pcal@jd\relax\pgfcalendarmatchestrue\fi},
   /pgf/calendar/jalali equals/.code args={#1-#2}{\pcal@ifdatejalali
@@ -521,9 +549,19 @@
       \pgf@x=\pcalendarcurrentweekday\pgf@x\pgftransformxshift{\pgf@x}},
     execute after day scope={\ifdate{Friday}{\pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgftransformyshift{-\pgf@y}}{}},
     tikz@lib@cal@width=7},
+  % Weeks as columns, as in calxxxx-yyyy: one weekday per row, Saturday on top, a new column after Friday.
+  % Use a negative `day xshift' for right to left.
+  /tikz/jalali week columns/.code={\pcal@columnstrue\pgfkeysalso{/tikz/jalali week columns@}},
+  /tikz/jalali week columns@/.style={jalali,
+    execute before day scope={\ifdate{day of month=1}{\ifdate{equals=\pgfcalendarbeginiso}{}{\pcal@nextmonthcolumn}%
+      \pcal@countcolumns\ifpcal@initials\pcal@initials\fi}{}%
+      \ifpcal@boxes\pcal@pad\fi},
+    execute at begin day scope={\pgfmathsetlength\pgf@y{\tikz@lib@cal@yshift}%
+      \pgf@y=-\pcalendarcurrentweekday\pgf@y\pgftransformyshift{\pgf@y}},
+    execute after day scope={\ifdate{Friday}{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}\pgftransformxshift{\pgf@x}}{}}},
   % Each day is a box one day step wide and high, so the boxes join into a grid.
   /tikz/jalali day boxes/.code={\pcal@boxestrue
-    \pgfkeysalso{/tikz/day code={\pcal@cell{name=\pgfcalendarsuggestedname}{\tikzdaytext}}}},
+    \pgfkeysalso{/tikz/day code={\pcal@cell{name=\pgfcalendarsuggestedname}{\tikzdaytext}{\pcal@digits}}}},
   % A row of weekday initials above each month (with `jalali week list').
   /tikz/jalali weekday initials/.code={\pcal@initialstrue},
   /tikz/every jalali weekday/.style={},
@@ -536,13 +574,13 @@
       \ifpcal@boxes % a box is one step wide and ends at the day's position
         \ifdim\pgf@xa<0pt \advance\pgf@xb by.5\pgf@xa\else\advance\pgf@xb by-.5\pgf@xa\fi
       \else
-        \pgfinterruptpicture\global\setbox\pgfutil@tempboxa\hbox{30}\endpgfinterruptpicture % TikZ draws in \nullfont
+        \pgfinterruptpicture\tikz@textfont\global\setbox\pgfutil@tempboxa\hbox{30}\endpgfinterruptpicture % TikZ draws in \nullfont
         \advance\pgf@xb by-.5\wd\pgfutil@tempboxa
         \pgfmathsetlength{\pgf@xa}{\pgfkeysvalueof{/pgf/inner xsep}}\advance\pgf@xb by-\pgf@xa
       \fi
       \pgftransformxshift{\pgf@xb}%
       \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgf@ya=1.25\pgf@y
-      \ifpcal@initials\advance\pgf@ya by\pgf@y\fi % above the row of initials
+      \ifpcal@initials\ifpcal@columns\else\advance\pgf@ya by\pgf@y\fi\fi % above the row of initials
       \ifpcal@boxes\advance\pgf@ya by.25\pgf@y\fi % clear of the box tops
       \pgftransformyshift{\pgf@ya}%
       \tikzmonthcode}}{}},

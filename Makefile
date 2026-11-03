@@ -56,14 +56,14 @@ cleanup: clean
 # CTAN archive: persian-calendar/{README,tex/,doc/}, built from package/, zipped as persian-calendar.zip (no version in the name).
 .PHONY: ctan
 ctan: readme doc
-	(cd $(DIR)/sample && for i in 1 2; do \
-	  TEXINPUTS=../tex: xelatex -interaction=nonstopmode -halt-on-error persian-calendar-test || exit 1; \
-	done)
+	(cd $(DIR)/sample && for f in $(DEMOS); do for i in 1 2; do \
+	  TEXINPUTS=../tex: xelatex -interaction=nonstopmode -halt-on-error $$f || exit 1; \
+	done; done)
 	rm -rf $(PKG) $(PKG).zip
 	mkdir -p $(PKG)/tex $(PKG)/doc
 	cp -v $(DIR)/README $(PKG)
 	cp -v $(STY) $(PKG)/tex
-	cp -v $(DIR)/sample/persian-calendar-test.tex $(DIR)/sample/persian-calendar-test.pdf $(PKG)/doc
+	cp -v $(DIR)/sample/*.tex $(DIR)/sample/*.pdf $(PKG)/doc
 	cp -v $(DIR)/doc/*.tex $(DIR)/doc/*.pdf $(PKG)/doc
 	zip -r $(PKG).zip $(PKG)
 	rm -rf $(PKG)

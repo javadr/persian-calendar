@@ -26,9 +26,9 @@
 \newcommand\GtoJ[2]{\demo{\pdate{#1}}{\pdate{#1}}{}\demo{\pisodate{#1}}{\lr{\pisodate{#1}}}{#2}\par\smallskip}
 \newcommand\JtoG[2]{\demo{\gdate{#1}}{\gdate{#1}}{}\demo{\gisodate{#1}}{\lr{\gisodate{#1}}}{#2}\par\smallskip}
 \newcommand\YEAR[1]{\demo{\gisodate{#1-01-01}}{\lr{\gisodate{#1-01-01}}}{start of Jalali year #1}}
-% one table cell: year and its animal; \YROW gives a row of years 6 apart
-\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\lr{\yy}\quad\pcalendaryearname{\yy}}
-\newcommand\YROW[1]{\yc{#1}&\yc{#1+6}&\yc{#1+12}&\yc{#1+18}}
+% one table cell: year and its animal, empty after 1420; \YROW gives a row of years 8 apart
+\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\ifnum\yy>1420 \else\lr{\yy}\quad\pcalendaryearname{\yy}\fi}
+\newcommand\YROW[1]{\yc{#1}&\yc{#1+8}&\yc{#1+16}&\yc{#1+24}&\yc{#1+32}}
 \newcommand\WEEKDAY[2]{%
   \pcalendardatetojulian{#1}\jd
   \pgfcalendarjuliantoweekday{\jd}{\wday}%
@@ -120,24 +120,24 @@ numbers Monday as 0, so the sample shifts the result by 2 to make Saturday 0, th
 \note{\texttt{\textbackslash pcalendaryearname\{year\}} gives the animal of the 12-year cycle of the
 Turkish-Mongol calendar for a Jalali year. It is defined for 0 to 2099 only.}
 \medskip
-\begin{tabular}{llll}
+\begin{tabular}{lllll}
 \YROW{1380}\\
 \YROW{1381}\\
 \YROW{1382}\\
 \YROW{1383}\\
 \YROW{1384}\\
 \YROW{1385}\\
+\YROW{1386}\\
+\YROW{1387}\\
 \end{tabular}
 
-\clearpage
 \subsection*{\lr{9. A Jalali month grid with TikZ}}
 \note{With \texttt{tikz} and its \texttt{calendar} library loaded, \texttt{jalali dates} and
 \texttt{jalali week list} lay out Jalali months, Saturday to Friday. The negative \texttt{day xshift}
-puts Saturday on the right. Fridays are red and 13 Farvardin (Sizdah Bedar) is blue. Esfand 1403 is a
-leap month, so it ends on the 30th.}
+puts Saturday on the right. The month is Dey 1404, which has 30 days; Fridays are red.}
 \begin{center}
-\tikz\calendar[jalali dates=1403-12-01 to 1404-01-last, jalali week list, day xshift=-2.5em,
-  jalali month label above centered] if (Friday) [red] if (jalali equals=1-13) [blue];
+\tikz\calendar[jalali dates=1404-10-01 to 1404-10-last, jalali week list, day xshift=-2em, day yshift=2.4ex,
+  jalali month label above centered] if (Friday) [red];
 \end{center}
 
 \clearpage

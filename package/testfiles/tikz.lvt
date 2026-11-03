@@ -94,6 +94,17 @@
     \xdef\r{\ifdim\lab<0.5pt \ifdim\lab>-0.5pt ok\else off\fi\else off\fi}}%
   \ASSERT{\r}{ok}
 }
+\TEST{boxed initials share one border line with the first week, and sit inside their boxes}{
+  % initials are deeper than digits; each kind is centred in its box, all boxes on one centre line
+  \def\pcalendarweekdayshortname#1{gy}%
+  \tikz{\calendar (cal) [jalali dates=1405-01-01 to 1405-01-07, jalali week list, jalali day boxes,
+      jalali weekday initials, day yshift=0.6cm, every jalali weekday/.append style={name=ini}];
+    \pgfextracty\ya{\pgfpointanchor{ini}{south}}\pgfextracty\yb{\pgfpointanchor{cal-2026-03-27}{north}}%
+    \advance\ya by-\yb \NEAR\r\ya{-0.4pt}%
+    \pgfextracty\ya{\pgfpointanchor{ini}{north}}\pgfextracty\yb{\pgfpointanchor{ini}{south}}%
+    \advance\ya by-\yb \NEAR\s\ya{0.6cm+0.4pt}}%
+  \ASSERT{\r}{ok}\ASSERT{\s}{ok}
+}
 \TEST{jalali weekday initials: seven initials per month, one row above the first week}{
   \newcount\n \n=0
   \tikz{\calendar (cal) [jalali dates=1405-01-01 to 1405-02-last, jalali week list, jalali weekday initials,
@@ -122,6 +133,24 @@
   \n=0 \tikz\calendar[jalali dates=1405-01-05 to 1405-01-09, jalali week list,
     every day/.append style={/utils/exec={\global\advance\n 1}}];%
   \ASSERT{\the\n}{5}
+}
+\TEST{jalali week columns: a row per weekday, Saturday on top, a new column after Friday (pt)}{
+  \gdef\acc{}%
+  \tikz\calendar[jalali dates=1405-01-06 to 1405-01-08, jalali week columns, day xshift=-1cm, day yshift=1cm,
+    day code={\pgfpointtransformed{\pgfpointorigin}%
+      \xdef\acc{\acc(\pcalendarcurrentday:\the\numexpr\dimexpr\pgf@x\relax/65536\relax,\the\numexpr\dimexpr\pgf@y\relax/65536\relax)}}];%
+  \ASSERT{\acc}{(6:0,-142)(7:0,-171)(8:-28,0)}
+}
+\TEST{jalali week columns: a month is as many columns wide as it has weeks}{
+  % 1405: Farvardin starts on Saturday, Ordibehesht on Tuesday (5 columns each), Khordad on Friday (6)
+  \gdef\acc{}%
+  \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last, jalali week columns, jalali month label above centered,
+    month code={\xdef\acc{\acc\tikz@lib@cal@width}}];%
+  \ASSERT{\acc}{556}
+  % with boxes, Farvardin is 5 whole columns of 7
+  \n=0 \tikz\calendar[jalali dates=1405-01-01 to 1405-01-last, jalali week columns, jalali day boxes,
+    every day/.append style={/utils/exec={\global\advance\n 1}}];%
+  \ASSERT{\the\n}{35}
 }
 \TEST{inside jalali, day of month= means the Jalali day}{
   \gdef\acc{}%

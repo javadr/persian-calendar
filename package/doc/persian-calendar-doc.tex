@@ -22,12 +22,13 @@
 \newcommand\cs[1]{\texttt{\textbackslash #1}}
 \newcommand\gap{\par\smallskip}
 \newcount\jd \newcount\wday
+\emergencystretch=3em % long macro names in the prose
 \renewcommand\thepage{\lr{\arabic{page}}}   % page numbers in Latin digits (the footer is typeset in the Persian font)
-% table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four
+% table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four/six
 \newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\texttt{\mm}\quad\pcalendarmonthname{\mm}}
 \newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\texttt{\yy}\quad\pcalendaryearname{\yy}}
 \newcommand\MROW[1]{\mc{#1}&\mc{#1+3}&\mc{#1+6}&\mc{#1+9}}
-\newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}}
+\newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}&\yc{#1+12}&\yc{#1+15}}
 
 % The prose uses the Latin font, so the macros that print Persian text switch to the Persian font.
 \def\fa@wrap#1{\expandafter\let\csname fa@orig@\string#1\endcsname#1%
@@ -224,11 +225,12 @@ other values print nothing.
 \gap
 The twelve animals in order, starting from year 1380:\gap
 \gap
-\begin{tabular}{llll}
+{\setlength\tabcolsep{4pt}% six columns fit the text width
+\begin{tabular}{llllll}
 \YROW{1380}\\
 \YROW{1381}\\
 \YROW{1382}
-\end{tabular}
+\end{tabular}}
 
 \paragraph{The weekday of a date.} The package has no weekday macro, but the day number gives you
 one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalendarweekdayname} numbers Saturday as 0, so
@@ -257,12 +259,14 @@ library yourself; the package does not load them:
 \usepackage{persian-calendar}
 ...
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
-               jalali week list, day xshift=-3em, jalali month label above centered]
+               jalali week list, day xshift=-2.2em, day yshift=2.5ex,
+               jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 \end{verbatim}
 \begin{center}
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
-               jalali week list, day xshift=-3em, jalali month label above centered]
+               jalali week list, day xshift=-2.2em, day yshift=2.5ex,
+               jalali month label above centered]
   if (Friday) [red] if (jalali equals=1-13) [blue];
 \end{center}
 
@@ -290,6 +294,14 @@ offset and so leaves it slightly off centre. This one measures a two-digit day (
 font and adds the inner sep of the day nodes, so the label is centred over the week at any font size.
 It assumes the library's default \texttt{every day} anchor (\texttt{base east}).
 
+\macro|jalali week columns|
+The other way round, as in \pkg{calxxxx-yyyy}: one row per weekday, Saturday on top, and a new column after
+each Friday, so a month is four to six columns wide. A negative \texttt{day xshift} puts the first week on
+the right. \texttt{jalali day boxes} completes the first and last columns, \texttt{jalali weekday initials}
+puts the initials in a column beside the month, and \texttt{jalali month label above centered} centres over
+the month's own number of columns. The sample \texttt{persian-calendar-years.tex} uses it to print a range of
+years, nine to an A4 page: set \cs{FirstYear} and \cs{LastYear} at its top.
+
 \macro|jalali day boxes|
 Draws every day as a box one day step wide (\texttt{day xshift}) and high (\texttt{day yshift}), so the boxes
 join into a grid. With \texttt{jalali week list}, empty boxes fill the days before the first and after the last
@@ -308,15 +320,17 @@ up above it. Style the initials with \texttt{every jalali weekday}, for example
 With either key, a new month starts at least three rows (four with initials) below the previous one,
 however small \texttt{month yshift} is, so an unfinished last week never runs into the next label.
 \begin{verbatim}
-\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list,
-  jalali day boxes, jalali weekday initials,
-  day xshift=-0.9cm, day yshift=0.7cm, jalali month label above centered]
+\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last,
+  jalali week list, jalali day boxes, jalali weekday initials,
+  day xshift=-0.9cm, day yshift=0.7cm,
+  jalali month label above centered]
   if (Friday) [red, every day/.append style={fill=red!10}];
 \end{verbatim}
 \begin{center}
-\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last, jalali week list,
-  jalali day boxes, jalali weekday initials,
-  day xshift=-0.9cm, day yshift=0.7cm, jalali month label above centered]
+\tikz\calendar[jalali dates=1405-01-01 to 1405-02-last,
+  jalali week list, jalali day boxes, jalali weekday initials,
+  day xshift=-0.9cm, day yshift=0.7cm,
+  jalali month label above centered]
   if (Friday) [red, every day/.append style={fill=red!10}];
 \end{center}
 
@@ -343,9 +357,10 @@ which sets its own.
 \foreach \m in {1,...,12} {
   \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
   \pgfmathtruncatemacro\row{div(\m-1,3)}% season
-  \calendar at (-\col*5.8cm, -\row*4.6cm)
+  \calendar at (-\col*5.4cm, -\row*4.6cm)
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
-     day xshift=-0.75cm, day yshift=0.5cm, jalali month label above centered,
+     day xshift=-0.7cm, day yshift=0.5cm,
+     jalali month label above centered,
      month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
     if (Friday) [red];
 }
@@ -356,12 +371,58 @@ which sets its own.
 \foreach \m in {1,...,12} {
   \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
   \pgfmathtruncatemacro\row{div(\m-1,3)}% season
-  \calendar at (-\col*5.8cm, -\row*4.6cm)
+  \calendar at (-\col*5.4cm, -\row*4.6cm)
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
-     day xshift=-0.75cm, day yshift=0.5cm, jalali month label above centered,
+     day xshift=-0.7cm, day yshift=0.5cm,
+     jalali month label above centered,
      month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
     if (Friday) [red];
 }
+\end{tikzpicture}
+\end{center}
+
+\paragraph{Calendars for a range of years.} The \pkg{calxxxx-yyyy} document on CTAN prints Gregorian
+calendars for a range of years, nine years to a page, each year as four rows of three months and each month
+as a column per week and a row per weekday. \texttt{jalali week columns} gives the same layout for Jalali
+months, and the sample \texttt{persian-calendar-years.tex}, which comes with the package, is the Jalali
+counterpart of \pkg{calxxxx-yyyy}: set \cs{FirstYear} and \cs{LastYear} at its top, for example
+\texttt{1405} and \texttt{1413}, and compile it with Xe\LaTeX{}. Each year carries its animal name
+(\cs{pcalendaryearname}). This is the code that draws one year; the sample wraps it in a macro and loops
+over the years, three to a row:
+\begin{verbatim}
+\begin{tikzpicture}[font=\tiny]
+  \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
+    {1405\quad\pcalendaryearname{1405}};
+  \foreach \m in {1,...,12} {
+    \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
+    \pgfmathtruncatemacro\row{div(\m-1,3)}% season
+    \calendar at (-\col*2.15cm, -0.55cm-\row*2.1cm)
+      [jalali dates=1405-\m-01 to 1405-\m-last,
+       jalali week columns, jalali weekday initials,
+       day xshift=-0.3cm, day yshift=0.235cm,
+       jalali month label above centered,
+       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       every jalali weekday/.style={gray}]
+      if (Friday) [red];
+  }
+\end{tikzpicture}
+\end{verbatim}
+\begin{center}
+\begin{tikzpicture}[font=\tiny]
+  \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
+    {1405\quad\pcalendaryearname{1405}};
+  \foreach \m in {1,...,12} {
+    \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
+    \pgfmathtruncatemacro\row{div(\m-1,3)}% season
+    \calendar at (-\col*2.15cm, -0.55cm-\row*2.1cm)
+      [jalali dates=1405-\m-01 to 1405-\m-last,
+       jalali week columns, jalali weekday initials,
+       day xshift=-0.3cm, day yshift=0.235cm,
+       jalali month label above centered,
+       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       every jalali weekday/.style={gray}]
+      if (Friday) [red];
+  }
 \end{tikzpicture}
 \end{center}
 
@@ -471,9 +532,9 @@ and the others in front of every day, ahead of the library's own per-day code, a
   \item \textbf{Shared registers.} Every conversion overwrites the result registers, as described in
     section~\ref{sec:day5}.
   \item \textbf{Year names} work for 0 to 2099 only.
-  \item \textbf{TikZ layouts.} Only \texttt{jalali week list} and the \texttt{day list} styles follow Jalali
-    months; the library's \texttt{week list} and \texttt{month list} stay Gregorian. There is no row of
-    weekday names; draw it yourself if you need one.
+  \item \textbf{TikZ layouts.} Only \texttt{jalali week list}, \texttt{jalali week columns} and the
+    \texttt{day list} styles follow Jalali months; the library's \texttt{week list} and \texttt{month list}
+    stay Gregorian.
   \item \textbf{\texttt{jalali dates} and \texttt{dates}} set the same range, so the later one wins. The
     dates of \texttt{jalali dates} must be literal, like those of \cs{pdate}.
   \item \textbf{Boxes and labels assume right-aligned days.} \texttt{jalali day boxes} and
@@ -491,6 +552,7 @@ and the others in front of every day, ahead of the library's own per-day code, a
 \section{Version history}\label{sec:version11}
 
 \begin{description}
+  \item[0.62 (2026-11-04)] \texttt{jalali week columns} and the sample \texttt{persian-calendar-years.tex}.
   \item[0.61 (2026-11-03)] \texttt{jalali day boxes} (a grid of boxes) and \texttt{jalali weekday initials}.
   \item[0.6 (2026-11-03)] Renamed from \pkg{pcalendar} to \pkg{persian-calendar} at the request of CTAN (file
     and package names only, the macros keep their names). Jalali month grids with the \pkg{TikZ}
