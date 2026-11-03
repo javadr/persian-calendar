@@ -25,6 +25,32 @@
     day code={\xdef\acc{\acc\pcalendarcurrentyear-\pcalendarcurrentmonth-\pcalendarcurrentday/\pcalendarcurrentweekday,}}];%
   \ASSERT{\acc}{1404-12-28/5,1404-12-29/6,1405-1-1/0,1405-1-2/1,}
 }
+\TEST{Esfand has 30 days in a leap year and 29 otherwise}{
+  \newcount\n
+  \n=0 \tikz\calendar[jalali dates=1403-12-01 to 1403-12-last, jalali, day code={\global\advance\n 1}];%
+  \ASSERT{\the\n}{30}
+  \n=0 \tikz\calendar[jalali dates=1404-12-01 to 1404-12-last, jalali, day code={\global\advance\n 1}];%
+  \ASSERT{\the\n}{29}
+}
+\TEST{TikZ month labels fire on the first of the Jalali month only}{
+  \gdef\acc{}%
+  \tikz\calendar[jalali dates=1405-01-25 to 1405-02-05, jalali week list, month label above centered,
+    month code={\xdef\acc{\acc[\pcalendarcurrentmonth]}}];%
+  \ASSERT{\acc}{[2]}
+}
+\TEST{jalali week list: Thursday in column 5, Friday in 6, Saturday starts a new row, right to left (pt)}{
+  \gdef\acc{}%
+  \tikz\calendar[jalali dates=1405-01-06 to 1405-01-08, jalali week list, day xshift=-1cm, day yshift=1cm,
+    day code={\pgfpointtransformed{\pgfpointorigin}%
+      \xdef\acc{\acc(\pcalendarcurrentday:\the\numexpr\dimexpr\pgf@x\relax/65536\relax,\the\numexpr\dimexpr\pgf@y\relax/65536\relax)}}];%
+  \ASSERT{\acc}{(6:-142,0)(7:-171,0)(8:0,-28)}
+}
+\TEST{if (jalali equals=M-D) applies options to that day only}{
+  \gdef\acc{}%
+  \tikz\calendar[jalali dates=1405-01-11 to 1405-01-15, jalali, day code={}]
+    if (jalali equals=1-13) [/utils/exec={\xdef\acc{\acc\pcalendarcurrentday}}];%
+  \ASSERT{\acc}{13}
+}
 \TEST{inside jalali, day of month= means the Jalali day}{
   \gdef\acc{}%
   \tikz\calendar[dates=2026-03-20 to 2026-03-22, jalali,

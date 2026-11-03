@@ -370,6 +370,14 @@ macro stops at 2099.
 \paragraph{No register leaks.} All registers are allocated once when the package loads, so any number of
 conversions can be made in one document. A test in the repository (\texttt{leaks.lvt}) checks this.
 
+\paragraph{TikZ calendars.} The keys of section~\ref{sec:tikz} are defined with \cs{pgfkeys} when the
+package loads, so they need no \pkg{TikZ} until they are used. \texttt{jalali dates} converts both ends to
+Gregorian and passes them to the library's \texttt{dates} key; \texttt{last} becomes the first day of the
+next Jalali month with a \texttt{+-1} offset. \texttt{jalali} puts a call that sets \cs{pcalendarcurrentyear}
+and the others in front of every day, ahead of the library's own per-day code, and redefines the
+\texttt{day of month} test for that calendar only. The conversions are run inside a group, because
+\pkg{pgfcalendar} walks the days with \cs{loop} and the conversions use \cs{loop} too.
+
 % ---------------------------------------------------------------------------
 \section{Limitations and known issues}\label{sec:limitations9}
 
@@ -392,12 +400,25 @@ conversions can be made in one document. A test in the repository (\texttt{leaks
   \item \textbf{Shared registers.} Every conversion overwrites the result registers, as described in
     section~\ref{sec:day5}.
   \item \textbf{Year names} work for 0 to 2099 only.
+  \item \textbf{TikZ layouts.} Only \texttt{jalali week list} and the \texttt{day list} styles follow Jalali
+    months; the library's \texttt{week list} and \texttt{month list} stay Gregorian. There is no row of
+    weekday names; draw it yourself if you need one.
+  \item \textbf{\texttt{jalali dates} and \texttt{dates}} set the same range, so the later one wins. The
+    dates of \texttt{jalali dates} must be literal, like those of \cs{pdate}.
+  \item \textbf{TikZ internals.} \texttt{jalali} adds its code to the library's internal macro
+    \cs{tikz@before@day}. A future \pkg{TikZ} that renames it would break the Jalali calendars; the
+    regression test \texttt{tikz.lvt} would catch it.
+  \item \textbf{Do not redefine \cs{wd}.} \cs{newcount}\cs{wd} or similar replaces a \TeX{} primitive that
+    \pkg{TikZ} needs, and stray text such as ``\texttt{==0pt}'' appears in the pictures.
 \end{itemize}
 
 % ---------------------------------------------------------------------------
 \section{Version history}\label{sec:version11}
 
 \begin{description}
+  \item[unreleased] Renamed from \pkg{pcalendar} to \pkg{persian-calendar} at the request of CTAN (file
+    and package names only, the macros keep their names). Jalali month grids with the \pkg{TikZ}
+    \texttt{calendar} library (section~\ref{sec:tikz}). License stated as LPPL 1.3c everywhere.
   \item[0.51 (2026-11-01)] Documentation only: the manuals now say that only printing the Persian names
     needs a Unicode engine and a Persian font; the Persian manual was rewritten.
   \item[0.5 (2026-11-01)] Fixed the register leak (several \cs{newcount} per call) and the undeclared
