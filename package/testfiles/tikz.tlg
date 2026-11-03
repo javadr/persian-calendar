@@ -1,0 +1,27 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: jalali dates converts both ends, `last' is the last day of the month
+============================================================
+PASSED
+PASSED
+PASSED
+============================================================
+============================================================
+TEST 2: jalali equals and jalali day of month test the Jalali date
+============================================================
+PASSED
+PASSED
+PASSED
+PASSED
+============================================================
+============================================================
+TEST 3: a jalali calendar visits every day with the Jalali date set
+============================================================
+PASSED
+============================================================
+============================================================
+TEST 4: inside jalali, day of month= means the Jalali day
+============================================================
+PASSED
+============================================================

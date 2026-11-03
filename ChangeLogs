@@ -2,6 +2,8 @@
 %% unreleased
 %% renamed the package from pcalendar to persian-calendar at the request of CTAN (files and package name only; macro names unchanged)
 %% stated the license as LPPL 1.3c everywhere
+%% added Jalali calendars for the TikZ calendar library: jalali dates, jalali, jalali week list, jalali equals, jalali day of month
+%% manuals and sample: renamed the \wd count to \wday, since \wd is a TeX primitive that TikZ needs
 %% ver 0.51 ## Nov 1, 2026
 %% documented that only printing the Persian names needs a Unicode engine and a Persian font (xepersian is optional)
 %% rewrote the Persian manual, moved the package files into package/, added the release workflow and references/

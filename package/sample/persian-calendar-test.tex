@@ -5,12 +5,14 @@
 \usepackage[a4paper,margin=2cm]{geometry}
 \usepackage{persian-calendar}
 \usepackage{pgffor}
+\usepackage{tikz}
+\usetikzlibrary{calendar}
 \usepackage{xepersian}
 
 \settextfont{Parisa}
 \setlatintextfont{Latin Modern Roman}
 
-\newcount\jd \newcount\wd
+\newcount\jd \newcount\wday
 
 % \note{English text}: explanatory paragraph
 \newcommand\note[1]{\par\medskip\noindent\lr{#1}\par\smallskip}
@@ -29,9 +31,9 @@
 \newcommand\YROW[1]{\yc{#1}&\yc{#1+6}&\yc{#1+12}&\yc{#1+18}}
 \newcommand\WEEKDAY[2]{%
   \pcalendardatetojulian{#1}\jd
-  \pgfcalendarjuliantoweekday{\jd}{\wd}%
-  \advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
-  \par\noindent\code{#1}\quad$\Rightarrow$\quad\pcalendarweekdayname{\wd}\quad\lr{(#2)}}
+  \pgfcalendarjuliantoweekday{\jd}{\wday}%
+  \advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
+  \par\noindent\code{#1}\quad$\Rightarrow$\quad\pcalendarweekdayname{\wday}\quad\lr{(#2)}}
 
 \begin{document}
 \setLTR % the explanations are English; only the results are Persian
@@ -126,6 +128,17 @@ Turkish-Mongol calendar for a Jalali year. It is defined for 0 to 2099 only.}
 \YROW{1384}\\
 \YROW{1385}\\
 \end{tabular}
+
+\clearpage
+\subsection*{\lr{9. A Jalali month grid with TikZ}}
+\note{With \texttt{tikz} and its \texttt{calendar} library loaded, \texttt{jalali dates} and
+\texttt{jalali week list} lay out Jalali months, Saturday to Friday. The negative \texttt{day xshift}
+puts Saturday on the right. Fridays are red and 13 Farvardin (Sizdah Bedar) is blue. Esfand 1403 is a
+leap month, so it ends on the 30th.}
+\begin{center}
+\tikz\calendar[jalali dates=1403-12-01 to 1404-01-last, jalali week list, day xshift=-2.5em,
+  month label above centered] if (Friday) [red] if (jalali equals=1-13) [blue];
+\end{center}
 
 \subsection*{\lr{Limits}}
 \note{The date arguments must be literal \texttt{Y-M-D} text. A macro holding a date, such as

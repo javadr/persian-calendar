@@ -439,6 +439,49 @@
 \def\pcalendarweekdayshortname#1{\ifcase#1 ش\or ی\or د\or س\or چ\or پ\or ج\fi}%
 \def\pcalendarmonthname#1{\pcal@persian@month{#1}}%
 \def\pcalendargregorianmonthname#1{\pcal@gregorian@month{#1}}%
+%
+% ---- Jalali calendars with the TikZ `calendar' library ----
+% Grouped because the converters use \loop and pgfcalendar runs its days in a \loop.
+\def\pcal@tojalali#1#2#3{\begingroup\pcal@gregoriantojalali{#1-#2-#3}%
+    \xdef\pcal@jy{\the\pcal@y}\xdef\pcal@jm{\the\pcal@m}\xdef\pcal@jd{\the\pcal@d}\endgroup}%
+\def\pcal@togregorian#1{\begingroup\pcal@jalalitogregorian{#1}%
+    \xdef\pcal@iso{\the\pcal@gy-\the\pcal@gm-\the\pcal@gd}\endgroup}%
+% Jalali date of the day being drawn; weekday counts from Saturday = 0, like \pcalendarweekdayname.
+\def\pcal@current{%
+    \pcal@tojalali\pgfcalendarcurrentyear\pgfcalendarcurrentmonth\pgfcalendarcurrentday
+    \let\pcalendarcurrentyear\pcal@jy\let\pcalendarcurrentmonth\pcal@jm\let\pcalendarcurrentday\pcal@jd
+    \pcal@temp=\pgfcalendarcurrentweekday\advance\pcal@temp by 2\relax
+    \ifnum\pcal@temp>6 \advance\pcal@temp by -7\relax\fi
+    \edef\pcalendarcurrentweekday{\the\pcal@temp}}%
+\def\pcal@iflast#1{\pgfutil@in@{last}{#1}}%
+\def\pcal@ifdatejalali{\pcal@tojalali\pgfcalendarifdateyear\pgfcalendarifdatemonth\pgfcalendarifdateday}%
+\pgfkeys{%
+  /pgf/calendar/jalali day of month/.code={\pcal@ifdatejalali\ifnum#1=\pcal@jd\relax\pgfcalendarmatchestrue\fi},
+  /pgf/calendar/jalali equals/.code args={#1-#2}{\pcal@ifdatejalali
+    \ifnum#1=\pcal@jm\relax\ifnum#2=\pcal@jd\relax\pgfcalendarmatchestrue\fi\fi},
+  % jalali dates=Y-M-D to Y-M-D; the day may be `last'
+  /tikz/jalali dates/.code args={#1to#2}{\pcal@togregorian{#1}\let\pcal@start\pcal@iso
+    \pcal@getymd#2;\expandafter\pcal@iflast\expandafter{\pcal@get@d}%
+    \ifpgfutil@in@ % first day of the next month, minus one
+      \pcal@temp=\pcal@get@m\relax\pcal@temptwo=\pcal@get@y\relax
+      \ifnum\pcal@temp=12 \pcal@temp=1 \advance\pcal@temptwo by 1 \else\advance\pcal@temp by 1 \fi
+      \edef\pcal@arg{\the\pcal@temptwo-\the\pcal@temp-1}\expandafter\pcal@togregorian\expandafter{\pcal@arg}%
+      \edef\pcal@iso{\pcal@iso+-1}%
+    \else\pcal@togregorian{#2}\fi
+    \pgfkeysalso{/tikz/dates/.expanded=\pcal@start to\pcal@iso}},
+  % Prepended so \pcalendarcurrent... are set before any other per-day code.
+  /tikz/jalali/.code={\expandafter\def\expandafter\tikz@before@day\expandafter{\expandafter\pcal@current\tikz@before@day}%
+    \pgfkeysalso{/pgf/calendar/day of month/.code={\pgfkeysalso{/pgf/calendar/jalali day of month=##1}},
+      /tikz/day text={\pcalendarcurrentday},
+      /tikz/month text={\pcalendarmonthname{\pcalendarcurrentmonth}\space\pcalendarcurrentyear}}},
+  % Like TikZ's `week list', but weeks run Saturday to Friday. Use a negative `day xshift' for right to left.
+  /tikz/jalali week list/.style={jalali,
+    execute before day scope={\ifdate{day of month=1}{\ifdate{equals=\pgfcalendarbeginiso}{}{%
+      \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@month@yshift}\pgftransformyshift{-\pgf@y}}}{}},
+    execute at begin day scope={\pgfmathsetlength\pgf@x{\tikz@lib@cal@xshift}%
+      \pgf@x=\pcalendarcurrentweekday\pgf@x\pgftransformxshift{\pgf@x}},
+    execute after day scope={\ifdate{Friday}{\pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgftransformyshift{-\pgf@y}}{}},
+    tikz@lib@cal@width=7}}%
 \endinput
 %%
 %% End of file `persian-calendar.sty'.

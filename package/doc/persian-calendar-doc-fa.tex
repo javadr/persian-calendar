@@ -4,6 +4,8 @@
 \usepackage[a4paper,margin=2.5cm]{geometry}
 \usepackage{persian-calendar}
 \usepackage{pgffor}
+\usepackage{tikz}
+\usetikzlibrary{calendar}
 \usepackage[colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 \usepackage{xepersian}
 
@@ -22,7 +24,7 @@
 % \ex|code|{result}: a call, an arrow and its typeset result (the call is typed twice on purpose)
 \NewDocumentCommand\ex{v m}{\par\noindent\hspace*{1em}\lr{\texttt{#1}}\quad$\leftarrow$\quad#2}
 \emergencystretch=3em
-\newcount\jd \newcount\wd
+\newcount\jd \newcount\wday
 \makeatletter\renewcommand*\l@section{\@dottedtocline{1}{0em}{2.3em}}\makeatother
 % table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four
 \newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\tx{\mm}\quad\pcalendarmonthname{\mm}}
@@ -58,9 +60,10 @@
   \item شمارهٔ روز ژولین یک تاریخ شمسی را بگیرید، چند روز به آن اضافه یا از آن کم کنید و دوباره به تاریخ
     برگردانید؛
   \item نام ماه‌های شمسی و میلادی و نام روزهای هفته را چاپ کنید؛
-  \item بفهمید هر سال به کدام حیوان از دورهٔ دوازده‌ساله تعلق دارد.
+  \item بفهمید هر سال به کدام حیوان از دورهٔ دوازده‌ساله تعلق دارد؛
+  \item با کتابخانهٔ \tx{calendar} در \pkg{TikZ} جدول ماه‌های شمسی را رسم کنید (بخش~\ref{sec:tikz}).
 \end{itemize}
-اما این بسته جدول ماه یا تقویم رومیزی نمی‌سازد، مناسبت‌ها و تعطیلات رسمی را نمی‌شناسد و فرمان جداگانه‌ای هم برای روز هفتهٔ یک تاریخ ندارد؛ هرچند در بخش~\ref{sec:names} می‌بینید که با چند خط می‌شود روز هفته را هم به دست آورد.
+اما این بسته مناسبت‌ها و تعطیلات رسمی را نمی‌شناسد و فرمان جداگانه‌ای هم برای روز هفتهٔ یک تاریخ ندارد؛ هرچند در بخش~\ref{sec:names} می‌بینید که با چند خط می‌شود روز هفته را هم به دست آورد.
 
 \paragraph{پیش‌نیازها.} تبدیل تاریخ فقط به بستهٔ \pkg{pgf} (که \pkg{pgfcalendar} بخشی از آن است) نیاز دارد و با \lr{pdfLaTeX}، \lr{XeLaTeX} و \lr{LuaLaTeX} کار می‌کند. نام‌های فارسی (و در نتیجه \cs{pdate}، \cs{gdate} و فرمان‌های نام) به‌صورت متن \lr{UTF-8} در خود فایل بسته نوشته شده‌اند؛ پس چاپ آن‌ها به موتور و بسته‌هایی نیاز دارد که حروف فارسی \lr{UTF-8} را پشتیبانی کنند و به قلمی که این حروف را داشته باشد. این راهنما از \pkg{xepersian} همراه با \lr{XeLaTeX} استفاده می‌کند، اما هر روش دیگری که فارسی را حروف‌چینی کند کافی است. اگر چنین چیزی ندارید، از فرمان‌های عددی \cs{pisodate} و \cs{gisodate} استفاده کنید که فقط رقم چاپ می‌کنند.
 
@@ -195,16 +198,49 @@
 
 \paragraph{روز هفتهٔ یک تاریخ.} فرمان آماده‌ای برای این کار نداریم، اما از روی شمارهٔ روز می‌شود آن را حساب کرد. \pkg{pgfcalendar} دوشنبه را ۰ می‌گیرد و \cs{pcalendarweekdayname} شنبه را؛ پس نتیجه را دو واحد جابه‌جا می‌کنیم:
 \begin{latin}\begin{verbatim}
-\newcount\jd \newcount\wd
+\newcount\jd \newcount\wday
 \pcalendardatetojulian{1403-01-01}\jd
-\pgfcalendarjuliantoweekday{\jd}{\wd}
-\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
-\pcalendarweekdayname{\wd}
+\pgfcalendarjuliantoweekday{\jd}{\wday}
+\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
+\pcalendarweekdayname{\wday}
 \end{verbatim}\end{latin}
 \pcalendardatetojulian{1403-01-01}\jd%
-\pgfcalendarjuliantoweekday{\jd}{\wd}%
-\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi%
-نتیجه «\pcalendarweekdayname{\wd}» است؛ یعنی اول فروردین ۱۴۰۳ چهارشنبه بوده است.
+\pgfcalendarjuliantoweekday{\jd}{\wday}%
+\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi%
+نتیجه «\pcalendarweekdayname{\wday}» است؛ یعنی اول فروردین ۱۴۰۳ چهارشنبه بوده است.
+
+% ---------------------------------------------------------------------------
+\section{تقویم با \lr{TikZ}}\label{sec:tikz}
+
+کتابخانهٔ \tx{calendar} در \pkg{TikZ} با فرمان \cs{calendar} تقویم رسم می‌کند، اما فقط ماه‌های میلادی را می‌شناسد. این بسته چند کلید به آن اضافه می‌کند تا ماه‌های شمسی را بچیند. \pkg{tikz} و این کتابخانه را خودتان بارگذاری کنید؛ بسته آن‌ها را بارگذاری نمی‌کند:
+\begin{latin}\begin{verbatim}
+\usepackage{tikz}
+\usetikzlibrary{calendar}
+\usepackage{persian-calendar}
+...
+\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last,
+               jalali week list, day xshift=-3em, month label above centered]
+  if (Friday) [red] if (jalali equals=1-13) [blue];
+\end{verbatim}\end{latin}
+\begin{center}
+\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last,
+               jalali week list, day xshift=-3em, month label above centered]
+  if (Friday) [red] if (jalali equals=1-13) [blue];
+\end{center}
+
+\macro|jalali dates=Y-M-D to Y-M-D|
+بازهٔ تاریخ‌هایی که رسم می‌شوند، به تاریخ شمسی. به‌جای روز می‌توانید \tx{last} بنویسید که یعنی روز آخر همان ماه (برای اسفند، بسته به کبیسه بودن سال، ۲۹ یا ۳۰). این کلید همان کلید \tx{dates} کتابخانه را تنظیم می‌کند، پس این دو را با هم به کار نبرید.
+
+\macro|jalali|
+تقویم را شمسی می‌کند. شمارهٔ روز، روز شمسی را نشان می‌دهد و عنوان ماه، نام فارسی ماه را همراه با سال (با \tx{day text} و \tx{month text} می‌توانید آن‌ها را عوض کنید). درون تقویم، شرط \tx{day of month=n} به روز شمسی اشاره می‌کند؛ به همین دلیل سبک‌های \tx{month label ...} خود کتابخانه در روز اول هر ماه شمسی اجرا می‌شوند. برای هر روز، \cs{pcalendarcurrentyear}، \cs{pcalendarcurrentmonth} و \cs{pcalendarcurrentday} تاریخ شمسی را نگه می‌دارند و \cs{pcalendarcurrentweekday} روز هفته را، با شمارش از شنبه برابر ۰ (مثل \cs{pcalendarweekdayname})؛ پس می‌توانید از آن‌ها در \tx{day code} استفاده کنید.
+
+\macro|jalali week list|
+مثل \tx{week list} کتابخانه، اما برای ماه‌های شمسی: \tx{jalali} را هم شامل می‌شود، هر هفته از شنبه تا جمعه است و هر ماه از سطر تازه‌ای شروع می‌شود. با \tx{day xshift} مثبت (پیش‌فرض) شنبه در سمت چپ است؛ با مقدار منفی، مثل نمونهٔ بالا، شنبه به سمت راست می‌رود.
+
+\macro|jalali equals=M-D|
+شرطی که در هر سال با یک ماه و روز شمسی جور درمی‌آید؛ مثلاً \tx{jalali equals=1-1} برای نوروز. این شرط و \tx{jalali day of month=n} را می‌توان در \tx{if (...)} و با \cs{pgfcalendarifdate} به کار برد، حتی بیرون از تقویم‌های \tx{jalali}.
+
+\paragraph{چیدمان‌های دیگر.} \tx{day list downward}، \tx{day list upward}، \tx{day list right} و \tx{day list left} همراه با \tx{jalali} درست کار می‌کنند، چون فقط شرط \tx{day of month=1} را می‌سنجند. اما \tx{week list} و \tx{month list} کتابخانه از روز و روز هفتهٔ میلادی استفاده می‌کنند؛ به‌جای آن‌ها \tx{jalali week list} را به کار ببرید.
 
 % ---------------------------------------------------------------------------
 \section{نمونه‌های کاربردی}\label{sec:recipes}

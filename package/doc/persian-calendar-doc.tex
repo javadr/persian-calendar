@@ -4,6 +4,8 @@
 \usepackage[a4paper,margin=2.5cm]{geometry}
 \usepackage{persian-calendar}
 \usepackage{pgffor}
+\usepackage{tikz}
+\usetikzlibrary{calendar}
 \usepackage[colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 \usepackage{xepersian}
 
@@ -19,7 +21,7 @@
 \newcommand\pkg[1]{\textsf{#1}}
 \newcommand\cs[1]{\texttt{\textbackslash #1}}
 \newcommand\gap{\par\smallskip}
-\newcount\jd \newcount\wd
+\newcount\jd \newcount\wday
 \renewcommand\thepage{\lr{\arabic{page}}}   % page numbers in Latin digits (the footer is typeset in the Persian font)
 % table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four
 \newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\texttt{\mm}\quad\pcalendarmonthname{\mm}}
@@ -60,10 +62,11 @@ The package is a date converter and a set of name tables. It provides:
   \item Gregorian $\to$ Jalali and Jalali $\to$ Gregorian conversion, printed as text or as numbers;
   \item Julian day numbers for Jalali dates, so you can add days, subtract dates or loop over days;
   \item Persian names of the Jalali and Gregorian months and of the weekdays;
-  \item the animal name of a year in the twelve-animal cycle.
+  \item the animal name of a year in the twelve-animal cycle;
+  \item Jalali month grids drawn with the \pkg{TikZ} \texttt{calendar} library (section~\ref{sec:tikz}).
 \end{itemize}
-It does \emph{not} typeset a month grid or a wall calendar, it has no holidays, and it has no macro
-that returns the weekday of a date (section~\ref{sec:names6} shows how to get one in three lines).
+It has no holidays, and it has no macro that returns the weekday of a date
+(section~\ref{sec:names6} shows how to get one in three lines).
 
 \paragraph{Requirements.} The \pkg{pgf} bundle (which contains \pkg{pgfcalendar}) is all the
 conversions need, and they work with pdf\LaTeX{}, Xe\LaTeX{} and Lua\LaTeX{}. Only the names (and
@@ -231,16 +234,65 @@ The twelve animals in order, starting from year 1380:\gap
 one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalendarweekdayname} numbers Saturday as 0, so
 shift by two:
 \begin{verbatim}
-\newcount\jd \newcount\wd
+\newcount\jd \newcount\wday
 \pcalendardatetojulian{1403-01-01}\jd
-\pgfcalendarjuliantoweekday{\jd}{\wd}
-\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi
-\pcalendarweekdayname{\wd}
+\pgfcalendarjuliantoweekday{\jd}{\wday}
+\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
+\pcalendarweekdayname{\wday}
 \end{verbatim}
 \pcalendardatetojulian{1403-01-01}\jd%
-\pgfcalendarjuliantoweekday{\jd}{\wd}%
-\advance\wd by 2 \ifnum\wd>6 \advance\wd by -7 \fi%
-gives \pcalendarweekdayname{\wd} (1 Farvardin 1403 was a Wednesday).
+\pgfcalendarjuliantoweekday{\jd}{\wday}%
+\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi%
+gives \pcalendarweekdayname{\wday} (1 Farvardin 1403 was a Wednesday).
+
+% ---------------------------------------------------------------------------
+\section{Calendars with TikZ}\label{sec:tikz}
+
+The \pkg{TikZ} \texttt{calendar} library draws calendars with \cs{calendar}, but it only knows Gregorian
+months. The package adds a few keys that make it lay out Jalali months instead. Load \pkg{tikz} and the
+library yourself; the package does not load them:
+\begin{verbatim}
+\usepackage{tikz}
+\usetikzlibrary{calendar}
+\usepackage{persian-calendar}
+...
+\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last,
+               jalali week list, day xshift=-3em, month label above centered]
+  if (Friday) [red] if (jalali equals=1-13) [blue];
+\end{verbatim}
+\begin{center}
+\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last,
+               jalali week list, day xshift=-3em, month label above centered]
+  if (Friday) [red] if (jalali equals=1-13) [blue];
+\end{center}
+
+\macro|jalali dates=Y-M-D to Y-M-D|
+The range to draw, as Jalali dates. The day can be \texttt{last}, the last day of that month (29 or 30 for
+Esfand, depending on the leap year). It sets the library's \texttt{dates} key, so the two must not be mixed.
+
+\macro|jalali|
+Switches the calendar to Jalali dates. The day number and the month label print the Jalali day and the
+Persian month name with the year (change them with \texttt{day text} and \texttt{month text}). Inside the
+calendar, the test \texttt{day of month=}$n$ means the Jalali day, so the library's
+\texttt{month label \ldots} styles fire on the first of each Jalali month. For every day,
+\cs{pcalendarcurrentyear}, \cs{pcalendarcurrentmonth}, \cs{pcalendarcurrentday} hold the Jalali date and
+\cs{pcalendarcurrentweekday} the weekday counted from Saturday${}=0$ (like \cs{pcalendarweekdayname}), so
+they can be used in \texttt{day code}.
+
+\macro|jalali week list|
+Like the library's \texttt{week list}, but for Jalali months: \texttt{jalali} is included, a week runs from
+Saturday to Friday and a new month starts a new block. With the default positive \texttt{day xshift}
+Saturday is on the left; a negative \texttt{day xshift}, as above, puts it on the right.
+
+\macro|jalali equals=M-D|
+A date test that matches one Jalali month and day in every year, for example \texttt{jalali equals=1-1}
+for Nowruz. It can be used in \texttt{if (\ldots)} and with \cs{pgfcalendarifdate}, also outside
+\texttt{jalali} calendars, as can \texttt{jalali day of month=}$n$.
+
+\paragraph{Other layouts.} \texttt{day list downward}, \texttt{day list upward}, \texttt{day list right} and
+\texttt{day list left} work together with \texttt{jalali}, because they only test \texttt{day of month=1}.
+The library's \texttt{week list} and \texttt{month list} use the Gregorian weekday and day, so use
+\texttt{jalali week list} instead.
 
 % ---------------------------------------------------------------------------
 \section{Recipes}\label{sec:recipes7}

@@ -1,8 +1,8 @@
 # persian-calendar
 
-A LaTeX package for the Persian (Jalali, Solar Hijri) calendar. It converts dates between the Persian and Gregorian calendars, prints dates with Persian month names, gives day numbers for date arithmetic, and provides Persian month, weekday and year-animal names. It is built on `pgfcalendar`. The date conversions work with any engine (pdfLaTeX, XeLaTeX, LuaLaTeX); printing the Persian names needs a Unicode engine and a Persian font, for example XeLaTeX with `xepersian`.
+A LaTeX package for the Persian (Jalali, Solar Hijri) calendar. It converts dates between the Persian and Gregorian calendars, prints dates with Persian month names, gives day numbers for date arithmetic, and provides Persian month, weekday and year-animal names. It is built on `pgfcalendar`, and it lets the TikZ `calendar` library draw Jalali month grids. The date conversions work with any engine (pdfLaTeX, XeLaTeX, LuaLaTeX); printing the Persian names needs a Unicode engine and a Persian font, for example XeLaTeX with `xepersian`.
 
-It is a date converter and a set of name tables. It does not typeset a month grid or a wall calendar, and it has no holidays.
+It is a date converter, a set of name tables and a Jalali layout for TikZ calendars. It has no holidays.
 
 ## Usage
 
@@ -34,6 +34,14 @@ Load `persian-calendar` in the preamble. The example below uses `xepersian` and 
 \pcalendardatetojulian{1394-01-01+10}\jd
 \pcalendarjuliantodate\jd\y\m\d
 \number\y-\number\m-\number\d         % 1394-1-11
+```
+
+With `tikz` and `\usetikzlibrary{calendar}` loaded, a Jalali month grid, Saturday to Friday, right to left:
+
+```latex
+\tikz\calendar[jalali dates=1405-01-01 to 1405-01-last, jalali week list,
+               day xshift=-3em, month label above centered]
+  if (Friday) [red] if (jalali equals=1-13) [blue];
 ```
 
 The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/persian-calendar-doc.tex`](package/doc/persian-calendar-doc.tex)) and Persian ([`package/doc/persian-calendar-doc-fa.tex`](package/doc/persian-calendar-doc-fa.tex)). `package/sample/persian-calendar-test.tex` shows every macro with its output.
