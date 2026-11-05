@@ -64,7 +64,8 @@ The package is a date converter and a set of name tables. It provides:
   \item Julian day numbers for Jalali dates, so you can add days, subtract dates or loop over days;
   \item Persian names of the Jalali and Gregorian months and of the weekdays;
   \item the animal name of a year in the twelve-animal cycle;
-  \item Jalali month grids drawn with the \pkg{TikZ} \texttt{calendar} library (section~\ref{sec:tikz}).
+  \item Jalali month grids drawn with the \pkg{TikZ} \texttt{calendar} library (section~\ref{sec:tikz});
+  \item a two-page year planner in the manner of \pkg{yplan} (section~\ref{sec:yplan}).
 \end{itemize}
 It has no holidays, and it has no macro that returns the weekday of a date
 (section~\ref{sec:names6} shows how to get one in three lines).
@@ -427,6 +428,69 @@ over the years, three to a row:
 \end{center}
 
 % ---------------------------------------------------------------------------
+\section{A year planner}\label{sec:yplan}
+
+The \pkg{yplan} package on CTAN prints a vertical year planner: all the days of a year on two A4 pages,
+six months to a page, with a column per month and a row per day. \cs{pcalendarplanner} does the same for a Jalali
+year. It is an ordinary \texttt{tabular}, so it needs neither \pkg{TikZ} nor any package beyond the ones
+that print Persian.
+
+\macro|\pcalendarplanner{year}|
+Typesets Jalali \texttt{year} on two pages: Farvardin to Shahrivar, then Mehr to Esfand. Each page starts
+with \cs{clearpage} and has page style \texttt{empty}. Above the table is the year, followed by
+\cs{pcalendarplannerleapyear} (``\rl{\setpersianfont\pcalendarplannerleapyear}'') in a leap year. Down the side are the weekday names; the
+rows are aligned on the weekday, so a row is the same weekday in every month. Weeks run Saturday to
+Friday and a double rule follows every Friday. As in \pkg{yplan}, only the cells that hold a day are
+ruled, and each page has as many rows as its months need (at most 37). The six month columns share the
+line width that the weekday column and the rules leave, so the page margins set their width. Under
+\pkg{xepersian} the table runs right to left: the weekday column is on the right, then Farvardin.
+The year may be a macro.
+\begin{verbatim}
+\documentclass{article}
+\usepackage[a4paper,margin=1.2cm]{geometry}
+\usepackage{persian-calendar}
+\usepackage{xepersian}
+\settextfont{Parisa}
+\begin{document}
+\pcalendarplanner{1405}
+\end{document}
+\end{verbatim}
+The sample \texttt{persian-calendar-planner.tex}, which comes with the package, is this document with the
+Fridays shaded.
+
+\paragraph{Adjusting the layout.} As in \pkg{yplan}, these can be redefined with \cs{renewcommand}:
+\begin{itemize}
+  \item \cs{pcalendarplannerdaystrut}: sets the height of the day rows; \verb|\rule{0pt}{12pt}| by default.
+    Make it taller or shorter to fill the page.
+  \item \cs{pcalendarplannermonthstrut}: the same for the row of month names.
+  \item \cs{pcalendarplannerleapyear}: the leap-year label.
+\end{itemize}
+
+\macro|\pcalendarplannercell{year}{month}{day}{weekday}|
+Typesets one day cell. \cs{pcalendarplanner} calls it for every day with the Jalali year, month and day, and the
+weekday numbered as \cs{pcalendarweekdayname} does (0 is Saturday, 6 is Friday). By default it prints
+the day number. Redefine it to colour, mark or annotate days; empty cells do not call it. This one
+shades the Fridays and prints 1 Farvardin in red:
+\begin{verbatim}
+\usepackage[table]{xcolor}
+\providecommand\UseMathForPositioningText{}
+...
+\renewcommand\pcalendarplannercell[4]{%
+  \ifnum#4=6 \cellcolor{gray!20}\fi
+  \ifnum\numexpr#2*100+#3=101 \textcolor{red}{#3}\else#3\fi}
+\end{verbatim}
+\cs{cellcolor} comes from \pkg{colortbl}, which the \texttt{table} option of \pkg{xcolor} loads. The
+\cs{providecommand} line works around a bug in \pkg{bidi} (section~\ref{sec:limitations9}). Use
+\cs{textcolor} rather than \cs{color} in a cell: \cs{color} at the start of a cell moves the number down
+a line. The cell is a paragraph column, so longer text, such as a holiday name, wraps inside it.
+
+\paragraph{Why a table and not TikZ.} A \pkg{TikZ} drawing of the same planner, with a node per day, took
+about 70 times as long to typeset as \cs{pcalendarplanner} (about 11\,s against 0.15\,s for ten years, beyond the
+time to load the packages), and it would have to set the right-to-left order and the column widths
+itself. The calendar keys of section~\ref{sec:tikz} are the better choice for a graphical calendar;
+\cs{pcalendarplannercell} covers colours and notes in the planner.
+
+% ---------------------------------------------------------------------------
 \section{Recipes}\label{sec:recipes7}
 
 \paragraph{Days between two Jalali dates.}
@@ -510,10 +574,17 @@ and the others in front of every day, ahead of the library's own per-day code, a
 \texttt{day of month} test for that calendar only. The conversions are run inside a group, because
 \pkg{pgfcalendar} walks the days with \cs{loop} and the conversions use \cs{loop} too.
 
+\paragraph{The year planner.} For each page \cs{pcalendarplanner} converts only the 1st of each of its six months
+(and of the month after) to a day number, through \cs{pcalendardatetojulian}'s machinery; their
+differences are the month lengths, and the weekday of each 1st gives the month's first row. The rows are
+then written into a token register, one cell per month with a call to \cs{pcalendarplannercell} in each cell that
+holds a day, together with the \cs{cline}s under them, and the register is put into the
+\texttt{tabular}. The rows are built by recursion rather than \cs{loop}, for the reason above.
+
 % ---------------------------------------------------------------------------
 \section{Limitations and known issues}\label{sec:limitations9}
 
-\begin{itemize}
+\begin{itemize}\sloppy % long code names cannot be hyphenated
   \item \textbf{No input checking.} A month 13, day 40 or malformed string gives wrong output or a TeX
     error, not a package message.
   \item \textbf{Literal dates only.} The date argument of \cs{pdate}, \cs{gdate}, \cs{pisodate} and
@@ -544,6 +615,13 @@ and the others in front of every day, ahead of the library's own per-day code, a
   \item \textbf{TikZ internals.} \texttt{jalali} adds its code to the library's internal macro
     \cs{tikz@before@day}. A future \pkg{TikZ} that renames it would break the Jalali calendars; the
     regression test \texttt{tikz.lvt} would catch it.
+  \item \textbf{Shading planner cells with \pkg{xepersian}.} Loading \pkg{colortbl} (for example with
+    \verb|\usepackage[table]{xcolor}|) together with \pkg{xepersian} stops at the first table with
+    ``Undefined control sequence \cs{UseMathForPositioningText}''. \pkg{bidi}'s adaptation of
+    \pkg{array} uses this macro, which current versions of \pkg{array} no longer define. Until \pkg{bidi}
+    is fixed, put \verb|\providecommand\UseMathForPositioningText{}| in the preamble.
+  \item \textbf{The planner is A4 portrait by default.} \cs{pcalendarplanner} does not change the page size or the
+    margins; set them with \pkg{geometry}, and the row height with \cs{pcalendarplannerdaystrut}.
   \item \textbf{Do not redefine \cs{wd}.} \cs{newcount}\cs{wd} or similar replaces a \TeX{} primitive that
     \pkg{TikZ} needs, and stray text such as ``\texttt{==0pt}'' appears in the pictures.
 \end{itemize}
@@ -551,7 +629,10 @@ and the others in front of every day, ahead of the library's own per-day code, a
 % ---------------------------------------------------------------------------
 \section{Version history}\label{sec:version11}
 
-\begin{description}
+\begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.7 (2026-11-05)] A year planner in the manner of \pkg{yplan}: \cs{pcalendarplanner}, and
+    \cs{pcalendarplannercell} to colour or annotate its days. The sample
+    \texttt{persian-calendar-planner.tex}.
   \item[0.62 (2026-11-04)] \texttt{jalali week columns} and the sample \texttt{persian-calendar-years.tex}.
   \item[0.61 (2026-11-03)] \texttt{jalali day boxes} (a grid of boxes) and \texttt{jalali weekday initials}.
   \item[0.6 (2026-11-03)] Renamed from \pkg{pcalendar} to \pkg{persian-calendar} at the request of CTAN (file

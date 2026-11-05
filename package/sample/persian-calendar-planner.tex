@@ -1,0 +1,21 @@
+% A vertical year planner for one Jalali year, in the manner of yplan: two A4 pages, six months each.
+% Set the year below. Build: make test   (XeLaTeX; xepersian and the font Parisa are needed)
+\documentclass{article}
+
+\usepackage[a4paper,margin=1.2cm]{geometry}
+\usepackage[table]{xcolor}
+\providecommand\UseMathForPositioningText{}% bidi's array patch needs it; current array.sty dropped it
+\usepackage{persian-calendar}
+\usepackage{xepersian}
+
+\settextfont{Parisa}
+
+% Every day cell goes through \pcalendarplannercell{year}{month}{day}{weekday}, weekday 0 = Saturday.
+% Here: Fridays shaded, and 1 Farvardin (Nowruz) in red.
+\renewcommand\pcalendarplannercell[4]{%
+  \ifnum#4=6 \cellcolor{gray!20}\fi
+  \ifnum\numexpr#2*100+#3=101 \textcolor{red}{#3}\else#3\fi}
+
+\begin{document}
+\pcalendarplanner{1405}
+\end{document}

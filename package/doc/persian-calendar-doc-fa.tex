@@ -62,7 +62,8 @@
     برگردانید؛
   \item نام ماه‌های شمسی و میلادی و نام روزهای هفته را چاپ کنید؛
   \item بفهمید هر سال به کدام حیوان از دورهٔ دوازده‌ساله تعلق دارد؛
-  \item با کتابخانهٔ \tx{calendar} در \pkg{TikZ} جدول ماه‌های شمسی را رسم کنید (بخش~\ref{sec:tikz}).
+  \item با کتابخانهٔ \tx{calendar} در \pkg{TikZ} جدول ماه‌های شمسی را رسم کنید (بخش~\ref{sec:tikz})؛
+  \item برنامه‌ریز سالانهٔ دوصفحه‌ای به شیوهٔ \pkg{yplan} چاپ کنید (بخش~\ref{sec:yplan}).
 \end{itemize}
 اما این بسته مناسبت‌ها و تعطیلات رسمی را نمی‌شناسد و فرمان جداگانه‌ای هم برای روز هفتهٔ یک تاریخ ندارد؛ هرچند در بخش~\ref{sec:names} می‌بینید که با چند خط می‌شود روز هفته را هم به دست آورد.
 
@@ -343,6 +344,46 @@
 \end{center}
 
 % ---------------------------------------------------------------------------
+\section{برنامه‌ریز سالانه}\label{sec:yplan}
+
+بستهٔ \pkg{yplan} در \lr{CTAN} یک برنامه‌ریز سالانهٔ عمودی چاپ می‌کند: همهٔ روزهای سال در دو صفحهٔ \lr{A4}، شش ماه در هر صفحه، با یک ستون برای هر ماه و یک سطر برای هر روز. \cs{pcalendarplanner} همین کار را برای سال شمسی انجام می‌دهد. این برنامه‌ریز یک \tx{tabular} معمولی است، پس به \pkg{TikZ} یا بستهٔ دیگری جز آن‌چه برای چاپ فارسی لازم است نیازی ندارد.
+
+\macro|\pcalendarplanner{year}|
+سال شمسی \tx{year} را در دو صفحه چاپ می‌کند: فروردین تا شهریور، و سپس مهر تا اسفند. هر صفحه با \cs{clearpage} شروع می‌شود و سبک صفحهٔ \tx{empty} دارد. بالای جدول سال و در سال کبیسه پس از آن \cs{pcalendarplannerleapyear} («\pcalendarplannerleapyear») می‌آید. در کنار جدول نام روزهای هفته است و سطرها بر اساس روز هفته چیده شده‌اند، پس هر سطر در همهٔ ماه‌ها یک روز هفته است. هفته از شنبه تا جمعه است و پس از هر جمعه خط دوتایی می‌آید. مانند \pkg{yplan} فقط دور خانه‌هایی که روز دارند خط کشیده می‌شود، و هر صفحه به اندازهٔ نیاز ماه‌هایش سطر دارد (حداکثر ۳۷). شش ستون ماه پهنایی را که ستون روزهای هفته و خط‌ها باقی می‌گذارند به تساوی تقسیم می‌کنند، پس حاشیه‌های صفحه پهنای آن‌ها را تعیین می‌کند. با \pkg{xepersian} جدول راست‌به‌چپ است: ستون روزهای هفته در سمت راست و پس از آن فروردین. سال می‌تواند یک ماکرو باشد.
+\begin{latin}\begin{verbatim}
+\documentclass{article}
+\usepackage[a4paper,margin=1.2cm]{geometry}
+\usepackage{persian-calendar}
+\usepackage{xepersian}
+\settextfont{Parisa}
+\begin{document}
+\pcalendarplanner{1405}
+\end{document}
+\end{verbatim}\end{latin}
+نمونهٔ \tx{persian-calendar-planner.tex}، که همراه بسته است، همین سند است با جمعه‌های سایه‌دار.
+
+\paragraph{تنظیم چیدمان.} مانند \pkg{yplan}، این‌ها را می‌توانید با \cs{renewcommand} از نو تعریف کنید:
+\begin{itemize}
+  \item \cs{pcalendarplannerdaystrut}: ارتفاع سطرهای روز؛ به‌طور پیش‌فرض \tx{\textbackslash rule\{0pt\}\{12pt\}}. برای پر کردن صفحه آن را بلندتر یا کوتاه‌تر کنید.
+  \item \cs{pcalendarplannermonthstrut}: همین برای سطر نام ماه‌ها.
+  \item \cs{pcalendarplannerleapyear}: برچسب سال کبیسه.
+\end{itemize}
+
+\macro|\pcalendarplannercell{year}{month}{day}{weekday}|
+یک خانهٔ روز را چاپ می‌کند. \cs{pcalendarplanner} آن را برای هر روز با سال، ماه و روز شمسی و روز هفته صدا می‌زند؛ روز هفته مانند \cs{pcalendarweekdayname} شماره‌گذاری شده است (۰ شنبه و ۶ جمعه). به‌طور پیش‌فرض فقط شمارهٔ روز را چاپ می‌کند. برای رنگ کردن، علامت زدن یا نوشتن یادداشت در روزها آن را از نو تعریف کنید؛ خانه‌های خالی آن را صدا نمی‌زنند. تعریف زیر جمعه‌ها را سایه می‌زند و ۱ فروردین را قرمز چاپ می‌کند:
+\begin{latin}\begin{verbatim}
+\usepackage[table]{xcolor}
+\providecommand\UseMathForPositioningText{}
+...
+\renewcommand\pcalendarplannercell[4]{%
+  \ifnum#4=6 \cellcolor{gray!20}\fi
+  \ifnum\numexpr#2*100+#3=101 \textcolor{red}{#3}\else#3\fi}
+\end{verbatim}\end{latin}
+\cs{cellcolor} از بستهٔ \pkg{colortbl} است که گزینهٔ \tx{table} در \pkg{xcolor} آن را بار می‌کند. سطر \cs{providecommand} اشکالی در \pkg{bidi} را دور می‌زند (بخش~\ref{sec:limits}). در خانه‌ها از \cs{textcolor} استفاده کنید نه \cs{color}: \cs{color} در ابتدای خانه شماره را یک سطر پایین می‌برد. هر خانه ستونی از نوع پاراگراف است، پس متن بلندتر، مثل نام یک مناسبت، درون آن می‌شکند.
+
+\paragraph{چرا جدول و نه \lr{TikZ}.} رسم همین برنامه‌ریز با \pkg{TikZ}، با یک گره برای هر روز، حدود ۷۰ برابر \cs{pcalendarplanner} زمان برد (برای ده سال حدود ۱۱ ثانیه در برابر ۰٫۱۵ ثانیه، بدون زمان بار کردن بسته‌ها) و ترتیب راست‌به‌چپ و پهنای ستون‌ها را هم باید خودش تنظیم می‌کرد. برای تقویم‌های گرافیکی کلیدهای بخش~\ref{sec:tikz} انتخاب بهتری‌اند؛ رنگ و یادداشت در برنامه‌ریز را \cs{pcalendarplannercell} پوشش می‌دهد.
+
+% ---------------------------------------------------------------------------
 \section{نمونه‌های کاربردی}\label{sec:recipes}
 
 \paragraph{فاصلهٔ دو تاریخ شمسی به روز.}\leavevmode\par
@@ -413,10 +454,12 @@
 
 \paragraph{تقویم‌های \lr{TikZ}.} کلیدهای بخش~\ref{sec:tikz} هنگام بارگذاری بسته با \cs{pgfkeys} تعریف می‌شوند، پس تا وقتی به کار نروند به \pkg{TikZ} نیازی ندارند. \tx{jalali dates} هر دو سر بازه را به میلادی تبدیل می‌کند و به کلید \tx{dates} کتابخانه می‌دهد؛ \tx{last} به روز اول ماه شمسی بعد با جابه‌جایی \tx{+-1} تبدیل می‌شود. \tx{jalali} پیش از هر روز، و پیش از کدهای خود کتابخانه، فرمانی اجرا می‌کند که \cs{pcalendarcurrentyear} و بقیه را تنظیم می‌کند، و شرط \tx{day of month} را فقط برای همان تقویم از نو تعریف می‌کند. تبدیل‌ها درون یک گروه اجرا می‌شوند، چون \pkg{pgfcalendar} روزها را با \cs{loop} می‌پیماید و تبدیل‌ها هم از \cs{loop} استفاده می‌کنند.
 
+\paragraph{برنامه‌ریز سالانه.} \cs{pcalendarplanner} برای هر صفحه فقط روز اول هر یک از شش ماه آن (و ماه بعد) را با همان سازوکار \cs{pcalendardatetojulian} به شمارهٔ روز تبدیل می‌کند؛ تفاضل آن‌ها طول ماه‌هاست و روز هفتهٔ روز اول هر ماه سطر شروع آن را می‌دهد. سپس سطرها در یک ثبات توکن نوشته می‌شوند، یک خانه برای هر ماه که در خانه‌های دارای روز \cs{pcalendarplannercell} را صدا می‌زند، همراه با \cs{cline}های زیر آن‌ها، و این ثبات درون \tx{tabular} قرار می‌گیرد. سطرها به همان دلیل بالا با بازگشت ساخته می‌شوند، نه با \cs{loop}.
+
 % ---------------------------------------------------------------------------
 \section{محدودیت‌ها و مشکلات شناخته‌شده}\label{sec:limits}
 
-\begin{itemize}
+\begin{itemize}\sloppy % long code names cannot be hyphenated
   \item \textbf{ورودی بررسی نمی‌شود.} اگر ماه ۱۳، روز ۴۰ یا رشتهٔ نادرستی بدهید، یا خروجی غلط می‌شود یا \TeX{} خطا می‌دهد (نه خود بسته).
   \item \textbf{ورودی باید خودِ تاریخ باشد.} \cs{pdate}، \cs{gdate}، \cs{pisodate} و \cs{gisodate} ورودی را همان‌طور که نوشته شده در خط‌های تیره می‌شکنند و فرمانی را که تاریخ در آن ذخیره شده باز نمی‌کنند. پس این‌طور بنویسید: \cs{pdate}\tx{\{2015-03-21\}}، نه \cs{pdate}\cs{mydate}. (\cs{pcalendardatetojulian} ورودی‌اش را
     باز می‌کند و این مشکل را ندارد.)
@@ -433,13 +476,16 @@
   \item \textbf{\tx{jalali dates} و \tx{dates}} هر دو یک بازه را تنظیم می‌کنند، پس هر کدام که بعدتر بیاید اعمال می‌شود. تاریخ‌های \tx{jalali dates} هم مثل ورودی \cs{pdate} باید خودِ تاریخ باشند.
   \item \textbf{خانه‌ها و عنوان روزهای راست‌چین را فرض می‌کنند.} \tx{jalali day boxes} و \tx{jalali month label above centered} لنگر پیش‌فرض \tx{every day} کتابخانه (\tx{base east}) را فرض می‌کنند. حرف‌های روزهای هفته همه یک سبک دارند، پس نمی‌شود فقط حرف جمعه را رنگی کرد.
   \item \textbf{وابستگی به جزئیات داخلی \lr{TikZ}.} \tx{jalali} کد خود را به ماکروی داخلی \cs{tikz@before@day} کتابخانه اضافه می‌کند. اگر نسخهٔ آیندهٔ \pkg{TikZ} نام آن را عوض کند، تقویم‌های شمسی از کار می‌افتند؛ آزمون \tx{tikz.lvt} این را نشان می‌دهد.
+  \item \textbf{سایه زدن خانه‌های برنامه‌ریز با \pkg{xepersian}.} بار کردن \pkg{colortbl} (مثلاً با \tx{\textbackslash usepackage[table]\{xcolor\}}) همراه با \pkg{xepersian} در اولین جدول با خطای «\lr{\texttt{Undefined control sequence}}» برای \cs{UseMathForPositioningText} متوقف می‌شود. نسخهٔ \pkg{bidi} از \pkg{array} این ماکرو را به کار می‌برد که نسخه‌های فعلی \pkg{array} دیگر تعریفش نمی‌کنند. تا وقتی \pkg{bidi} اصلاح شود، این ماکرو را با \cs{providecommand} در پیش‌درآمد سند خالی تعریف کنید (سطر دوم مثال بخش~\ref{sec:yplan}).
+  \item \textbf{برنامه‌ریز اندازهٔ صفحه را تغییر نمی‌دهد.} \cs{pcalendarplanner} اندازهٔ صفحه و حاشیه‌ها را عوض نمی‌کند؛ آن‌ها را با \pkg{geometry} و ارتفاع سطرها را با \cs{pcalendarplannerdaystrut} تنظیم کنید.
   \item \textbf{\cs{wd} را از نو تعریف نکنید.} \cs{newcount}\cs{wd} یا مانند آن یک فرمان پایهٔ \TeX{} را که \pkg{TikZ} لازم دارد از بین می‌برد و متن ناخواسته‌ای مثل «\tx{==0pt}» در تصویرها ظاهر می‌شود.
 \end{itemize}
 
 % ---------------------------------------------------------------------------
 \section{تاریخچهٔ نسخه‌ها}\label{sec:history}
 
-\begin{description}
+\begin{description}\sloppy % long code names cannot be hyphenated
+  \item[\lr{0.7 (2026-11-05)}] برنامه‌ریز سالانه به شیوهٔ \pkg{yplan}: فرمان \cs{pcalendarplanner} و فرمان \cs{pcalendarplannercell} برای رنگ کردن یا یادداشت‌گذاری روزها. نمونهٔ \tx{persian-calendar-planner.tex}.
   \item[\lr{0.62 (2026-11-04)}] \tx{jalali week columns} و نمونهٔ \tx{persian-calendar-years.tex}.
   \item[\lr{0.61 (2026-11-03)}] \tx{jalali day boxes} (جدول خانه‌دار) و \tx{jalali weekday initials} (حرف اول روزهای هفته).
   \item[\lr{0.6 (2026-11-03)}] تغییر نام از \pkg{pcalendar} به \pkg{persian-calendar} به درخواست \lr{CTAN} (فقط نام فایل‌ها و بسته؛ نام فرمان‌ها تغییری نکرده است). رسم جدول ماه‌های شمسی با کتابخانهٔ \tx{calendar} در \pkg{TikZ} (بخش~\ref{sec:tikz}). ذکر مجوز به‌صورت \lr{LPPL 1.3c} در همه‌جا.

@@ -20,8 +20,8 @@
 %%
 %%
 \NeedsTeXFormat{LaTeX2e}
-\def\pcalendardate{2026/11/04}
-\def\pcalendarversion{0.62}
+\def\pcalendardate{2026/11/05}
+\def\pcalendarversion{0.7}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -585,6 +585,70 @@
       \pgftransformyshift{\pgf@ya}%
       \tikzmonthcode}}{}},
     every month/.append style={anchor=base}}}%
+%
+% ---- \pcalendarplanner{year}: a vertical year planner in the manner of yplan ----
+% Two pages, six Jalali months each: a column per month, a row per day, rows aligned on the weekday
+% (Saturday first), a double rule after each Friday. Built with recursion, not \loop (the converters use \loop).
+\newcount\pcal@yprow \newcount\pcal@yprows \newcount\pcal@ypwd \newtoks\pcal@yptoks \newdimen\pcal@ypwidth
+\def\pcalendarplannerdaystrut{\rule{0pt}{12pt}}%
+\def\pcalendarplannermonthstrut{\rule{0pt}{12pt}}%
+\def\pcalendarplannerleapyear{سال کبیسه}%
+% Typesets one day cell: Jalali year, month, day, weekday (Saturday = 0). Redefine to colour or annotate days.
+\def\pcalendarplannercell#1#2#3#4{#3}%
+% Julian day of the 1st of Jalali month #2 (may be 13) of year #1, into \pcal@ypj#3.
+\def\pcal@ypfirst#1#2#3{{\pcal@temp=\numexpr#2\relax\pcal@temptwo=#1\relax
+    \ifnum\pcal@temp>12 \advance\pcal@temp by -12 \advance\pcal@temptwo by 1 \fi
+    \edef\pcal@arg{\the\pcal@temptwo-\the\pcal@temp-1}\expandafter\pcal@togregorian\expandafter{\pcal@arg}%
+    \pgfcalendardatetojulian{\pcal@iso}{\pgfutil@tempcnta}%
+    \expandafter\xdef\csname pcal@ypj#3\endcsname{\the\pgfutil@tempcnta}}}%
+% Column #1 (1-6): weekday of its 1st (Saturday = 0) into \pcal@ypo#1, length into \pcal@ypl#1.
+\def\pcal@ypmonth#1{{\pgfcalendarjuliantoweekday{\csname pcal@ypj#1\endcsname}{\pcal@temp}%
+    \advance\pcal@temp by 2 \ifnum\pcal@temp>6 \advance\pcal@temp by -7 \fi
+    \expandafter\xdef\csname pcal@ypo#1\endcsname{\the\pcal@temp}%
+    \expandafter\xdef\csname pcal@ypl#1\endcsname{\the\numexpr\csname pcal@ypj\the\numexpr#1+1\endcsname
+      -\csname pcal@ypj#1\endcsname\relax}}%
+    \ifnum\numexpr\csname pcal@ypo#1\endcsname+\csname pcal@ypl#1\endcsname>\pcal@yprows
+      \pcal@yprows=\numexpr\csname pcal@ypo#1\endcsname+\csname pcal@ypl#1\endcsname\relax\fi}%
+% Expands to 1 if row #1 of column #2 holds a day, else 0.
+\def\pcal@ypin#1#2{\ifnum\numexpr(#1)-\csname pcal@ypo#2\endcsname<0 0\else
+    \ifnum\numexpr(#1)-\csname pcal@ypo#2\endcsname<\csname pcal@ypl#2\endcsname\space 1\else 0\fi\fi}%
+\def\pcal@ypcell#1{&\ifnum\pcal@ypin\pcal@yprow{#1}=1 \noexpand\pcalendarplannercell{\pcal@ypyear}{\the\numexpr\pcal@ypbase+#1-1\relax}%
+    {\the\numexpr\pcal@yprow-\csname pcal@ypo#1\endcsname+1\relax}{\the\pcal@ypwd}\fi}%
+% Rule under a cell that holds a day, or above one; full rules after Friday and the last row.
+\def\pcal@ypcline#1{\ifnum\pcal@ypin\pcal@yprow{#1}\pcal@ypin{\pcal@yprow+1}{#1}>0
+    \noexpand\cline{\the\numexpr#1+1\relax-\the\numexpr#1+1\relax}\fi}%
+\def\pcal@yprule{\ifnum\pcal@yprow=\numexpr\pcal@yprows-1\relax\noexpand\hline
+    \else\ifnum\pcal@ypwd=6 \noexpand\hline\noexpand\hline
+    \else\noexpand\cline{1-1}\pcal@ypcline1\pcal@ypcline2\pcal@ypcline3\pcal@ypcline4\pcal@ypcline5\pcal@ypcline6\fi\fi}%
+\def\pcal@yprowloop{\ifnum\pcal@yprow<\pcal@yprows
+    \begingroup\edef\x{\endgroup\pcal@yptoks{\the\pcal@yptoks
+      \noexpand\pcalendarplannerdaystrut\noexpand\pcalendarweekdayname{\the\pcal@ypwd}%
+      \pcal@ypcell1\pcal@ypcell2\pcal@ypcell3\pcal@ypcell4\pcal@ypcell5\pcal@ypcell6\noexpand\\\pcal@yprule}}\x
+    \advance\pcal@yprow by 1 \advance\pcal@ypwd by 1 \ifnum\pcal@ypwd=7 \pcal@ypwd=0 \fi
+    \expandafter\pcal@yprowloop\fi}%
+\def\pcal@ypwidest#1{\setbox\pgfutil@tempboxa\hbox{\pcalendarweekdayname{#1}}%
+    \ifdim\wd\pgfutil@tempboxa>\dimen@\dimen@=\wd\pgfutil@tempboxa\fi}%
+% One page: year #1, months #2 to #2+5.
+\def\pcal@yphalf#1#2{\clearpage\thispagestyle{empty}\begingroup
+    \pcal@ypfirst{#1}{#2}{1}\pcal@ypfirst{#1}{#2+1}{2}\pcal@ypfirst{#1}{#2+2}{3}%
+    \pcal@ypfirst{#1}{#2+3}{4}\pcal@ypfirst{#1}{#2+4}{5}\pcal@ypfirst{#1}{#2+5}{6}\pcal@ypfirst{#1}{#2+6}{7}%
+    \pcal@ypfirst{#1}{12}{e}\pcal@ypfirst{#1}{13}{f}%
+    \edef\pcal@ypyear{\number#1}\edef\pcal@ypbase{\number\numexpr#2\relax}%
+    \pcal@yprows=0 \pcal@ypmonth1\pcal@ypmonth2\pcal@ypmonth3\pcal@ypmonth4\pcal@ypmonth5\pcal@ypmonth6
+    \pcal@yprow=0 \pcal@ypwd=0 \pcal@yptoks{}\pcal@yprowloop
+    % the month columns share what the weekday column and the rules leave of the line
+    \dimen@=0pt \pcal@ypwidest0\pcal@ypwidest1\pcal@ypwidest2\pcal@ypwidest3\pcal@ypwidest4\pcal@ypwidest5\pcal@ypwidest6
+    \pcal@ypwidth=\dimexpr(\linewidth-\dimen@-14\tabcolsep-10\arrayrulewidth-\doublerulesep)/6\relax
+    \noindent\hspace{1cm}{\LARGE #1}\hspace{8mm}%
+    \ifnum\numexpr\pcal@ypjf-\pcal@ypje\relax=30 \pcalendarplannerleapyear\fi\par\medskip
+    \noindent\begin{tabular}{|c||*{6}{p{\pcal@ypwidth}|}}\hline
+      \multicolumn{1}{|c||}{\pcalendarplannermonthstrut}%
+      \pcal@yphead{#2}\pcal@yphead{#2+1}\pcal@yphead{#2+2}\pcal@yphead{#2+3}\pcal@yphead{#2+4}\pcal@yphead{#2+5}\\
+      \hline\hline
+      \the\pcal@yptoks
+    \end{tabular}\par\endgroup\clearpage}%
+\def\pcal@yphead#1{&\multicolumn{1}{c|}{\pcalendarmonthname{\numexpr#1\relax}}}%
+\def\pcalendarplanner#1{\pcal@yphalf{#1}{1}\pcal@yphalf{#1}{7}}%
 \endinput
 %%
 %% End of file `persian-calendar.sty'.
