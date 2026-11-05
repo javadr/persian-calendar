@@ -15,28 +15,6 @@
 \newcommand\FirstYear{1405}
 \newcommand\LastYear{1413}
 
-% One year: the title (the year), then four rows of seasons, three months each, right to left.
-% A month is six week columns plus the column of initials: 7 x 0.3cm = 2.1cm; three years fit the width.
-\newcommand\JalaliYear[1]{%
-  \begin{tikzpicture}[font=\tiny]
-    \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35) {#1};
-    \foreach \m in {1,...,12} {
-      \pgfmathtruncatemacro\col{mod(\m-1,3)}%
-      \pgfmathtruncatemacro\row{div(\m-1,3)}%
-      \calendar at (-\col*2.15cm, -0.55cm-\row*2.1cm)
-        [jalali dates=#1-\m-01 to #1-\m-last, jalali week columns, jalali weekday initials,
-         day xshift=-0.3cm, day yshift=0.235cm, jalali month label above centered,
-         month text={\pcalmonthname{\pcalcurrentmonth}},
-         every jalali weekday/.style={gray}]
-        if (Friday) [red];
-    }
-  \end{tikzpicture}}
-
 \begin{document}
-\noindent
-\foreach \yr [count=\i] in {\FirstYear,...,\LastYear} {%
-  % separator before every year but the first: a new row after each third, so none after the last
-  \ifnum\i>1 \pgfmathtruncatemacro\n{mod(\i-1,3)}\ifnum\n=0 \par\bigskip\noindent\else\hfill\fi\fi
-  \JalaliYear{\yr}%
-}
+\pcalyears{\FirstYear}{\LastYear}
 \end{document}

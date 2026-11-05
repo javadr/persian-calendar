@@ -164,4 +164,12 @@
     day code={\ifdate{day of month=1}{\xdef\acc{\acc\pcalcurrentday}}{}}];%
   \ASSERT{\acc}{1}
 }
+\TEST{\pcalyear draws every day of the year, \pcalyears every year of the range}{
+  \newcount\days \newcount\years \tracinglostchars=0 % the month names are Persian, the test font is not
+  \tikzset{every pcal month/.style={day code={\global\advance\days 1}},
+           every pcal year/.style={execute at begin picture={\global\advance\years 1}}}%
+  \days=0 \setbox0\hbox{\pcalyear{1405}}\ASSERT{\the\days}{365}
+  \days=0 \setbox0\hbox{\pcalyear{1403}}\ASSERT{\the\days}{366}% leap year
+  \years=0 \setbox0\vbox{\pcalyears{1405}{1409}}\ASSERT{\the\years}{5}
+}
 \END

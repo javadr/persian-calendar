@@ -37,11 +37,13 @@
 \fa@wrap\pcalweekdayname \fa@wrap\pcalweekdayshortname \fa@wrap\pcalyearname
 
 \title{The \pkg{persian-calendar} package}
-\author{Javad Razavian}
+\author{Javad Razavian\thanks{Source code and bug reports:
+  \url{https://github.com/javadr/persian-calendar}}}
 \date{Version \pcalendarversion\quad(\pcalendardate)}
 
 \begin{document}
 \latin % the text is English (Latin font, left to right); the typeset results are Persian
+\leftfootnoterule % the footnote rule on the left, as the text runs left to right
 
 \maketitle
 
@@ -64,7 +66,8 @@ The package is a date converter and a set of name tables. It provides:
   \item Julian day numbers for Jalali dates, so you can add days, subtract dates or loop over days;
   \item Persian names of the Jalali and Gregorian months and of the weekdays;
   \item the animal name of a year in the twelve-animal cycle;
-  \item Jalali month grids drawn with the \pkg{TikZ} \texttt{calendar} library (section~\ref{sec:tikz});
+  \item Jalali month grids and year calendars drawn with the \pkg{TikZ} \texttt{calendar} library
+    (section~\ref{sec:tikz});
   \item a two-page year planner in the manner of \pkg{yplan} (section~\ref{sec:yplan}).
 \end{itemize}
 It has no holidays, and it has no macro that returns the weekday of a date
@@ -77,13 +80,6 @@ text: they are stored as UTF-8 in the source file, so printing them needs an eng
 handle UTF-8 Persian letters, together with a font that has them. \pkg{xepersian} with Xe\LaTeX{} is
 what this manual uses, but any setup that can typeset Persian will do. Without one, use the numeric
 macros \cs{pisodate} and \cs{gisodate}, which print only digits.
-
-{\sloppy % long code names cannot be hyphenated
-\paragraph{Names before 0.71.} Up to version 0.7 the macros were called \cs{pcalendar\ldots}
-(\cs{pcalendardatetojulian}, \cs{pcalendarmonthname} and so on, and \cs{pcalendarcurrentyear} and the
-others in \pkg{TikZ} calendars). Version 0.71 shortened the prefix to \cs{pcal\ldots}. The old names still
-work and call the new ones, so documents written for earlier versions need no change. \cs{pcalendardate}
-and \cs{pcalendarversion}, the release date and version, keep their names.\par}
 
 % ---------------------------------------------------------------------------
 \section{Installation}\label{sec:installation2}
@@ -391,44 +387,35 @@ which sets its own.
 
 \paragraph{Calendars for a range of years.} The \pkg{calxxxx-yyyy} document on CTAN prints Gregorian
 calendars for a range of years, nine years to a page, each year as four rows of three months and each month
-as a column per week and a row per weekday. \texttt{jalali week columns} gives the same layout for Jalali
-months, and the sample \texttt{persian-calendar-years.tex}, which comes with the package, is the Jalali
-counterpart of \pkg{calxxxx-yyyy}: set \cs{FirstYear} and \cs{LastYear} at its top, for example
-\texttt{1405} and \texttt{1413}, and compile it with Xe\LaTeX{}. This is the code that draws one year;
-the sample wraps it in a macro and loops over the years, three to a row:
+as a column per week and a row per weekday. \cs{pcalyear} and \cs{pcalyears} draw the same layout for
+Jalali years, with \texttt{jalali week columns}. Like the keys above they need \pkg{TikZ} and its
+\texttt{calendar} library; without them they stop with an error that says so.
+
+\macro|\pcalyear{year}|
+Draws one Jalali year as a \texttt{tikzpicture}: the year as title, then four rows of seasons, three months
+each, right to left, with the Fridays in red. It is sized for nine years to an A4 page, 0.3\,cm per day.
+
+\macro|\pcalyears{first}{last}|
+Draws the years from \texttt{first} to \texttt{last}, three to a row, on as many pages as they need. The
+sample \texttt{persian-calendar-years.tex}, which comes with the package, is the Jalali counterpart of
+\pkg{calxxxx-yyyy}: it calls \cs{pcalyears} with \cs{FirstYear} and \cs{LastYear}, set at its top to
+\texttt{1405} and \texttt{1413}.
+
+\paragraph{Styles.} Four \pkg{TikZ} styles change the look; set them with \cs{tikzset}:
+\begin{itemize}
+  \item \texttt{every pcal year}: the picture of a year (default font \verb|\tiny|);
+  \item \texttt{every pcal year title}: the year at the top (default font \verb|\footnotesize\bfseries|);
+  \item \texttt{every pcal month}: added to the options of each month's \cs{calendar}, after the package's own;
+  \item \texttt{pcal friday}: the Fridays, \texttt{red} by default.
+\end{itemize}
+The first three are empty; the fonts above are set before them. For example, this draws the Fridays in
+blue:
 \begin{verbatim}
-\begin{tikzpicture}[font=\tiny]
-  \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35) {1405};
-  \foreach \m in {1,...,12} {
-    \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
-    \pgfmathtruncatemacro\row{div(\m-1,3)}% season
-    \calendar at (-\col*2.15cm, -0.55cm-\row*2.1cm)
-      [jalali dates=1405-\m-01 to 1405-\m-last,
-       jalali week columns, jalali weekday initials,
-       day xshift=-0.3cm, day yshift=0.235cm,
-       jalali month label above centered,
-       month text={\pcalmonthname{\pcalcurrentmonth}},
-       every jalali weekday/.style={gray}]
-      if (Friday) [red];
-  }
-\end{tikzpicture}
+\tikzset{pcal friday/.style={blue}}
 \end{verbatim}
+This is \verb|\pcalyear{1405}|:
 \begin{center}
-\begin{tikzpicture}[font=\tiny]
-  \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35) {1405};
-  \foreach \m in {1,...,12} {
-    \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
-    \pgfmathtruncatemacro\row{div(\m-1,3)}% season
-    \calendar at (-\col*2.15cm, -0.55cm-\row*2.1cm)
-      [jalali dates=1405-\m-01 to 1405-\m-last,
-       jalali week columns, jalali weekday initials,
-       day xshift=-0.3cm, day yshift=0.235cm,
-       jalali month label above centered,
-       month text={\pcalmonthname{\pcalcurrentmonth}},
-       every jalali weekday/.style={gray}]
-      if (Friday) [red];
-  }
-\end{tikzpicture}
+\pcalyear{1405}
 \end{center}
 
 % ---------------------------------------------------------------------------
@@ -487,12 +474,6 @@ shades the Fridays and prints 1 Farvardin in red:
 \cs{providecommand} line works around a bug in \pkg{bidi} (section~\ref{sec:limitations9}). Use
 \cs{textcolor} rather than \cs{color} in a cell: \cs{color} at the start of a cell moves the number down
 a line. The cell is a paragraph column, so longer text, such as a holiday name, wraps inside it.
-
-\paragraph{Why a table and not TikZ.} A \pkg{TikZ} drawing of the same planner, with a node per day, took
-about 70 times as long to typeset as \cs{pcalplanner} (about 11\,s against 0.15\,s for ten years, beyond the
-time to load the packages), and it would have to set the right-to-left order and the column widths
-itself. The calendar keys of section~\ref{sec:tikz} are the better choice for a graphical calendar;
-\cs{pcalplannercell} covers colours and notes in the planner.
 
 % ---------------------------------------------------------------------------
 \section{Recipes}\label{sec:recipes7}
@@ -634,8 +615,10 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.72 (2026-11-05)] \cs{pcalyear} and \cs{pcalyears}: year calendars in the manner of
+    \pkg{calxxxx-yyyy}, with styles for the year, its title, the months and the Fridays.
   \item[0.71 (2026-11-05)] Shorter names: \cs{pcal\ldots} instead of \cs{pcalendar\ldots}; the old names still
-    work (section~\ref{sec:what1}).
+    work.
   \item[0.7 (2026-11-05)] A year planner in the manner of \pkg{yplan}: \cs{pcalplanner}, and
     \cs{pcalplannercell} to colour or annotate its days. The sample
     \texttt{persian-calendar-planner.tex}.

@@ -21,7 +21,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \def\pcalendardate{2026/11/05}
-\def\pcalendarversion{0.71}
+\def\pcalendarversion{0.72}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -587,6 +587,36 @@
       \pgftransformyshift{\pgf@ya}%
       \tikzmonthcode}}{}},
     every month/.append style={anchor=base}}}%
+%
+% ---- \pcalyear{year}, \pcalyears{first}{last}: year calendars in the manner of calxxxx-yyyy ----
+% A year is four rows of seasons, three months each, right to left; a month is a column per week and a
+% row per weekday, with the initials beside it. Sized for nine years to an A4 page (0.3cm per day).
+% Needs TikZ and its calendar library, which the package does not load.
+\pgfkeys{/tikz/every pcal year/.style={}, /tikz/every pcal year title/.style={},
+  /tikz/every pcal month/.style={}, /tikz/pcal friday/.style={red}}%
+\def\pcal@needtikz{\ifx\tikz@lib@cal@calendar\@undefined\PackageError{persian-calendar}%
+    {\string\pcalyear\space and \string\pcalyears\space need TikZ and its calendar library}%
+    {Add \string\usepackage{tikz} and \string\usetikzlibrary{calendar} to the preamble.}\fi}%
+\def\pcalyear#1{\pcal@needtikz\ifx\tikz@lib@cal@calendar\@undefined\else
+  \begin{tikzpicture}[font=\tiny,every pcal year]
+    \node[anchor=base east,font=\footnotesize\bfseries,every pcal year title] at (0.3,0.35) {#1};
+    \foreach \pcal@mo in {1,...,12} {%
+      \pgfmathtruncatemacro\pcal@col{mod(\pcal@mo-1,3)}% month within the season
+      \pgfmathtruncatemacro\pcal@row{div(\pcal@mo-1,3)}% season
+      \calendar at (-\pcal@col*2.15cm,-0.55cm-\pcal@row*2.1cm)
+        [jalali dates=#1-\pcal@mo-01 to #1-\pcal@mo-last, jalali week columns, jalali weekday initials,
+         day xshift=-0.3cm, day yshift=0.235cm, jalali month label above centered,
+         month text={\pcalmonthname{\pcalcurrentmonth}},
+         every jalali weekday/.style={gray}, every pcal month]
+        if (Friday) [pcal friday];
+    }
+  \end{tikzpicture}\fi}%
+% Three years to a row; a new row starts only when another year follows, so no empty paragraph is left.
+\def\pcalyears#1#2{\par\noindent
+  \foreach \pcal@yr [count=\pcal@yi] in {#1,...,#2} {%
+    \ifnum\pcal@yi>1 \pgfmathtruncatemacro\pcal@yn{mod(\pcal@yi-1,3)}%
+      \ifnum\pcal@yn=0 \par\bigskip\noindent\else\hfill\fi\fi
+    \expandafter\pcalyear\expandafter{\pcal@yr}}\par}%
 %
 % ---- \pcalplanner{year}: a vertical year planner in the manner of yplan ----
 % Two pages, six Jalali months each: a column per month, a row per day, rows aligned on the weekday

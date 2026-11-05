@@ -1,4 +1,7 @@
 %% Change Logs
+%% ver 0.72 ## Nov 5, 2026
+%% added \pcalyear{year} and \pcalyears{first}{last}, year calendars like calxxxx-yyyy (needs TikZ and its calendar library); styles every pcal year, every pcal year title, every pcal month, pcal friday
+%% sample/persian-calendar-years.tex now calls \pcalyears; it no longer ends with an empty page, and the year calendars show no year names
 %% ver 0.71 ## Nov 5, 2026
 %% shorter names for the user macros: \pcal... instead of \pcalendar... (\pcaldatetojulian, \pcalmonthname, \pcalplanner, \pcalcurrentyear, ...); the old names still work and call the new ones; \pcalendardate and \pcalendarversion unchanged
 %% ver 0.7 ## Nov 5, 2026
