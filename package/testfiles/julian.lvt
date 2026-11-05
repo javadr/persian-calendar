@@ -11,16 +11,16 @@
 \newcount\ja \newcount\ga
 \begin{document}
 \START
-\TEST{\pcalendardatetojulian equals the pgf Julian day of the Gregorian date}{
-  \pcalendardatetojulian{1394-01-01}\ja \pgfcalendardatetojulian{2015-03-21}\ga
+\TEST{\pcaldatetojulian equals the pgf Julian day of the Gregorian date}{
+  \pcaldatetojulian{1394-01-01}\ja \pgfcalendardatetojulian{2015-03-21}\ga
   \ASSERT{\the\ja}{\the\ga}
 }
 \TEST{+offset adds days}{
-  \pcalendardatetojulian{1394-01-01+10}\ja \pgfcalendardatetojulian{2015-03-31}\ga
+  \pcaldatetojulian{1394-01-01+10}\ja \pgfcalendardatetojulian{2015-03-31}\ga
   \ASSERT{\the\ja}{\the\ga}
 }
-\TEST{\pcalendarjuliantodate returns the Jalali date}{
-  \pgfcalendardatetojulian{2015-03-21}\ja \pcalendarjuliantodate\ja\y\m\d
+\TEST{\pcaljuliantodate returns the Jalali date}{
+  \pgfcalendardatetojulian{2015-03-21}\ja \pcaljuliantodate\ja\y\m\d
   \ASSERT{\number\y-\number\m-\number\d}{1394-1-1}
 }
 \END

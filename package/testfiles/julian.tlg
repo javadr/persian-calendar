@@ -1,7 +1,7 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 ============================================================
-TEST 1: \pcalendardatetojulian equals the pgf Julian day of the Gregorian date
+TEST 1: \pcaldatetojulian equals the pgf Julian day of the Gregorian date
 ============================================================
 PASSED
 ============================================================
@@ -11,7 +11,7 @@ TEST 2: +offset adds days
 PASSED
 ============================================================
 ============================================================
-TEST 3: \pcalendarjuliantodate returns the Jalali date
+TEST 3: \pcaljuliantodate returns the Jalali date
 ============================================================
 PASSED
 ============================================================

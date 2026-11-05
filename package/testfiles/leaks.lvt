@@ -12,8 +12,8 @@
   \loop
     \pcal@gregoriantojalali{2024-03-20}
     \pcal@jalalitogregorian{1403-01-01}
-    \pcalendardatetojulian{1403-01-01+5}\jd
-    \tracinglostchars=0 \setbox0\hbox{\pcalendaryearname{1403}}
+    \pcaldatetojulian{1403-01-01+5}\jd
+    \tracinglostchars=0 \setbox0\hbox{\pcalyearname{1403}}
     \advance\iter by 1
   \ifnum\iter<2000 \repeat
   \ASSERT{\the\numexpr\count10-\before\relax}{0}

@@ -27,13 +27,13 @@
 \newcommand\JtoG[2]{\demo{\gdate{#1}}{\gdate{#1}}{}\demo{\gisodate{#1}}{\lr{\gisodate{#1}}}{#2}\par\smallskip}
 \newcommand\YEAR[1]{\demo{\gisodate{#1-01-01}}{\lr{\gisodate{#1-01-01}}}{start of Jalali year #1}}
 % one table cell: year and its animal, empty after 1420; \YROW gives a row of years 8 apart
-\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\ifnum\yy>1420 \else\lr{\yy}\quad\pcalendaryearname{\yy}\fi}
+\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\ifnum\yy>1420 \else\lr{\yy}\quad\pcalyearname{\yy}\fi}
 \newcommand\YROW[1]{\yc{#1}&\yc{#1+8}&\yc{#1+16}&\yc{#1+24}&\yc{#1+32}}
 \newcommand\WEEKDAY[2]{%
-  \pcalendardatetojulian{#1}\jd
+  \pcaldatetojulian{#1}\jd
   \pgfcalendarjuliantoweekday{\jd}{\wday}%
   \advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
-  \par\noindent\code{#1}\quad$\Rightarrow$\quad\pcalendarweekdayname{\wday}\quad\lr{(#2)}}
+  \par\noindent\code{#1}\quad$\Rightarrow$\quad\pcalweekdayname{\wday}\quad\lr{(#2)}}
 
 \begin{document}
 \setLTR % the explanations are English; only the results are Persian
@@ -81,43 +81,43 @@ the argument is a Jalali date, the result is Gregorian.}
 \subsection*{\lr{5. Name macros}}
 \note{These take a number and print the name. Months are 1 to 12; weekdays are 0 to 6,
 where 0 is Saturday, the first day of the Persian week.}
-\demo{\pcalendarmonthname{1}}{\pcalendarmonthname{1}}{Jalali month 1}
-\demo{\pcalendarmonthname{12}}{\pcalendarmonthname{12}}{Jalali month 12}
-\demo{\pcalendargregorianmonthname{3}}{\pcalendargregorianmonthname{3}}{Gregorian month 3, in Persian}
-\demo{\pcalendarweekdayname{0}}{\pcalendarweekdayname{0}}{weekday 0}
-\demo{\pcalendarweekdayname{6}}{\pcalendarweekdayname{6}}{weekday 6}
-\demo{\pcalendarweekdayshortname{0}}{\pcalendarweekdayshortname{0}}{short weekday 0}
+\demo{\pcalmonthname{1}}{\pcalmonthname{1}}{Jalali month 1}
+\demo{\pcalmonthname{12}}{\pcalmonthname{12}}{Jalali month 12}
+\demo{\pcalgregorianmonthname{3}}{\pcalgregorianmonthname{3}}{Gregorian month 3, in Persian}
+\demo{\pcalweekdayname{0}}{\pcalweekdayname{0}}{weekday 0}
+\demo{\pcalweekdayname{6}}{\pcalweekdayname{6}}{weekday 6}
+\demo{\pcalweekdayshortname{0}}{\pcalweekdayshortname{0}}{short weekday 0}
 \par\medskip\noindent\lr{All Jalali months:}\quad
-\foreach \m in {1,...,12}{\pcalendarmonthname{\m}\space}
+\foreach \m in {1,...,12}{\pcalmonthname{\m}\space}
 
 \subsection*{\lr{6. Julian day numbers and date arithmetic}}
-\note{\texttt{\textbackslash pcalendardatetojulian\{Y-M-D\}\{\textbackslash count\}} stores the Julian day
+\note{\texttt{\textbackslash pcaldatetojulian\{Y-M-D\}\{\textbackslash count\}} stores the Julian day
 number of a Jalali date in a count register. A \texttt{+N} suffix adds N days.
-\texttt{\textbackslash pcalendarjuliantodate\{\textbackslash count\}\{\textbackslash y\}\{\textbackslash m\}\{\textbackslash d\}}
+\texttt{\textbackslash pcaljuliantodate\{\textbackslash count\}\{\textbackslash y\}\{\textbackslash m\}\{\textbackslash d\}}
 converts a day number back and sets \texttt{\textbackslash y}, \texttt{\textbackslash m}, \texttt{\textbackslash d}.}
-\pcalendardatetojulian{1394-01-01}\jd%
-\demo{\pcalendardatetojulian{1394-01-01}\jd}{\number\jd}{day number of 1394-01-01}
-\pcalendardatetojulian{1394-01-01+10}\jd%
-\demo{\pcalendardatetojulian{1394-01-01+10}\jd}{\number\jd}{ten days later}
-\pcalendarjuliantodate\jd\y\m\d%
-\demo{\pcalendarjuliantodate\jd\y\m\d}{\lr{\number\y-\number\m-\number\d}}{back to a Jalali date}
-\pcalendardatetojulian{1403-12-29+1}\jd%
-\pcalendarjuliantodate\jd\y\m\d%
-\demo{\pcalendardatetojulian{1403-12-29+1}\jd}{\lr{\number\y-\number\m-\number\d}}{1403 is a leap year, so Esfand has 30 days}
-\pcalendardatetojulian{1403-12-29+2}\jd%
-\pcalendarjuliantodate\jd\y\m\d%
-\demo{\pcalendardatetojulian{1403-12-29+2}\jd}{\lr{\number\y-\number\m-\number\d}}{rolls over into the new year}
+\pcaldatetojulian{1394-01-01}\jd%
+\demo{\pcaldatetojulian{1394-01-01}\jd}{\number\jd}{day number of 1394-01-01}
+\pcaldatetojulian{1394-01-01+10}\jd%
+\demo{\pcaldatetojulian{1394-01-01+10}\jd}{\number\jd}{ten days later}
+\pcaljuliantodate\jd\y\m\d%
+\demo{\pcaljuliantodate\jd\y\m\d}{\lr{\number\y-\number\m-\number\d}}{back to a Jalali date}
+\pcaldatetojulian{1403-12-29+1}\jd%
+\pcaljuliantodate\jd\y\m\d%
+\demo{\pcaldatetojulian{1403-12-29+1}\jd}{\lr{\number\y-\number\m-\number\d}}{1403 is a leap year, so Esfand has 30 days}
+\pcaldatetojulian{1403-12-29+2}\jd%
+\pcaljuliantodate\jd\y\m\d%
+\demo{\pcaldatetojulian{1403-12-29+2}\jd}{\lr{\number\y-\number\m-\number\d}}{rolls over into the new year}
 
 \subsection*{\lr{7. Weekday of a Jalali date}}
 \note{The package has no weekday macro of its own. PGF's \texttt{\textbackslash pgfcalendarjuliantoweekday}
 numbers Monday as 0, so the sample shifts the result by 2 to make Saturday 0, then calls
-\texttt{\textbackslash pcalendarweekdayname}.}
+\texttt{\textbackslash pcalweekdayname}.}
 \WEEKDAY{1394-01-01}{Saturday, March 21, 2015}
 \WEEKDAY{1403-01-01}{Wednesday, March 20, 2024}
 \WEEKDAY{1404-01-01}{Friday, March 21, 2025}
 
 \subsection*{\lr{8. Animal year names}}
-\note{\texttt{\textbackslash pcalendaryearname\{year\}} gives the animal of the 12-year cycle of the
+\note{\texttt{\textbackslash pcalyearname\{year\}} gives the animal of the 12-year cycle of the
 Turkish-Mongol calendar for a Jalali year. It is defined for 0 to 2099 only.}
 \medskip
 \begin{tabular}{lllll}
@@ -153,7 +153,7 @@ puts Saturday on the right. The month is Dey 1404, which has 30 days; Fridays ar
   \calendar at (-\col*6.2cm, -\row*5cm)
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
      day xshift=-0.8cm, day yshift=0.55cm, jalali month label above centered,
-     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+     month text={\pcalmonthname{\pcalcurrentmonth}}]
     if (Friday) [red];
 }
 \end{tikzpicture}

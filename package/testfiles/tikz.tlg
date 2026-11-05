@@ -21,24 +21,29 @@ TEST 3: a jalali calendar visits every day with the Jalali date set
 PASSED
 ============================================================
 ============================================================
-TEST 4: Esfand has 30 days in a leap year and 29 otherwise
+TEST 4: the names before 0.71 still work: \pcalendarcurrent ... follow \pcalcurrent ...
+============================================================
+PASSED
+============================================================
+============================================================
+TEST 5: Esfand has 30 days in a leap year and 29 otherwise
 ============================================================
 \n=\count...
 PASSED
 PASSED
 ============================================================
 ============================================================
-TEST 5: TikZ month labels fire on the first of the Jalali month only
+TEST 6: TikZ month labels fire on the first of the Jalali month only
 ============================================================
 PASSED
 ============================================================
 ============================================================
-TEST 6: jalali week list: Thursday in column 5, Friday in 6, Saturday starts a new row, right to left (pt)
+TEST 7: jalali week list: Thursday in column 5, Friday in 6, Saturday starts a new row, right to left (pt)
 ============================================================
 PASSED
 ============================================================
 ============================================================
-TEST 7: if (jalali equals=M-D) applies options to that day only
+TEST 8: if (jalali equals=M-D) applies options to that day only
 ============================================================
 PASSED
 ============================================================
@@ -46,7 +51,7 @@ PASSED
 \sat=\dimen...
 \fri=\dimen...
 ============================================================
-TEST 8: jalali month label above centered centres the label over a full week (|offset| < 0.5pt)
+TEST 9: jalali month label above centered centres the label over a full week (|offset| < 0.5pt)
 ============================================================
 PASSED
 PASSED
@@ -55,54 +60,54 @@ PASSED
 \ya=\dimen...
 \yb=\dimen...
 ============================================================
-TEST 9: jalali day boxes: one step wide and high, neighbours share one border line (anchors include the 0.4pt line)
+TEST 10: jalali day boxes: one step wide and high, neighbours share one border line (anchors include the 0.4pt line)
 ============================================================
 PASSED
 PASSED
 PASSED
 ============================================================
 ============================================================
-TEST 10: jalali month label above centered centres over a row of boxes (|offset| < 0.5pt)
+TEST 11: jalali month label above centered centres over a row of boxes (|offset| < 0.5pt)
 ============================================================
 PASSED
 ============================================================
 ============================================================
-TEST 11: boxed initials share one border line with the first week, and sit inside their boxes
+TEST 12: boxed initials share one border line with the first week, and sit inside their boxes
 ============================================================
 PASSED
 PASSED
 ============================================================
 ============================================================
-TEST 12: jalali weekday initials: seven initials per month, one row above the first week
+TEST 13: jalali weekday initials: seven initials per month, one row above the first week
 ============================================================
 \n=\count...
 PASSED
 ============================================================
 ============================================================
-TEST 13: with boxes and initials a new month starts at least four rows below an unfinished week
+TEST 14: with boxes and initials a new month starts at least four rows below an unfinished week
 ============================================================
 PASSED
 ============================================================
 ============================================================
-TEST 14: jalali day boxes fill every month to whole weeks with empty boxes
+TEST 15: jalali day boxes fill every month to whole weeks with empty boxes
 ============================================================
 PASSED
 PASSED
 PASSED
 ============================================================
 ============================================================
-TEST 15: jalali week columns: a row per weekday, Saturday on top, a new column after Friday (pt)
+TEST 16: jalali week columns: a row per weekday, Saturday on top, a new column after Friday (pt)
 ============================================================
 PASSED
 ============================================================
 ============================================================
-TEST 16: jalali week columns: a month is as many columns wide as it has weeks
+TEST 17: jalali week columns: a month is as many columns wide as it has weeks
 ============================================================
 PASSED
 PASSED
 ============================================================
 ============================================================
-TEST 17: inside jalali, day of month= means the Jalali day
+TEST 18: inside jalali, day of month= means the Jalali day
 ============================================================
 PASSED
 ============================================================

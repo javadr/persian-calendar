@@ -20,19 +20,19 @@ Load `persian-calendar` in the preamble. The example below uses `xepersian` and 
 | `\gdate{Y-M-D}` | Jalali date | the Gregorian date with the month name |
 | `\pisodate{Y-M-D}` | Gregorian date | the Jalali date as `DD/MM/YYYY` |
 | `\gisodate{Y-M-D}` | Jalali date | the Gregorian date as `DD/MM/YYYY` |
-| `\pcalendardatetojulian{Y-M-D[+N]}{\count}` | Jalali date | stores its day number in `\count`, after adding `N` days |
-| `\pcalendarjuliantodate{\count}{\y}{\m}{\d}` | day number | sets `\y`, `\m`, `\d` to the Jalali date |
-| `\pcalendarmonthname{n}`, `\pcalendargregorianmonthname{n}` | 1 to 12 | the Persian name of the month |
-| `\pcalendarweekdayname{n}`, `\pcalendarweekdayshortname{n}` | 0 to 6, Saturday is 0 | the weekday name |
-| `\pcalendaryearname{year}` | Jalali year, 0 to 2099 | the animal of the year |
+| `\pcaldatetojulian{Y-M-D[+N]}{\count}` | Jalali date | stores its day number in `\count`, after adding `N` days |
+| `\pcaljuliantodate{\count}{\y}{\m}{\d}` | day number | sets `\y`, `\m`, `\d` to the Jalali date |
+| `\pcalmonthname{n}`, `\pcalgregorianmonthname{n}` | 1 to 12 | the Persian name of the month |
+| `\pcalweekdayname{n}`, `\pcalweekdayshortname{n}` | 0 to 6, Saturday is 0 | the weekday name |
+| `\pcalyearname{year}` | Jalali year, 0 to 2099 | the animal of the year |
 
 ```latex
 \pdate{2015-03-21}                    % 1 Farvardin 1394, in Persian
 \gisodate{1403-01-01}                 % 20/03/2024
 
 \newcount\jd
-\pcalendardatetojulian{1394-01-01+10}\jd
-\pcalendarjuliantodate\jd\y\m\d
+\pcaldatetojulian{1394-01-01+10}\jd
+\pcaljuliantodate\jd\y\m\d
 \number\y-\number\m-\number\d         % 1394-1-11
 ```
 
@@ -57,8 +57,8 @@ Copy `package/tex/persian-calendar.sty` into a directory TeX searches, for examp
 - Dates must be written as literal `Y-M-D` text. A macro holding a date is not expanded by `\pdate`, `\gdate`, `\pisodate` and `\gisodate`.
 - There is no input checking: a month 13 or a malformed string gives wrong output or a TeX error.
 - The Jalali leap rule is the 33-year arithmetic approximation, which can differ from the official calendar in some years.
-- Every conversion overwrites the package's result registers, so read `\y`, `\m`, `\d` right after `\pcalendarjuliantodate`.
-- `\pcalendaryearname` works for 0 to 2099 only.
+- Every conversion overwrites the package's result registers, so read `\y`, `\m`, `\d` right after `\pcaljuliantodate`.
+- `\pcalyearname` works for 0 to 2099 only.
 
 ## Development and testing
 

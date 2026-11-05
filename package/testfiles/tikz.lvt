@@ -22,8 +22,14 @@
 \TEST{a jalali calendar visits every day with the Jalali date set}{
   \gdef\acc{}%
   \tikz\calendar[jalali dates=1404-12-28 to 1405-01-02, jalali week list,
-    day code={\xdef\acc{\acc\pcalendarcurrentyear-\pcalendarcurrentmonth-\pcalendarcurrentday/\pcalendarcurrentweekday,}}];%
+    day code={\xdef\acc{\acc\pcalcurrentyear-\pcalcurrentmonth-\pcalcurrentday/\pcalcurrentweekday,}}];%
   \ASSERT{\acc}{1404-12-28/5,1404-12-29/6,1405-1-1/0,1405-1-2/1,}
+}
+\TEST{the names before 0.71 still work: \pcalendarcurrent... follow \pcalcurrent...}{
+  \gdef\acc{}%
+  \tikz\calendar[jalali dates=1405-01-01 to 1405-01-02, jalali,
+    day code={\xdef\acc{\acc\pcalendarcurrentyear-\pcalendarcurrentmonth-\pcalendarcurrentday/\pcalendarcurrentweekday,}}];%
+  \ASSERT{\acc}{1405-1-1/0,1405-1-2/1,}
 }
 \TEST{Esfand has 30 days in a leap year and 29 otherwise}{
   \newcount\n
@@ -35,20 +41,20 @@
 \TEST{TikZ month labels fire on the first of the Jalali month only}{
   \gdef\acc{}%
   \tikz\calendar[jalali dates=1405-01-25 to 1405-02-05, jalali week list, month label above centered,
-    month code={\xdef\acc{\acc[\pcalendarcurrentmonth]}}];%
+    month code={\xdef\acc{\acc[\pcalcurrentmonth]}}];%
   \ASSERT{\acc}{[2]}
 }
 \TEST{jalali week list: Thursday in column 5, Friday in 6, Saturday starts a new row, right to left (pt)}{
   \gdef\acc{}%
   \tikz\calendar[jalali dates=1405-01-06 to 1405-01-08, jalali week list, day xshift=-1cm, day yshift=1cm,
     day code={\pgfpointtransformed{\pgfpointorigin}%
-      \xdef\acc{\acc(\pcalendarcurrentday:\the\numexpr\dimexpr\pgf@x\relax/65536\relax,\the\numexpr\dimexpr\pgf@y\relax/65536\relax)}}];%
+      \xdef\acc{\acc(\pcalcurrentday:\the\numexpr\dimexpr\pgf@x\relax/65536\relax,\the\numexpr\dimexpr\pgf@y\relax/65536\relax)}}];%
   \ASSERT{\acc}{(6:-142,0)(7:-171,0)(8:0,-28)}
 }
 \TEST{if (jalali equals=M-D) applies options to that day only}{
   \gdef\acc{}%
   \tikz\calendar[jalali dates=1405-01-11 to 1405-01-15, jalali, day code={}]
-    if (jalali equals=1-13) [/utils/exec={\xdef\acc{\acc\pcalendarcurrentday}}];%
+    if (jalali equals=1-13) [/utils/exec={\xdef\acc{\acc\pcalcurrentday}}];%
   \ASSERT{\acc}{13}
 }
 \newdimen\lab \newdimen\sat \newdimen\fri
@@ -70,7 +76,7 @@
 }
 \newdimen\ya \newdimen\yb
 % Latin stand-ins: the test font has no Persian letters
-\def\pcalendarweekdayshortname#1{w#1}
+\def\pcalweekdayshortname#1{w#1}
 % \NEAR\result{dimen}{target}: \result is `ok' when the two are within 0.05pt
 \def\NEAR#1#2#3{\dimen@=\dimexpr#2-(#3)\relax\ifdim\dimen@<0pt \dimen@=-\dimen@\fi
   \ifdim\dimen@<0.05pt \gdef#1{ok}\else\xdef#1{off(\the\dimexpr#2\relax)}\fi}
@@ -96,7 +102,7 @@
 }
 \TEST{boxed initials share one border line with the first week, and sit inside their boxes}{
   % initials are deeper than digits; each kind is centred in its box, all boxes on one centre line
-  \def\pcalendarweekdayshortname#1{gy}%
+  \def\pcalweekdayshortname#1{gy}%
   \tikz{\calendar (cal) [jalali dates=1405-01-01 to 1405-01-07, jalali week list, jalali day boxes,
       jalali weekday initials, day yshift=0.6cm, every jalali weekday/.append style={name=ini}];
     \pgfextracty\ya{\pgfpointanchor{ini}{south}}\pgfextracty\yb{\pgfpointanchor{cal-2026-03-27}{north}}%
@@ -138,7 +144,7 @@
   \gdef\acc{}%
   \tikz\calendar[jalali dates=1405-01-06 to 1405-01-08, jalali week columns, day xshift=-1cm, day yshift=1cm,
     day code={\pgfpointtransformed{\pgfpointorigin}%
-      \xdef\acc{\acc(\pcalendarcurrentday:\the\numexpr\dimexpr\pgf@x\relax/65536\relax,\the\numexpr\dimexpr\pgf@y\relax/65536\relax)}}];%
+      \xdef\acc{\acc(\pcalcurrentday:\the\numexpr\dimexpr\pgf@x\relax/65536\relax,\the\numexpr\dimexpr\pgf@y\relax/65536\relax)}}];%
   \ASSERT{\acc}{(6:0,-142)(7:0,-171)(8:-28,0)}
 }
 \TEST{jalali week columns: a month is as many columns wide as it has weeks}{
@@ -155,7 +161,7 @@
 \TEST{inside jalali, day of month= means the Jalali day}{
   \gdef\acc{}%
   \tikz\calendar[dates=2026-03-20 to 2026-03-22, jalali,
-    day code={\ifdate{day of month=1}{\xdef\acc{\acc\pcalendarcurrentday}}{}}];%
+    day code={\ifdate{day of month=1}{\xdef\acc{\acc\pcalcurrentday}}{}}];%
   \ASSERT{\acc}{1}
 }
 \END

@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.71 ## Nov 5, 2026
+%% shorter names for the user macros: \pcal... instead of \pcalendar... (\pcaldatetojulian, \pcalmonthname, \pcalplanner, \pcalcurrentyear, ...); the old names still work and call the new ones; \pcalendardate and \pcalendarversion unchanged
 %% ver 0.7 ## Nov 5, 2026
 %% added \pcalendarplanner{year}, a vertical year planner like yplan: two pages of six Jalali months, weeks from Saturday; sample/persian-calendar-planner.tex and testfiles/planner.lvt
 %% \pcalendarplannercell{year}{month}{day}{weekday} typesets each day cell of \pcalendarplanner; redefine it to shade Fridays or mark holidays (see the sample)

@@ -10,12 +10,12 @@
 
 \settextfont{Parisa}
 
-% Every day cell goes through \pcalendarplannercell{year}{month}{day}{weekday}, weekday 0 = Saturday.
+% Every day cell goes through \pcalplannercell{year}{month}{day}{weekday}, weekday 0 = Saturday.
 % Here: Fridays shaded, and 1 Farvardin (Nowruz) in red.
-\renewcommand\pcalendarplannercell[4]{%
+\renewcommand\pcalplannercell[4]{%
   \ifnum#4=6 \cellcolor{gray!20}\fi
   \ifnum\numexpr#2*100+#3=101 \textcolor{red}{#3}\else#3\fi}
 
 \begin{document}
-\pcalendarplanner{1405}
+\pcalplanner{1405}
 \end{document}

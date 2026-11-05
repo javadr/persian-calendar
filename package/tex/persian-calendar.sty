@@ -21,7 +21,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \def\pcalendardate{2026/11/05}
-\def\pcalendarversion{0.7}
+\def\pcalendarversion{0.71}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -360,7 +360,7 @@
 }
 %
 \def\pcalendar@unpack#1+{\count8=#1\relax}%
-\def\pcalendardatetojulian#1#2{\edef\pcal@arg{#1}\expandafter\pcalendar@datetojulian\pcal@arg+/{#2}}
+\def\pcaldatetojulian#1#2{\edef\pcal@arg{#1}\expandafter\pcalendar@datetojulian\pcal@arg+/{#2}}
 \def\pcalendar@datetojulian#1-#2-#3+#4/#5{%
     \count1=#1\relax% % jalali year
     \count2=#2\relax% % jalali month
@@ -377,7 +377,7 @@
     \advance#5 by \count8\relax
 }%
 %
-\def\pcalendarjuliantodate#1#2#3#4{%
+\def\pcaljuliantodate#1#2#3#4{%
     \pgfcalendarjuliantodate#1#2#3#4
     \pcal@gregoriantojalali{#2-#3-#4}
     \let#2=\pcal@y
@@ -398,7 +398,7 @@
     \number\pcal@gy%
 }%
 %
-\def\pcalendaryearname#1{%
+\def\pcalyearname#1{%
 \ifnum#1>-1\ifnum#1<2100\relax
     \pcal@thousandth=#1
     \pcal@decimal=#1
@@ -434,10 +434,10 @@
 \def\pcal@gregorian@month#1{\ifcase#1\or ژانویه\or فوریه\or مارس\or آوریل\or می\or ژوئن%
 \or جولای\or آگوست\or سپتامبر\or اکتبر\or نوامبر\or دسامبر\fi}%
 %
-\def\pcalendarweekdayname#1{\ifcase#1 شنبه\or یکشنبه\or دوشنبه\or سه‌شنبه\or چهارشنبه\or پنجشنبه\or جمعه\fi}%
-\def\pcalendarweekdayshortname#1{\ifcase#1 ش\or ی\or د\or س\or چ\or پ\or ج\fi}%
-\def\pcalendarmonthname#1{\pcal@persian@month{#1}}%
-\def\pcalendargregorianmonthname#1{\pcal@gregorian@month{#1}}%
+\def\pcalweekdayname#1{\ifcase#1 شنبه\or یکشنبه\or دوشنبه\or سه‌شنبه\or چهارشنبه\or پنجشنبه\or جمعه\fi}%
+\def\pcalweekdayshortname#1{\ifcase#1 ش\or ی\or د\or س\or چ\or پ\or ج\fi}%
+\def\pcalmonthname#1{\pcal@persian@month{#1}}%
+\def\pcalgregorianmonthname#1{\pcal@gregorian@month{#1}}%
 %
 % ---- Jalali calendars with the TikZ `calendar' library ----
 % Grouped because the converters use \loop and pgfcalendar runs its days in a \loop.
@@ -445,13 +445,15 @@
     \xdef\pcal@jy{\the\pcal@y}\xdef\pcal@jm{\the\pcal@m}\xdef\pcal@jd{\the\pcal@d}\endgroup}%
 \def\pcal@togregorian#1{\begingroup\pcal@jalalitogregorian{#1}%
     \xdef\pcal@iso{\the\pcal@gy-\the\pcal@gm-\the\pcal@gd}\endgroup}%
-% Jalali date of the day being drawn; weekday counts from Saturday = 0, like \pcalendarweekdayname.
+% Jalali date of the day being drawn; weekday counts from Saturday = 0, like \pcalweekdayname.
 \def\pcal@current{%
     \pcal@tojalali\pgfcalendarcurrentyear\pgfcalendarcurrentmonth\pgfcalendarcurrentday
-    \let\pcalendarcurrentyear\pcal@jy\let\pcalendarcurrentmonth\pcal@jm\let\pcalendarcurrentday\pcal@jd
+    \let\pcalcurrentyear\pcal@jy\let\pcalcurrentmonth\pcal@jm\let\pcalcurrentday\pcal@jd
     \pcal@temp=\pgfcalendarcurrentweekday\advance\pcal@temp by 2\relax
     \ifnum\pcal@temp>6 \advance\pcal@temp by -7\relax\fi
-    \edef\pcalendarcurrentweekday{\the\pcal@temp}}%
+    \edef\pcalcurrentweekday{\the\pcal@temp}%
+    \let\pcalendarcurrentyear\pcalcurrentyear\let\pcalendarcurrentmonth\pcalcurrentmonth % names before 0.71
+    \let\pcalendarcurrentday\pcalcurrentday\let\pcalendarcurrentweekday\pcalcurrentweekday}%
 \def\pcal@iflast#1{\pgfutil@in@{last}{#1}}%
 \def\pcal@ifdatejalali{\pcal@tojalali\pgfcalendarifdateyear\pgfcalendarifdatemonth\pgfcalendarifdateday}%
 \newif\ifpcal@boxes \newif\ifpcal@initials \newif\ifpcal@columns
@@ -459,8 +461,8 @@
 \def\pcal@measure#1{\pgfinterruptpicture\tikz@textfont\global\setbox\pgfutil@tempboxa\hbox{#1}\endpgfinterruptpicture
     \xdef\pcal@txtht{\the\ht\pgfutil@tempboxa}\xdef\pcal@txtdp{\the\dp\pgfutil@tempboxa}}%
 \def\pcal@digits{0123456789}%
-\def\pcal@initialsample{\pcalendarweekdayshortname{0}\pcalendarweekdayshortname{1}\pcalendarweekdayshortname{2}%
-    \pcalendarweekdayshortname{3}\pcalendarweekdayshortname{4}\pcalendarweekdayshortname{5}\pcalendarweekdayshortname{6}}%
+\def\pcal@initialsample{\pcalweekdayshortname{0}\pcalweekdayshortname{1}\pcalweekdayshortname{2}%
+    \pcalweekdayshortname{3}\pcalweekdayshortname{4}\pcalweekdayshortname{5}\pcalweekdayshortname{6}}%
 % One cell: #1 node options, #2 text, #3 sample text whose height and depth the cell's text gets.
 % A box is one day step wide and high, its right edge on the day's position like a plain day. All boxes
 % share one centre line (where digits on the baseline are centred), so the rows touch; the text of each
@@ -484,11 +486,11 @@
 % so every month is a full rectangle. Runs at the start of the row, before the day is placed.
 \newcount\pcal@lo \newcount\pcal@hi \newif\ifpcal@last
 \def\pcal@pad{\pcal@steps
-    \pcal@lo=0 \pcal@hi=\pcalendarcurrentweekday\advance\pcal@hi by -1
-    \ifnum\pcalendarcurrentday=1 \pcal@padrow\else
+    \pcal@lo=0 \pcal@hi=\pcalcurrentweekday\advance\pcal@hi by -1
+    \ifnum\pcalcurrentday=1 \pcal@padrow\else
       \ifnum\pgfcalendarcurrentjulian=\pgfcalendarbeginjulian\relax\pcal@padrow\fi\fi
     \pcal@checklast
-    \ifpcal@last\pcal@lo=\pcalendarcurrentweekday\advance\pcal@lo by 1 \pcal@hi=6 \pcal@padrow\fi}%
+    \ifpcal@last\pcal@lo=\pcalcurrentweekday\advance\pcal@lo by 1 \pcal@hi=6 \pcal@padrow\fi}%
 \def\pcal@padrow{\pcal@padcell0\pcal@padcell1\pcal@padcell2\pcal@padcell3\pcal@padcell4\pcal@padcell5\pcal@padcell6}%
 \def\pcal@padcell#1{\ifnum#1<\pcal@lo\else\ifnum#1>\pcal@hi\else
     {\pcal@moveto{#1}\pcal@cell{}{}{\pcal@digits}}\fi\fi}%
@@ -507,19 +509,19 @@
 \def\pcal@initials{{\pcal@steps
     \ifpcal@columns\pgf@x=-\pcal@step\pgftransformxshift{\pgf@x}\else\pgftransformyshift{\pcal@ystep}\fi
     \pcal@initial0\pcal@initial1\pcal@initial2\pcal@initial3\pcal@initial4\pcal@initial5\pcal@initial6}}%
-\def\pcal@initial#1{{\pcal@moveto{#1}\pcal@cell{every jalali weekday}{\pcalendarweekdayshortname{#1}}{\pcal@initialsample}}}%
+\def\pcal@initial#1{{\pcal@moveto{#1}\pcal@cell{every jalali weekday}{\pcalweekdayshortname{#1}}{\pcal@initialsample}}}%
 % For `jalali week columns': on the first of a month, the number of week columns it needs.
-\def\pcal@countcolumns{{\pcal@temp=\pcalendarcurrentmonth\pcal@temptwo=\pcalendarcurrentyear
+\def\pcal@countcolumns{{\pcal@temp=\pcalcurrentmonth\pcal@temptwo=\pcalcurrentyear
     \ifnum\pcal@temp=12 \pcal@temp=1 \advance\pcal@temptwo by 1 \else\advance\pcal@temp by 1 \fi
     \edef\pcal@arg{\the\pcal@temptwo-\the\pcal@temp-1}\expandafter\pcal@togregorian\expandafter{\pcal@arg}%
     \pgfcalendardatetojulian{\pcal@iso}{\pgfutil@tempcnta}% first day of the next month
     \advance\pgfutil@tempcnta by-\pgfcalendarcurrentjulian % days in this month
-    \advance\pgfutil@tempcnta by\pcalendarcurrentweekday\advance\pgfutil@tempcnta by 6
+    \advance\pgfutil@tempcnta by\pcalcurrentweekday\advance\pgfutil@tempcnta by 6
     \divide\pgfutil@tempcnta by 7 \xdef\tikz@lib@cal@width{\the\pgfutil@tempcnta}}}%
 % A new month in `jalali week columns': a new column if the last week was unfinished, then month xshift.
 \def\pcal@nextmonthcolumn{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}%
     \pgfmathsetlength{\pgf@xa}{\tikz@lib@cal@month@xshift}\ifdim\pgf@x<0pt \pgf@xa=-\pgf@xa\fi
-    \ifnum\pcalendarcurrentweekday>0 \advance\pgf@xa by\pgf@x\fi
+    \ifnum\pcalcurrentweekday>0 \advance\pgf@xa by\pgf@x\fi
     \pgftransformxshift{\pgf@xa}}%
 \pgfkeys{%
   /pgf/calendar/jalali day of month/.code={\pcal@ifdatejalali\ifnum#1=\pcal@jd\relax\pgfcalendarmatchestrue\fi},
@@ -535,18 +537,18 @@
       \edef\pcal@iso{\pcal@iso+-1}%
     \else\pcal@togregorian{#2}\fi
     \pgfkeysalso{/tikz/dates/.expanded=\pcal@start to\pcal@iso}},
-  % Prepended so \pcalendarcurrent... are set before any other per-day code.
+  % Prepended so \pcalcurrent... are set before any other per-day code.
   /tikz/jalali/.code={\expandafter\def\expandafter\tikz@before@day\expandafter{\expandafter\pcal@current\tikz@before@day}%
     \pgfkeysalso{/pgf/calendar/day of month/.code={\pgfkeysalso{/pgf/calendar/jalali day of month=##1}},
-      /tikz/day text={\pcalendarcurrentday},
-      /tikz/month text={\pcalendarmonthname{\pcalendarcurrentmonth}\space\pcalendarcurrentyear}}},
+      /tikz/day text={\pcalcurrentday},
+      /tikz/month text={\pcalmonthname{\pcalcurrentmonth}\space\pcalcurrentyear}}},
   % Like TikZ's `week list', but weeks run Saturday to Friday. Use a negative `day xshift' for right to left.
   /tikz/jalali week list/.style={jalali,
     execute before day scope={\ifdate{day of month=1}{\ifdate{equals=\pgfcalendarbeginiso}{}{\pcal@nextmonth}%
       \ifpcal@initials\pcal@initials\fi}{}%
       \ifpcal@boxes\pcal@pad\fi},
     execute at begin day scope={\pgfmathsetlength\pgf@x{\tikz@lib@cal@xshift}%
-      \pgf@x=\pcalendarcurrentweekday\pgf@x\pgftransformxshift{\pgf@x}},
+      \pgf@x=\pcalcurrentweekday\pgf@x\pgftransformxshift{\pgf@x}},
     execute after day scope={\ifdate{Friday}{\pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}\pgftransformyshift{-\pgf@y}}{}},
     tikz@lib@cal@width=7},
   % Weeks as columns, as in calxxxx-yyyy: one weekday per row, Saturday on top, a new column after Friday.
@@ -557,7 +559,7 @@
       \pcal@countcolumns\ifpcal@initials\pcal@initials\fi}{}%
       \ifpcal@boxes\pcal@pad\fi},
     execute at begin day scope={\pgfmathsetlength\pgf@y{\tikz@lib@cal@yshift}%
-      \pgf@y=-\pcalendarcurrentweekday\pgf@y\pgftransformyshift{\pgf@y}},
+      \pgf@y=-\pcalcurrentweekday\pgf@y\pgftransformyshift{\pgf@y}},
     execute after day scope={\ifdate{Friday}{\pgfmathsetlength{\pgf@x}{\tikz@lib@cal@xshift}\pgftransformxshift{\pgf@x}}{}}},
   % Each day is a box one day step wide and high, so the boxes join into a grid.
   /tikz/jalali day boxes/.code={\pcal@boxestrue
@@ -586,15 +588,15 @@
       \tikzmonthcode}}{}},
     every month/.append style={anchor=base}}}%
 %
-% ---- \pcalendarplanner{year}: a vertical year planner in the manner of yplan ----
+% ---- \pcalplanner{year}: a vertical year planner in the manner of yplan ----
 % Two pages, six Jalali months each: a column per month, a row per day, rows aligned on the weekday
 % (Saturday first), a double rule after each Friday. Built with recursion, not \loop (the converters use \loop).
 \newcount\pcal@yprow \newcount\pcal@yprows \newcount\pcal@ypwd \newtoks\pcal@yptoks \newdimen\pcal@ypwidth
-\def\pcalendarplannerdaystrut{\rule{0pt}{12pt}}%
-\def\pcalendarplannermonthstrut{\rule{0pt}{12pt}}%
-\def\pcalendarplannerleapyear{سال کبیسه}%
+\def\pcalplannerdaystrut{\rule{0pt}{12pt}}%
+\def\pcalplannermonthstrut{\rule{0pt}{12pt}}%
+\def\pcalplannerleapyear{سال کبیسه}%
 % Typesets one day cell: Jalali year, month, day, weekday (Saturday = 0). Redefine to colour or annotate days.
-\def\pcalendarplannercell#1#2#3#4{#3}%
+\def\pcalplannercell#1#2#3#4{#3}%
 % Julian day of the 1st of Jalali month #2 (may be 13) of year #1, into \pcal@ypj#3.
 \def\pcal@ypfirst#1#2#3{{\pcal@temp=\numexpr#2\relax\pcal@temptwo=#1\relax
     \ifnum\pcal@temp>12 \advance\pcal@temp by -12 \advance\pcal@temptwo by 1 \fi
@@ -612,7 +614,7 @@
 % Expands to 1 if row #1 of column #2 holds a day, else 0.
 \def\pcal@ypin#1#2{\ifnum\numexpr(#1)-\csname pcal@ypo#2\endcsname<0 0\else
     \ifnum\numexpr(#1)-\csname pcal@ypo#2\endcsname<\csname pcal@ypl#2\endcsname\space 1\else 0\fi\fi}%
-\def\pcal@ypcell#1{&\ifnum\pcal@ypin\pcal@yprow{#1}=1 \noexpand\pcalendarplannercell{\pcal@ypyear}{\the\numexpr\pcal@ypbase+#1-1\relax}%
+\def\pcal@ypcell#1{&\ifnum\pcal@ypin\pcal@yprow{#1}=1 \noexpand\pcalplannercell{\pcal@ypyear}{\the\numexpr\pcal@ypbase+#1-1\relax}%
     {\the\numexpr\pcal@yprow-\csname pcal@ypo#1\endcsname+1\relax}{\the\pcal@ypwd}\fi}%
 % Rule under a cell that holds a day, or above one; full rules after Friday and the last row.
 \def\pcal@ypcline#1{\ifnum\pcal@ypin\pcal@yprow{#1}\pcal@ypin{\pcal@yprow+1}{#1}>0
@@ -622,11 +624,11 @@
     \else\noexpand\cline{1-1}\pcal@ypcline1\pcal@ypcline2\pcal@ypcline3\pcal@ypcline4\pcal@ypcline5\pcal@ypcline6\fi\fi}%
 \def\pcal@yprowloop{\ifnum\pcal@yprow<\pcal@yprows
     \begingroup\edef\x{\endgroup\pcal@yptoks{\the\pcal@yptoks
-      \noexpand\pcalendarplannerdaystrut\noexpand\pcalendarweekdayname{\the\pcal@ypwd}%
+      \noexpand\pcalplannerdaystrut\noexpand\pcalweekdayname{\the\pcal@ypwd}%
       \pcal@ypcell1\pcal@ypcell2\pcal@ypcell3\pcal@ypcell4\pcal@ypcell5\pcal@ypcell6\noexpand\\\pcal@yprule}}\x
     \advance\pcal@yprow by 1 \advance\pcal@ypwd by 1 \ifnum\pcal@ypwd=7 \pcal@ypwd=0 \fi
     \expandafter\pcal@yprowloop\fi}%
-\def\pcal@ypwidest#1{\setbox\pgfutil@tempboxa\hbox{\pcalendarweekdayname{#1}}%
+\def\pcal@ypwidest#1{\setbox\pgfutil@tempboxa\hbox{\pcalweekdayname{#1}}%
     \ifdim\wd\pgfutil@tempboxa>\dimen@\dimen@=\wd\pgfutil@tempboxa\fi}%
 % One page: year #1, months #2 to #2+5.
 \def\pcal@yphalf#1#2{\clearpage\thispagestyle{empty}\begingroup
@@ -640,15 +642,24 @@
     \dimen@=0pt \pcal@ypwidest0\pcal@ypwidest1\pcal@ypwidest2\pcal@ypwidest3\pcal@ypwidest4\pcal@ypwidest5\pcal@ypwidest6
     \pcal@ypwidth=\dimexpr(\linewidth-\dimen@-14\tabcolsep-10\arrayrulewidth-\doublerulesep)/6\relax
     \noindent\hspace{1cm}{\LARGE #1}\hspace{8mm}%
-    \ifnum\numexpr\pcal@ypjf-\pcal@ypje\relax=30 \pcalendarplannerleapyear\fi\par\medskip
+    \ifnum\numexpr\pcal@ypjf-\pcal@ypje\relax=30 \pcalplannerleapyear\fi\par\medskip
     \noindent\begin{tabular}{|c||*{6}{p{\pcal@ypwidth}|}}\hline
-      \multicolumn{1}{|c||}{\pcalendarplannermonthstrut}%
+      \multicolumn{1}{|c||}{\pcalplannermonthstrut}%
       \pcal@yphead{#2}\pcal@yphead{#2+1}\pcal@yphead{#2+2}\pcal@yphead{#2+3}\pcal@yphead{#2+4}\pcal@yphead{#2+5}\\
       \hline\hline
       \the\pcal@yptoks
     \end{tabular}\par\endgroup\clearpage}%
-\def\pcal@yphead#1{&\multicolumn{1}{c|}{\pcalendarmonthname{\numexpr#1\relax}}}%
-\def\pcalendarplanner#1{\pcal@yphalf{#1}{1}\pcal@yphalf{#1}{7}}%
+\def\pcal@yphead#1{&\multicolumn{1}{c|}{\pcalmonthname{\numexpr#1\relax}}}%
+\def\pcalplanner#1{\pcal@yphalf{#1}{1}\pcal@yphalf{#1}{7}}%
+%
+% Names before 0.71, kept so older documents still work; they call the new names, so they follow redefinitions.
+\def\pcalendardatetojulian{\pcaldatetojulian}
+\def\pcalendarjuliantodate{\pcaljuliantodate}
+\def\pcalendaryearname{\pcalyearname}
+\def\pcalendarmonthname{\pcalmonthname}
+\def\pcalendargregorianmonthname{\pcalgregorianmonthname}
+\def\pcalendarweekdayname{\pcalweekdayname}
+\def\pcalendarweekdayshortname{\pcalweekdayshortname}
 \endinput
 %%
 %% End of file `persian-calendar.sty'.

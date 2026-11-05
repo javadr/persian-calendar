@@ -25,16 +25,16 @@
 \emergencystretch=3em % long macro names in the prose
 \renewcommand\thepage{\lr{\arabic{page}}}   % page numbers in Latin digits (the footer is typeset in the Persian font)
 % table cells for the name lists: \mc{n} month n, \yc{y} year y; \MROW/\YROW{first} fill a row of four/six
-\newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\texttt{\mm}\quad\pcalendarmonthname{\mm}}
-\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\texttt{\yy}\quad\pcalendaryearname{\yy}}
+\newcommand\mc[1]{\edef\mm{\number\numexpr#1\relax}\texttt{\mm}\quad\pcalmonthname{\mm}}
+\newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\texttt{\yy}\quad\pcalyearname{\yy}}
 \newcommand\MROW[1]{\mc{#1}&\mc{#1+3}&\mc{#1+6}&\mc{#1+9}}
 \newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}&\yc{#1+12}&\yc{#1+15}}
 
 % The prose uses the Latin font, so the macros that print Persian text switch to the Persian font.
 \def\fa@wrap#1{\expandafter\let\csname fa@orig@\string#1\endcsname#1%
   \def#1##1{{\setpersianfont\csname fa@orig@\string#1\endcsname{##1}}}}
-\fa@wrap\pdate \fa@wrap\gdate \fa@wrap\pcalendarmonthname \fa@wrap\pcalendargregorianmonthname
-\fa@wrap\pcalendarweekdayname \fa@wrap\pcalendarweekdayshortname \fa@wrap\pcalendaryearname
+\fa@wrap\pdate \fa@wrap\gdate \fa@wrap\pcalmonthname \fa@wrap\pcalgregorianmonthname
+\fa@wrap\pcalweekdayname \fa@wrap\pcalweekdayshortname \fa@wrap\pcalyearname
 
 \title{The \pkg{persian-calendar} package}
 \author{Javad Razavian}
@@ -72,11 +72,18 @@ It has no holidays, and it has no macro that returns the weekday of a date
 
 \paragraph{Requirements.} The \pkg{pgf} bundle (which contains \pkg{pgfcalendar}) is all the
 conversions need, and they work with pdf\LaTeX{}, Xe\LaTeX{} and Lua\LaTeX{}. Only the names (and
-so \cs{pdate}, \cs{gdate} and the \texttt{\textbackslash pcalendar\ldots name} macros) are Persian
+so \cs{pdate}, \cs{gdate} and the \texttt{\textbackslash pcal\ldots name} macros) are Persian
 text: they are stored as UTF-8 in the source file, so printing them needs an engine and packages that
 handle UTF-8 Persian letters, together with a font that has them. \pkg{xepersian} with Xe\LaTeX{} is
 what this manual uses, but any setup that can typeset Persian will do. Without one, use the numeric
 macros \cs{pisodate} and \cs{gisodate}, which print only digits.
+
+{\sloppy % long code names cannot be hyphenated
+\paragraph{Names before 0.71.} Up to version 0.7 the macros were called \cs{pcalendar\ldots}
+(\cs{pcalendardatetojulian}, \cs{pcalendarmonthname} and so on, and \cs{pcalendarcurrentyear} and the
+others in \pkg{TikZ} calendars). Version 0.71 shortened the prefix to \cs{pcal\ldots}. The old names still
+work and call the new ones, so documents written for earlier versions need no change. \cs{pcalendardate}
+and \cs{pcalendarversion}, the release date and version, keep their names.\par}
 
 % ---------------------------------------------------------------------------
 \section{Installation}\label{sec:installation2}
@@ -156,45 +163,45 @@ The conversion macros above cannot add days. For that, the package works with Ju
 defined by \pkg{pgfcalendar}: whole days counted from a fixed origin, so subtracting two numbers gives
 the number of days between two dates.
 
-\macro|\pcalendardatetojulian{Y-M-D}{\count}|
+\macro|\pcaldatetojulian{Y-M-D}{\count}|
 Stores the day number of the \emph{Jalali} date \texttt{Y-M-D} in the count register \cs{count}. Append
 \texttt{+N} to the date to add \texttt{N} days first: \texttt{1394-01-01+10} is ten days after
 1 Farvardin 1394.
 
-\macro|\pcalendarjuliantodate{\count}{\y}{\m}{\d}|
+\macro|\pcaljuliantodate{\count}{\y}{\m}{\d}|
 Converts the day number in \cs{count} back to a \emph{Jalali} date and puts the year, month and day
 into the macros \cs{y}, \cs{m} and \cs{d} (you may choose other names).
 
 \begin{verbatim}
 \newcount\jd
-\pcalendardatetojulian{1394-01-01+10}\jd
-\pcalendarjuliantodate\jd\y\m\d
+\pcaldatetojulian{1394-01-01+10}\jd
+\pcaljuliantodate\jd\y\m\d
 \number\y-\number\m-\number\d
 \end{verbatim}
-\pcalendardatetojulian{1394-01-01+10}\jd%
-\pcalendarjuliantodate\jd\y\m\d%
+\pcaldatetojulian{1394-01-01+10}\jd%
+\pcaljuliantodate\jd\y\m\d%
 prints \iso{\number\y-\number\m-\number\d}.
 
-\paragraph{Read \cs{y}, \cs{m}, \cs{d} immediately.} After \cs{pcalendarjuliantodate} the three macros
+\paragraph{Read \cs{y}, \cs{m}, \cs{d} immediately.} After \cs{pcaljuliantodate} the three macros
 are aliases of the package's internal result registers, not copies. Any later conversion
 (\cs{pdate}, \cs{gisodate}, and so on) changes them. If you need the values later, store them in your
 own counters first: \texttt{\cs{newcount}\cs{myyear}\ \cs{myyear=\cs{y}}}.
 
 \paragraph{Offsets across a year end.} Day arithmetic knows about leap years:
-\pcalendardatetojulian{1403-12-29+1}\jd\pcalendarjuliantodate\jd\y\m\d%
+\pcaldatetojulian{1403-12-29+1}\jd\pcaljuliantodate\jd\y\m\d%
 1403-12-29 plus one day is \iso{\number\y-\number\m-\number\d}, because 1403 is a leap year;
-\pcalendardatetojulian{1403-12-29+2}\jd\pcalendarjuliantodate\jd\y\m\d%
+\pcaldatetojulian{1403-12-29+2}\jd\pcaljuliantodate\jd\y\m\d%
 plus two days is \iso{\number\y-\number\m-\number\d}.
 
-\paragraph{Counts used internally.} \cs{pcalendardatetojulian} uses \cs{count1}, \cs{count2},
+\paragraph{Counts used internally.} \cs{pcaldatetojulian} uses \cs{count1}, \cs{count2},
 \cs{count3} and \cs{count8} as scratch registers. Do not keep values in those.
 
 % ---------------------------------------------------------------------------
 \section{Names}\label{sec:names6}
 
-\macro|\pcalendarmonthname{n}|
+\macro|\pcalmonthname{n}|
 Persian month name, \texttt{n} from 1 to 12. An argument outside this range prints nothing.
-\ex|\pcalendarmonthname{1}|{\pcalendarmonthname{1}}
+\ex|\pcalmonthname{1}|{\pcalmonthname{1}}
 \gap
 All twelve, in order:\gap
 \gap
@@ -204,25 +211,25 @@ All twelve, in order:\gap
 \MROW{3}
 \end{tabular}
 
-\macro|\pcalendargregorianmonthname{n}|
+\macro|\pcalgregorianmonthname{n}|
 Persian transliteration of the Gregorian month name, \texttt{n} from 1 to 12.
-\ex|\pcalendargregorianmonthname{3}|{\pcalendargregorianmonthname{3}}
+\ex|\pcalgregorianmonthname{3}|{\pcalgregorianmonthname{3}}
 
-\macro|\pcalendarweekdayname{n}|
+\macro|\pcalweekdayname{n}|
 Weekday name, \texttt{n} from 0 to 6, where \textbf{0 is Saturday} (the first day of the Persian
 week) and 6 is Friday.
 \gap
-\foreach \w in {0,...,6}{\texttt{\w}~\pcalendarweekdayname{\w}\quad}
+\foreach \w in {0,...,6}{\texttt{\w}~\pcalweekdayname{\w}\quad}
 
-\macro|\pcalendarweekdayshortname{n}|
+\macro|\pcalweekdayshortname{n}|
 One-letter weekday abbreviation, same numbering.
 \gap
-\foreach \w in {0,...,6}{\texttt{\w}~\pcalendarweekdayshortname{\w}\quad}
+\foreach \w in {0,...,6}{\texttt{\w}~\pcalweekdayshortname{\w}\quad}
 
-\macro|\pcalendaryearname{year}|
+\macro|\pcalyearname{year}|
 Name of a Jalali year in the twelve-animal cycle. \texttt{year} must be between 0 and 2099;
 other values print nothing.
-\ex|\pcalendaryearname{1403}|{\pcalendaryearname{1403}}
+\ex|\pcalyearname{1403}|{\pcalyearname{1403}}
 \gap
 The twelve animals in order, starting from year 1380:\gap
 \gap
@@ -234,19 +241,19 @@ The twelve animals in order, starting from year 1380:\gap
 \end{tabular}}
 
 \paragraph{The weekday of a date.} The package has no weekday macro, but the day number gives you
-one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalendarweekdayname} numbers Saturday as 0, so
+one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalweekdayname} numbers Saturday as 0, so
 shift by two:
 \begin{verbatim}
 \newcount\jd \newcount\wday
-\pcalendardatetojulian{1403-01-01}\jd
+\pcaldatetojulian{1403-01-01}\jd
 \pgfcalendarjuliantoweekday{\jd}{\wday}
 \advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
-\pcalendarweekdayname{\wday}
+\pcalweekdayname{\wday}
 \end{verbatim}
-\pcalendardatetojulian{1403-01-01}\jd%
+\pcaldatetojulian{1403-01-01}\jd%
 \pgfcalendarjuliantoweekday{\jd}{\wday}%
 \advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi%
-gives \pcalendarweekdayname{\wday} (1 Farvardin 1403 was a Wednesday).
+gives \pcalweekdayname{\wday} (1 Farvardin 1403 was a Wednesday).
 
 % ---------------------------------------------------------------------------
 \section{Calendars with TikZ}\label{sec:tikz}
@@ -280,8 +287,8 @@ Switches the calendar to Jalali dates. The day number and the month label print 
 Persian month name with the year (change them with \texttt{day text} and \texttt{month text}). Inside the
 calendar, the test \texttt{day of month=}$n$ means the Jalali day, so the library's
 \texttt{month label \ldots} styles fire on the first of each Jalali month. For every day,
-\cs{pcalendarcurrentyear}, \cs{pcalendarcurrentmonth}, \cs{pcalendarcurrentday} hold the Jalali date and
-\cs{pcalendarcurrentweekday} the weekday counted from Saturday${}=0$ (like \cs{pcalendarweekdayname}), so
+\cs{pcalcurrentyear}, \cs{pcalcurrentmonth}, \cs{pcalcurrentday} hold the Jalali date and
+\cs{pcalcurrentweekday} the weekday counted from Saturday${}=0$ (like \cs{pcalweekdayname}), so
 they can be used in \texttt{day code}.
 
 \macro|jalali week list|
@@ -312,8 +319,8 @@ day of each month (or of the range), so every month is a full rectangle of whole
 reach the box.
 
 \macro|jalali weekday initials|
-Adds a row of weekday initials (\pcalendarweekdayshortname{0}, \pcalendarweekdayshortname{1}, \ldots,
-\pcalendarweekdayshortname{6}, from \cs{pcalendarweekdayshortname}) one row above each month, in boxes
+Adds a row of weekday initials (\pcalweekdayshortname{0}, \pcalweekdayshortname{1}, \ldots,
+\pcalweekdayshortname{6}, from \cs{pcalweekdayshortname}) one row above each month, in boxes
 when \texttt{jalali day boxes} is on. It works with \texttt{jalali week list}, and the month label moves
 up above it. Style the initials with \texttt{every jalali weekday}, for example
 \texttt{every jalali weekday/.style=\{font=\textbackslash bfseries\}}.
@@ -362,7 +369,7 @@ which sets its own.
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
      day xshift=-0.7cm, day yshift=0.5cm,
      jalali month label above centered,
-     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+     month text={\pcalmonthname{\pcalcurrentmonth}}]
     if (Friday) [red];
 }
 \end{tikzpicture}
@@ -376,7 +383,7 @@ which sets its own.
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
      day xshift=-0.7cm, day yshift=0.5cm,
      jalali month label above centered,
-     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+     month text={\pcalmonthname{\pcalcurrentmonth}}]
     if (Friday) [red];
 }
 \end{tikzpicture}
@@ -388,12 +395,12 @@ as a column per week and a row per weekday. \texttt{jalali week columns} gives t
 months, and the sample \texttt{persian-calendar-years.tex}, which comes with the package, is the Jalali
 counterpart of \pkg{calxxxx-yyyy}: set \cs{FirstYear} and \cs{LastYear} at its top, for example
 \texttt{1405} and \texttt{1413}, and compile it with Xe\LaTeX{}. Each year carries its animal name
-(\cs{pcalendaryearname}). This is the code that draws one year; the sample wraps it in a macro and loops
+(\cs{pcalyearname}). This is the code that draws one year; the sample wraps it in a macro and loops
 over the years, three to a row:
 \begin{verbatim}
 \begin{tikzpicture}[font=\tiny]
   \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
-    {1405\quad\pcalendaryearname{1405}};
+    {1405\quad\pcalyearname{1405}};
   \foreach \m in {1,...,12} {
     \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
     \pgfmathtruncatemacro\row{div(\m-1,3)}% season
@@ -402,7 +409,7 @@ over the years, three to a row:
        jalali week columns, jalali weekday initials,
        day xshift=-0.3cm, day yshift=0.235cm,
        jalali month label above centered,
-       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       month text={\pcalmonthname{\pcalcurrentmonth}},
        every jalali weekday/.style={gray}]
       if (Friday) [red];
   }
@@ -411,7 +418,7 @@ over the years, three to a row:
 \begin{center}
 \begin{tikzpicture}[font=\tiny]
   \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
-    {1405\quad\pcalendaryearname{1405}};
+    {1405\quad\pcalyearname{1405}};
   \foreach \m in {1,...,12} {
     \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
     \pgfmathtruncatemacro\row{div(\m-1,3)}% season
@@ -420,7 +427,7 @@ over the years, three to a row:
        jalali week columns, jalali weekday initials,
        day xshift=-0.3cm, day yshift=0.235cm,
        jalali month label above centered,
-       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       month text={\pcalmonthname{\pcalcurrentmonth}},
        every jalali weekday/.style={gray}]
       if (Friday) [red];
   }
@@ -431,14 +438,14 @@ over the years, three to a row:
 \section{A year planner}\label{sec:yplan}
 
 The \pkg{yplan} package on CTAN prints a vertical year planner: all the days of a year on two A4 pages,
-six months to a page, with a column per month and a row per day. \cs{pcalendarplanner} does the same for a Jalali
+six months to a page, with a column per month and a row per day. \cs{pcalplanner} does the same for a Jalali
 year. It is an ordinary \texttt{tabular}, so it needs neither \pkg{TikZ} nor any package beyond the ones
 that print Persian.
 
-\macro|\pcalendarplanner{year}|
+\macro|\pcalplanner{year}|
 Typesets Jalali \texttt{year} on two pages: Farvardin to Shahrivar, then Mehr to Esfand. Each page starts
 with \cs{clearpage} and has page style \texttt{empty}. Above the table is the year, followed by
-\cs{pcalendarplannerleapyear} (``\rl{\setpersianfont\pcalendarplannerleapyear}'') in a leap year. Down the side are the weekday names; the
+\cs{pcalplannerleapyear} (``\rl{\setpersianfont\pcalplannerleapyear}'') in a leap year. Down the side are the weekday names; the
 rows are aligned on the weekday, so a row is the same weekday in every month. Weeks run Saturday to
 Friday and a double rule follows every Friday. As in \pkg{yplan}, only the cells that hold a day are
 ruled, and each page has as many rows as its months need (at most 37). The six month columns share the
@@ -452,7 +459,7 @@ The year may be a macro.
 \usepackage{xepersian}
 \settextfont{Parisa}
 \begin{document}
-\pcalendarplanner{1405}
+\pcalplanner{1405}
 \end{document}
 \end{verbatim}
 The sample \texttt{persian-calendar-planner.tex}, which comes with the package, is this document with the
@@ -460,22 +467,22 @@ Fridays shaded.
 
 \paragraph{Adjusting the layout.} As in \pkg{yplan}, these can be redefined with \cs{renewcommand}:
 \begin{itemize}
-  \item \cs{pcalendarplannerdaystrut}: sets the height of the day rows; \verb|\rule{0pt}{12pt}| by default.
+  \item \cs{pcalplannerdaystrut}: sets the height of the day rows; \verb|\rule{0pt}{12pt}| by default.
     Make it taller or shorter to fill the page.
-  \item \cs{pcalendarplannermonthstrut}: the same for the row of month names.
-  \item \cs{pcalendarplannerleapyear}: the leap-year label.
+  \item \cs{pcalplannermonthstrut}: the same for the row of month names.
+  \item \cs{pcalplannerleapyear}: the leap-year label.
 \end{itemize}
 
-\macro|\pcalendarplannercell{year}{month}{day}{weekday}|
-Typesets one day cell. \cs{pcalendarplanner} calls it for every day with the Jalali year, month and day, and the
-weekday numbered as \cs{pcalendarweekdayname} does (0 is Saturday, 6 is Friday). By default it prints
+\macro|\pcalplannercell{year}{month}{day}{weekday}|
+Typesets one day cell. \cs{pcalplanner} calls it for every day with the Jalali year, month and day, and the
+weekday numbered as \cs{pcalweekdayname} does (0 is Saturday, 6 is Friday). By default it prints
 the day number. Redefine it to colour, mark or annotate days; empty cells do not call it. This one
 shades the Fridays and prints 1 Farvardin in red:
 \begin{verbatim}
 \usepackage[table]{xcolor}
 \providecommand\UseMathForPositioningText{}
 ...
-\renewcommand\pcalendarplannercell[4]{%
+\renewcommand\pcalplannercell[4]{%
   \ifnum#4=6 \cellcolor{gray!20}\fi
   \ifnum\numexpr#2*100+#3=101 \textcolor{red}{#3}\else#3\fi}
 \end{verbatim}
@@ -485,10 +492,10 @@ shades the Fridays and prints 1 Farvardin in red:
 a line. The cell is a paragraph column, so longer text, such as a holiday name, wraps inside it.
 
 \paragraph{Why a table and not TikZ.} A \pkg{TikZ} drawing of the same planner, with a node per day, took
-about 70 times as long to typeset as \cs{pcalendarplanner} (about 11\,s against 0.15\,s for ten years, beyond the
+about 70 times as long to typeset as \cs{pcalplanner} (about 11\,s against 0.15\,s for ten years, beyond the
 time to load the packages), and it would have to set the right-to-left order and the column widths
 itself. The calendar keys of section~\ref{sec:tikz} are the better choice for a graphical calendar;
-\cs{pcalendarplannercell} covers colours and notes in the planner.
+\cs{pcalplannercell} covers colours and notes in the planner.
 
 % ---------------------------------------------------------------------------
 \section{Recipes}\label{sec:recipes7}
@@ -496,13 +503,13 @@ itself. The calendar keys of section~\ref{sec:tikz} are the better choice for a 
 \paragraph{Days between two Jalali dates.}
 \begin{verbatim}
 \newcount\a \newcount\b
-\pcalendardatetojulian{1403-01-01}\a
-\pcalendardatetojulian{1404-01-01}\b
+\pcaldatetojulian{1403-01-01}\a
+\pcaldatetojulian{1404-01-01}\b
 \advance\b by -\a
 \number\b
 \end{verbatim}
-\pcalendardatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
-\pcalendardatetojulian{1404-01-01}\jd\advance\jd by -\ja
+\pcaldatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
+\pcaldatetojulian{1404-01-01}\jd\advance\jd by -\ja
 prints \number\jd{} days (1403 is a leap year).
 
 \paragraph{A list of consecutive days.} Typeset the 5 days after 1 Farvardin 1403 with a loop. Each date
@@ -511,18 +518,18 @@ conversion:
 \begin{verbatim}
 \newcount\jd
 \foreach \x in {0,...,4}{%
-  \pcalendardatetojulian{1403-01-01+\x}\jd
-  \pcalendarjuliantodate\jd\y\m\d
+  \pcaldatetojulian{1403-01-01+\x}\jd
+  \pcaljuliantodate\jd\y\m\d
   \number\y-\number\m-\number\d\par
 }
 \end{verbatim}
 \foreach \x in {0,...,4}{%
-  \pcalendardatetojulian{1403-01-01+\x}\jd
-  \pcalendarjuliantodate\jd\y\m\d
+  \pcaldatetojulian{1403-01-01+\x}\jd
+  \pcaljuliantodate\jd\y\m\d
   \par\noindent\hspace*{1em}\iso{\number\y-\number\m-\number\d}%
 }
 \par\medskip
-Using \texttt{\cs{x}} inside \cs{pcalendardatetojulian} works, because that macro expands its argument.
+Using \texttt{\cs{x}} inside \cs{pcaldatetojulian} works, because that macro expands its argument.
 
 \paragraph{Declare registers once.} \cs{newcount} inside a loop allocates a new register at every
 iteration and eventually fails with ``No room for a new \cs{count}''. Declare your counters before the
@@ -554,9 +561,9 @@ roman numerals (\cs{pcal@latini} to \cs{pcal@latinxii} and \cs{pcal@persiani} to
 \cs{pcal@persianxiii}). Dey appears twice: the first slot is the part of Dey left in the Gregorian year, the last is
 the whole month, which is why there are thirteen.
 
-\paragraph{Julian day bridge.} \cs{pcalendardatetojulian} converts the Jalali date to Gregorian with the
+\paragraph{Julian day bridge.} \cs{pcaldatetojulian} converts the Jalali date to Gregorian with the
 Jalali-to-Gregorian macro above and hands the result to \cs{pgfcalendardatetojulian}.
-\cs{pcalendarjuliantodate} does the reverse: \cs{pgfcalendarjuliantodate} gives a Gregorian date, which the
+\cs{pcaljuliantodate} does the reverse: \cs{pgfcalendarjuliantodate} gives a Gregorian date, which the
 Gregorian-to-Jalali macro turns into the Jalali date.
 
 \paragraph{Year names.} The twelve animals repeat every 12 years. A second, three-step shift is applied
@@ -569,15 +576,15 @@ conversions can be made in one document. A test in the repository (\texttt{leaks
 \paragraph{TikZ calendars.} The keys of section~\ref{sec:tikz} are defined with \cs{pgfkeys} when the
 package loads, so they need no \pkg{TikZ} until they are used. \texttt{jalali dates} converts both ends to
 Gregorian and passes them to the library's \texttt{dates} key; \texttt{last} becomes the first day of the
-next Jalali month with a \texttt{+-1} offset. \texttt{jalali} puts a call that sets \cs{pcalendarcurrentyear}
+next Jalali month with a \texttt{+-1} offset. \texttt{jalali} puts a call that sets \cs{pcalcurrentyear}
 and the others in front of every day, ahead of the library's own per-day code, and redefines the
 \texttt{day of month} test for that calendar only. The conversions are run inside a group, because
 \pkg{pgfcalendar} walks the days with \cs{loop} and the conversions use \cs{loop} too.
 
-\paragraph{The year planner.} For each page \cs{pcalendarplanner} converts only the 1st of each of its six months
-(and of the month after) to a day number, through \cs{pcalendardatetojulian}'s machinery; their
+\paragraph{The year planner.} For each page \cs{pcalplanner} converts only the 1st of each of its six months
+(and of the month after) to a day number, through \cs{pcaldatetojulian}'s machinery; their
 differences are the month lengths, and the weekday of each 1st gives the month's first row. The rows are
-then written into a token register, one cell per month with a call to \cs{pcalendarplannercell} in each cell that
+then written into a token register, one cell per month with a call to \cs{pcalplannercell} in each cell that
 holds a day, together with the \cs{cline}s under them, and the register is put into the
 \texttt{tabular}. The rows are built by recursion rather than \cs{loop}, for the reason above.
 
@@ -589,7 +596,7 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
     error, not a package message.
   \item \textbf{Literal dates only.} The date argument of \cs{pdate}, \cs{gdate}, \cs{pisodate} and
     \cs{gisodate} is split at the hyphens as it stands; a macro holding a date is not expanded. Write
-    \cs{pdate}\texttt{\{2015-03-21\}}, not \cs{pdate}\cs{mydate}. (\cs{pcalendardatetojulian} does
+    \cs{pdate}\texttt{\{2015-03-21\}}, not \cs{pdate}\cs{mydate}. (\cs{pcaldatetojulian} does
     expand its date.)
   \item \textbf{Approximate Jalali leap rule.} The 33-year rule is an arithmetic approximation of the
     official calendar, which is defined by astronomical observation. The two agree for the years in
@@ -620,8 +627,8 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
     ``Undefined control sequence \cs{UseMathForPositioningText}''. \pkg{bidi}'s adaptation of
     \pkg{array} uses this macro, which current versions of \pkg{array} no longer define. Until \pkg{bidi}
     is fixed, put \verb|\providecommand\UseMathForPositioningText{}| in the preamble.
-  \item \textbf{The planner is A4 portrait by default.} \cs{pcalendarplanner} does not change the page size or the
-    margins; set them with \pkg{geometry}, and the row height with \cs{pcalendarplannerdaystrut}.
+  \item \textbf{The planner is A4 portrait by default.} \cs{pcalplanner} does not change the page size or the
+    margins; set them with \pkg{geometry}, and the row height with \cs{pcalplannerdaystrut}.
   \item \textbf{Do not redefine \cs{wd}.} \cs{newcount}\cs{wd} or similar replaces a \TeX{} primitive that
     \pkg{TikZ} needs, and stray text such as ``\texttt{==0pt}'' appears in the pictures.
 \end{itemize}
@@ -630,8 +637,10 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
-  \item[0.7 (2026-11-05)] A year planner in the manner of \pkg{yplan}: \cs{pcalendarplanner}, and
-    \cs{pcalendarplannercell} to colour or annotate its days. The sample
+  \item[0.71 (2026-11-05)] Shorter names: \cs{pcal\ldots} instead of \cs{pcalendar\ldots}; the old names still
+    work (section~\ref{sec:what1}).
+  \item[0.7 (2026-11-05)] A year planner in the manner of \pkg{yplan}: \cs{pcalplanner}, and
+    \cs{pcalplannercell} to colour or annotate its days. The sample
     \texttt{persian-calendar-planner.tex}.
   \item[0.62 (2026-11-04)] \texttt{jalali week columns} and the sample \texttt{persian-calendar-years.tex}.
   \item[0.61 (2026-11-03)] \texttt{jalali day boxes} (a grid of boxes) and \texttt{jalali weekday initials}.
@@ -648,13 +657,5 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
   \item[0.2 (2015-08-09)] Jalali to Gregorian conversion.
   \item[0.1 (2015-07-25)] Initial version.
 \end{description}
-
-% ---------------------------------------------------------------------------
-\section{License}\label{sec:license12}
-
-This work may be distributed and/or modified under
-the conditions of the \LaTeX{} Project Public License, either version 1.3c of this license or (at your
-option) any later version. The latest version is at \texttt{http://www.latex-project.org/lppl.txt}. This
-work has the LPPL maintenance status ``author-maintained''.
 
 \end{document}

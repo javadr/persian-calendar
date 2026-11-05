@@ -29,4 +29,13 @@
   \J2G{1379-12-11}{2001-3-1}\ASSERT{\ifpcal@leap y\else n\fi}{n}
   \J2G{1479-1-1}{2100-3-21}\ASSERT{\ifpcal@leap y\else n\fi}{n}
 }
+\TEST{the names before 0.71 still work and follow the new ones}{
+  \newcount\jdold \newcount\jdnew
+  \pcalendardatetojulian{1405-01-01+3}\jdold \pcaldatetojulian{1405-01-01+3}\jdnew
+  \ASSERT{\the\jdold}{\the\jdnew}
+  \pcalendarjuliantodate\jdold\yy\mm\dd \ASSERT{\the\yy-\the\mm-\the\dd}{1405-1-4}
+  \ASSERT{\pcalendarmonthname{1}|\pcalendargregorianmonthname{3}|\pcalendarweekdayname{6}|\pcalendarweekdayshortname{6}|\pcalendaryearname{1405}}
+         {\pcalmonthname{1}|\pcalgregorianmonthname{3}|\pcalweekdayname{6}|\pcalweekdayshortname{6}|\pcalyearname{1405}}
+  {\def\pcalmonthname#1{M#1}\ASSERT{\pcalendarmonthname{7}}{M7}}
+}
 \END

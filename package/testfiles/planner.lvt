@@ -2,7 +2,7 @@
 \input{regression-test}
 \usepackage{persian-calendar}
 \makeatletter
-% Fill the \pcalendarplanner column data for year #1, months #2..#2+5, as \pcal@yphalf does.
+% Fill the \pcalplanner column data for year #1, months #2..#2+5, as \pcal@yphalf does.
 \def\HALF#1#2{\pcal@ypfirst{#1}{#2}{1}\pcal@ypfirst{#1}{#2+1}{2}\pcal@ypfirst{#1}{#2+2}{3}%
   \pcal@ypfirst{#1}{#2+3}{4}\pcal@ypfirst{#1}{#2+4}{5}\pcal@ypfirst{#1}{#2+5}{6}\pcal@ypfirst{#1}{#2+6}{7}%
   \pcal@yprows=0 \pcal@ypmonth1\pcal@ypmonth2\pcal@ypmonth3\pcal@ypmonth4\pcal@ypmonth5\pcal@ypmonth6}
@@ -10,7 +10,7 @@
 \def\ALL{\O1/\L1,\O2/\L2,\O3/\L3,\O4/\L4,\O5/\L5,\O6/\L6;\the\pcal@yprows}
 \begin{document}
 \START
-\TEST{\pcalendarplanner data: weekday of the 1st (Saturday = 0) / length, rows}{
+\TEST{\pcalplanner data: weekday of the 1st (Saturday = 0) / length, rows}{
   \HALF{1405}{1}\ASSERT{\ALL}{0/31,3/31,6/31,2/31,5/31,1/31;37}
   \HALF{1405}{7}\ASSERT{\ALL}{4/30,6/30,1/30,3/30,5/30,0/29;36}
   \HALF{1403}{7}\ASSERT{\L6}{30}% leap year
@@ -19,14 +19,14 @@
   \HALF{1405}{7}% Mehr starts on Wednesday (4), 30 days
   \ASSERT{\pcal@ypin{3}{1}\pcal@ypin{4}{1}\pcal@ypin{33}{1}\pcal@ypin{34}{1}}{0110}
 }
-\TEST{\pcalendarplannercell gets year, month, day and weekday (Saturday = 0)}{
+\TEST{\pcalplannercell gets year, month, day and weekday (Saturday = 0)}{
   \HALF{1405}{7}\def\pcal@ypyear{1405}\def\pcal@ypbase{7}%
   \pcal@yprow=0 \pcal@ypwd=0 \pcal@yptoks{}\pcal@yprowloop
   % \HAS{tokens}: append y or n to \R as the rows built hold the tokens or not
   \def\R{}\def\HAS#1{\edef\x{\noexpand\pgfutil@in@{\detokenize{#1}}{\detokenize\expandafter{\the\pcal@yptoks}}}\x
     \edef\R{\R\ifpgfutil@in@ y\else n\fi}}
   % Mehr 1 is a Wednesday; Esfand 29 a Saturday; Esfand has no 30th in 1405
-  \HAS{\pcalendarplannercell{1405}{7}{1}{4}}\HAS{\pcalendarplannercell{1405}{12}{29}{0}}\HAS{\pcalendarplannercell{1405}{12}{30}}
+  \HAS{\pcalplannercell{1405}{7}{1}{4}}\HAS{\pcalplannercell{1405}{12}{29}{0}}\HAS{\pcalplannercell{1405}{12}{30}}
   \ASSERT{\R}{yyn}
 }
 \END

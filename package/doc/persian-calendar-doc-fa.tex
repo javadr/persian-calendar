@@ -28,8 +28,8 @@
 \makeatletter\renewcommand*\l@section{\@dottedtocline{1}{0em}{2.3em}}\makeatother
 % table cells for the name lists: \mc{n} month n, \yc{y} year y, each a number cell and a name cell,
 % so both line up in right-to-left tables; \MROW/\YROW{first} fill a row of four/six pairs
-\newcommand\mc[1]{\tx{\number\numexpr#1\relax}&\pcalendarmonthname{\number\numexpr#1\relax}}
-\newcommand\yc[1]{\tx{\number\numexpr#1\relax}&\pcalendaryearname{\number\numexpr#1\relax}}
+\newcommand\mc[1]{\tx{\number\numexpr#1\relax}&\pcalmonthname{\number\numexpr#1\relax}}
+\newcommand\yc[1]{\tx{\number\numexpr#1\relax}&\pcalyearname{\number\numexpr#1\relax}}
 \newcommand\MROW[1]{\mc{#1}&\mc{#1+3}&\mc{#1+6}&\mc{#1+9}}
 \newcommand\YROW[1]{\yc{#1}&\yc{#1+3}&\yc{#1+6}&\yc{#1+9}&\yc{#1+12}&\yc{#1+15}}
 
@@ -68,6 +68,9 @@
 اما این بسته مناسبت‌ها و تعطیلات رسمی را نمی‌شناسد و فرمان جداگانه‌ای هم برای روز هفتهٔ یک تاریخ ندارد؛ هرچند در بخش~\ref{sec:names} می‌بینید که با چند خط می‌شود روز هفته را هم به دست آورد.
 
 \paragraph{پیش‌نیازها.} تبدیل تاریخ فقط به بستهٔ \pkg{pgf} (که \pkg{pgfcalendar} بخشی از آن است) نیاز دارد و با \lr{pdfLaTeX}، \lr{XeLaTeX} و \lr{LuaLaTeX} کار می‌کند. نام‌های فارسی (و در نتیجه \cs{pdate}، \cs{gdate} و فرمان‌های نام) به‌صورت متن \lr{UTF-8} در خود فایل بسته نوشته شده‌اند؛ پس چاپ آن‌ها به موتور و بسته‌هایی نیاز دارد که حروف فارسی \lr{UTF-8} را پشتیبانی کنند و به قلمی که این حروف را داشته باشد. این راهنما از \pkg{xepersian} همراه با \lr{XeLaTeX} استفاده می‌کند، اما هر روش دیگری که فارسی را حروف‌چینی کند کافی است. اگر چنین چیزی ندارید، از فرمان‌های عددی \cs{pisodate} و \cs{gisodate} استفاده کنید که فقط رقم چاپ می‌کنند.
+
+{\sloppy % long code names cannot be hyphenated
+\paragraph{نام‌های پیش از نسخهٔ \lr{0.71}.} تا نسخهٔ \lr{0.7} نام فرمان‌ها با \cs{pcalendar\ldots} شروع می‌شد (\cs{pcalendardatetojulian}، \cs{pcalendarmonthname} و مانند آن‌ها، و \cs{pcalendarcurrentyear} و بقیه در تقویم‌های \lr{TikZ}). در نسخهٔ \lr{0.71} این پیشوند به \cs{pcal\ldots} کوتاه شد. نام‌های قدیمی هنوز کار می‌کنند و فرمان‌های جدید را صدا می‌زنند، پس سندهایی که برای نسخه‌های قبلی نوشته شده‌اند نیازی به تغییر ندارند. \cs{pcalendardate} و \cs{pcalendarversion}، تاریخ و شمارهٔ نسخه، همان نام قبلی را دارند.\par}
 
 % ---------------------------------------------------------------------------
 \section{نصب}\label{sec:install}
@@ -132,39 +135,39 @@
 
 فرمان‌های بالا فقط تبدیل می‌کنند و با آن‌ها نمی‌شود به تاریخ روز اضافه کرد. برای این کار بسته از شمارهٔ روز ژولین کمک می‌گیرد، همان شماره‌ای که \pkg{pgfcalendar} تعریف کرده است. روزها از یک مبدأ ثابت شمرده می‌شوند، پس تفاضل دو شماره دقیقاً برابر با تعداد روزهای بین دو تاریخ است.
 
-\macro|\pcalendardatetojulian{Y-M-D}{\count}|
+\macro|\pcaldatetojulian{Y-M-D}{\count}|
 شمارهٔ روز تاریخ \emph{شمسی} \tx{Y-M-D} را در شمارندهٔ \cs{count} می‌گذارد. اگر \tx{+N} را به آخر تاریخ بچسبانید، \tx{N} روز هم به آن اضافه می‌شود؛ مثلاً \tx{1394-01-01+10} یعنی ده روز بعد از اول فروردین ۱۳۹۴.
 
-\macro|\pcalendarjuliantodate{\count}{\y}{\m}{\d}|
+\macro|\pcaljuliantodate{\count}{\y}{\m}{\d}|
 شمارهٔ روزِ داخل \cs{count} را دوباره به تاریخ \emph{شمسی} تبدیل می‌کند و سال و ماه و روز را در فرمان‌های \cs{y} و \cs{m} و \cs{d} می‌گذارد (به‌جای این سه می‌توانید نام دیگری هم بدهید).
 
 \begin{latin}\begin{verbatim}
 \newcount\jd
-\pcalendardatetojulian{1394-01-01+10}\jd
-\pcalendarjuliantodate\jd\y\m\d
+\pcaldatetojulian{1394-01-01+10}\jd
+\pcaljuliantodate\jd\y\m\d
 \number\y-\number\m-\number\d
 \end{verbatim}\end{latin}
-\pcalendardatetojulian{1394-01-01+10}\jd%
-\pcalendarjuliantodate\jd\y\m\d%
+\pcaldatetojulian{1394-01-01+10}\jd%
+\pcaljuliantodate\jd\y\m\d%
 خروجی این کد \iso{\number\y-\number\m-\number\d} است.
 
-\paragraph{\cs{y} و \cs{m} و \cs{d} را همان لحظه بخوانید.} بعد از \cs{pcalendarjuliantodate}، این سه فرمان رونوشتی از مقدار نیستند و فقط نام دیگری برای شمارنده‌های نتیجهٔ بسته‌اند. به همین دلیل هر تبدیل بعدی (\cs{pdate}، \cs{gisodate} و مانند آن‌ها) مقدارشان را عوض می‌کند. اگر بعداً به آن‌ها نیاز دارید، همان لحظه در شمارنده‌های خودتان نگه‌شان دارید:
+\paragraph{\cs{y} و \cs{m} و \cs{d} را همان لحظه بخوانید.} بعد از \cs{pcaljuliantodate}، این سه فرمان رونوشتی از مقدار نیستند و فقط نام دیگری برای شمارنده‌های نتیجهٔ بسته‌اند. به همین دلیل هر تبدیل بعدی (\cs{pdate}، \cs{gisodate} و مانند آن‌ها) مقدارشان را عوض می‌کند. اگر بعداً به آن‌ها نیاز دارید، همان لحظه در شمارنده‌های خودتان نگه‌شان دارید:
 \tx{\textbackslash newcount\textbackslash myyear\ \textbackslash myyear=\textbackslash y}.
 
 \paragraph{عبور از پایان سال.} محاسبهٔ روز، سال کبیسه را هم درنظر می‌گیرد:
-\pcalendardatetojulian{1403-12-29+1}\jd\pcalendarjuliantodate\jd\y\m\d%
+\pcaldatetojulian{1403-12-29+1}\jd\pcaljuliantodate\jd\y\m\d%
 یک روز بعد از ۱۴۰۳-۱۲-۲۹ می‌شود \iso{\number\y-\number\m-\number\d}، چون ۱۴۰۳ کبیسه است؛
-\pcalendardatetojulian{1403-12-29+2}\jd\pcalendarjuliantodate\jd\y\m\d%
+\pcaldatetojulian{1403-12-29+2}\jd\pcaljuliantodate\jd\y\m\d%
 و دو روز بعد از آن می‌شود \iso{\number\y-\number\m-\number\d}.
 
-\paragraph{شمارنده‌های موقت.} \cs{pcalendardatetojulian} هنگام کار از \cs{count1}، \cs{count2}، \cs{count3} و \cs{count8} استفاده می‌کند؛ پس مقداری در این شمارنده‌ها نگه ندارید.
+\paragraph{شمارنده‌های موقت.} \cs{pcaldatetojulian} هنگام کار از \cs{count1}، \cs{count2}، \cs{count3} و \cs{count8} استفاده می‌کند؛ پس مقداری در این شمارنده‌ها نگه ندارید.
 
 % ---------------------------------------------------------------------------
 \section{نام‌ها}\label{sec:names}
 
-\macro|\pcalendarmonthname{n}|
+\macro|\pcalmonthname{n}|
 نام ماه شمسی را چاپ می‌کند. \tx{n} عددی از ۱ تا ۱۲ است؛ برای عددهای دیگر چیزی چاپ نمی‌شود.
-\ex|\pcalendarmonthname{1}|{\pcalendarmonthname{1}}
+\ex|\pcalmonthname{1}|{\pcalmonthname{1}}
 \gap
 نام هر دوازده ماه به ترتیب:\gap
 \begin{tabular}{*{4}{rr@{\hspace{1.5em}}}}
@@ -173,23 +176,23 @@
 \MROW{3}
 \end{tabular}
 
-\macro|\pcalendargregorianmonthname{n}|
+\macro|\pcalgregorianmonthname{n}|
 نام ماه میلادی را به فارسی چاپ می‌کند (مثلاً «مارس»). \tx{n} این‌جا هم از ۱ تا ۱۲ است.
-\ex|\pcalendargregorianmonthname{3}|{\pcalendargregorianmonthname{3}}
+\ex|\pcalgregorianmonthname{3}|{\pcalgregorianmonthname{3}}
 
-\macro|\pcalendarweekdayname{n}|
+\macro|\pcalweekdayname{n}|
 نام روز هفته را چاپ می‌کند. \tx{n} از ۰ تا ۶ است: ۰ شنبه، یعنی اولین روز هفته در ایران، و ۶ جمعه است.
 \gap\leavevmode
-\foreach \w in {0,...,6}{\hbox{\tx{\w}~\pcalendarweekdayname{\w}}\quad}
+\foreach \w in {0,...,6}{\hbox{\tx{\w}~\pcalweekdayname{\w}}\quad}
 
-\macro|\pcalendarweekdayshortname{n}|
+\macro|\pcalweekdayshortname{n}|
 مخفف تک‌حرفی روز هفته را چاپ می‌کند؛ شماره‌گذاری مثل فرمان قبلی است.
 \gap\leavevmode
-\foreach \w in {0,...,6}{\hbox{\tx{\w}~\pcalendarweekdayshortname{\w}}\quad}
+\foreach \w in {0,...,6}{\hbox{\tx{\w}~\pcalweekdayshortname{\w}}\quad}
 
-\macro|\pcalendaryearname{year}|
+\macro|\pcalyearname{year}|
 حیوان یک سال شمسی را در دورهٔ دوازده‌ساله چاپ می‌کند. \tx{year} باید بین ۰ تا ۲۰۹۹ باشد؛ برای مقدارهای دیگر چیزی چاپ نمی‌شود.
-\ex|\pcalendaryearname{1403}|{\pcalendaryearname{1403}}
+\ex|\pcalyearname{1403}|{\pcalyearname{1403}}
 \gap
 حیوان‌های سال به ترتیب، از سال ۱۳۸۰:\gap
 {\setlength\tabcolsep{4pt}% six columns fit the text width
@@ -199,18 +202,18 @@
 \YROW{1382}
 \end{tabular}}
 
-\paragraph{روز هفتهٔ یک تاریخ.} فرمان آماده‌ای برای این کار نداریم، اما از روی شمارهٔ روز می‌شود آن را حساب کرد. \pkg{pgfcalendar} دوشنبه را ۰ می‌گیرد و \cs{pcalendarweekdayname} شنبه را؛ پس نتیجه را دو واحد جابه‌جا می‌کنیم:
+\paragraph{روز هفتهٔ یک تاریخ.} فرمان آماده‌ای برای این کار نداریم، اما از روی شمارهٔ روز می‌شود آن را حساب کرد. \pkg{pgfcalendar} دوشنبه را ۰ می‌گیرد و \cs{pcalweekdayname} شنبه را؛ پس نتیجه را دو واحد جابه‌جا می‌کنیم:
 \begin{latin}\begin{verbatim}
 \newcount\jd \newcount\wday
-\pcalendardatetojulian{1403-01-01}\jd
+\pcaldatetojulian{1403-01-01}\jd
 \pgfcalendarjuliantoweekday{\jd}{\wday}
 \advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
-\pcalendarweekdayname{\wday}
+\pcalweekdayname{\wday}
 \end{verbatim}\end{latin}
-\pcalendardatetojulian{1403-01-01}\jd%
+\pcaldatetojulian{1403-01-01}\jd%
 \pgfcalendarjuliantoweekday{\jd}{\wday}%
 \advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi%
-نتیجه «\pcalendarweekdayname{\wday}» است؛ یعنی اول فروردین ۱۴۰۳ چهارشنبه بوده است.
+نتیجه «\pcalweekdayname{\wday}» است؛ یعنی اول فروردین ۱۴۰۳ چهارشنبه بوده است.
 
 % ---------------------------------------------------------------------------
 \section{تقویم با \lr{TikZ}}\label{sec:tikz}
@@ -237,7 +240,7 @@
 بازهٔ تاریخ‌هایی که رسم می‌شوند، به تاریخ شمسی. به‌جای روز می‌توانید \tx{last} بنویسید که یعنی روز آخر همان ماه (برای اسفند، بسته به کبیسه بودن سال، ۲۹ یا ۳۰). این کلید همان کلید \tx{dates} کتابخانه را تنظیم می‌کند، پس این دو را با هم به کار نبرید.
 
 \macro|jalali|
-تقویم را شمسی می‌کند. شمارهٔ روز، روز شمسی را نشان می‌دهد و عنوان ماه، نام فارسی ماه را همراه با سال (با \tx{day text} و \tx{month text} می‌توانید آن‌ها را عوض کنید). درون تقویم، شرط \tx{day of month=n} به روز شمسی اشاره می‌کند؛ به همین دلیل سبک‌های \tx{month label ...} خود کتابخانه در روز اول هر ماه شمسی اجرا می‌شوند. برای هر روز، \cs{pcalendarcurrentyear}، \cs{pcalendarcurrentmonth} و \cs{pcalendarcurrentday} تاریخ شمسی را نگه می‌دارند و \cs{pcalendarcurrentweekday} روز هفته را، با شمارش از شنبه برابر ۰ (مثل \cs{pcalendarweekdayname})؛ پس می‌توانید از آن‌ها در \tx{day code} استفاده کنید.
+تقویم را شمسی می‌کند. شمارهٔ روز، روز شمسی را نشان می‌دهد و عنوان ماه، نام فارسی ماه را همراه با سال (با \tx{day text} و \tx{month text} می‌توانید آن‌ها را عوض کنید). درون تقویم، شرط \tx{day of month=n} به روز شمسی اشاره می‌کند؛ به همین دلیل سبک‌های \tx{month label ...} خود کتابخانه در روز اول هر ماه شمسی اجرا می‌شوند. برای هر روز، \cs{pcalcurrentyear}، \cs{pcalcurrentmonth} و \cs{pcalcurrentday} تاریخ شمسی را نگه می‌دارند و \cs{pcalcurrentweekday} روز هفته را، با شمارش از شنبه برابر ۰ (مثل \cs{pcalweekdayname})؛ پس می‌توانید از آن‌ها در \tx{day code} استفاده کنید.
 
 \macro|jalali week list|
 مثل \tx{week list} کتابخانه، اما برای ماه‌های شمسی: \tx{jalali} را هم شامل می‌شود، هر هفته از شنبه تا جمعه است و هر ماه از سطر تازه‌ای شروع می‌شود. با \tx{day xshift} مثبت (پیش‌فرض) شنبه در سمت چپ است؛ با مقدار منفی، مثل نمونهٔ بالا، شنبه به سمت راست می‌رود.
@@ -252,7 +255,7 @@
 هر روز را در خانه‌ای به پهنای یک گام روز (\tx{day xshift}) و به ارتفاع \tx{day yshift} رسم می‌کند تا خانه‌ها به هم بچسبند و جدول بسازند. همراه با \tx{jalali week list}، خانه‌های خالی جای روزهای پیش از روز اول و پس از روز آخر هر ماه (یا بازه) را پر می‌کنند تا هر ماه یک مستطیل کامل از هفته‌های کامل باشد. ارتفاع و عمق متن با واحد \tx{ex} ثابت شده است، پس سطرها با هر اندازهٔ قلم هم‌تراز می‌مانند. در این حالت \tx{jalali month label above centered} عنوان را بالای وسط خانه‌ها می‌گذارد. برای رنگ کردن زمینهٔ برخی روزها، مثل نمونهٔ زیر به سبک \tx{every day} آن‌ها چیزی اضافه کنید؛ \tx{fill=} ساده در \tx{if (...)} به خانه نمی‌رسد.
 
 \macro|jalali weekday initials|
-بالای هر ماه یک سطر حرف اول روزهای هفته (\pcalendarweekdayshortname{0}، \pcalendarweekdayshortname{1}، ...، \pcalendarweekdayshortname{6}، از \cs{pcalendarweekdayshortname}) می‌گذارد؛ اگر \tx{jalali day boxes} روشن باشد، این حرف‌ها هم در خانه می‌نشینند. این کلید با \tx{jalali week list} کار می‌کند و عنوان ماه بالای این سطر می‌رود. ظاهر حرف‌ها را با \tx{every jalali weekday} تنظیم کنید، مثلاً \tx{every jalali weekday/.style=\{font=\textbackslash bfseries\}}.
+بالای هر ماه یک سطر حرف اول روزهای هفته (\pcalweekdayshortname{0}، \pcalweekdayshortname{1}، ...، \pcalweekdayshortname{6}، از \cs{pcalweekdayshortname}) می‌گذارد؛ اگر \tx{jalali day boxes} روشن باشد، این حرف‌ها هم در خانه می‌نشینند. این کلید با \tx{jalali week list} کار می‌کند و عنوان ماه بالای این سطر می‌رود. ظاهر حرف‌ها را با \tx{every jalali weekday} تنظیم کنید، مثلاً \tx{every jalali weekday/.style=\{font=\textbackslash bfseries\}}.
 
 با هر کدام از این دو کلید، هر ماه دست‌کم سه سطر (با حرف‌های هفته چهار سطر) پایین‌تر از ماه قبل شروع می‌شود، هرچقدر هم \tx{month yshift} کوچک باشد؛ پس هفتهٔ ناتمام آخر ماه هیچ‌وقت روی عنوان ماه بعد نمی‌افتد.
 \begin{latin}\begin{verbatim}
@@ -285,7 +288,7 @@
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
      day xshift=-0.7cm, day yshift=0.5cm,
      jalali month label above centered,
-     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+     month text={\pcalmonthname{\pcalcurrentmonth}}]
     if (Friday) [red];
 }
 \end{tikzpicture}
@@ -299,17 +302,17 @@
     [jalali dates=1405-\m-01 to 1405-\m-last, jalali week list,
      day xshift=-0.7cm, day yshift=0.5cm,
      jalali month label above centered,
-     month text={\pcalendarmonthname{\pcalendarcurrentmonth}}]
+     month text={\pcalmonthname{\pcalcurrentmonth}}]
     if (Friday) [red];
 }
 \end{tikzpicture}
 \end{center}
 
-\paragraph{تقویم چند سال.} سند \pkg{calxxxx-yyyy} در \lr{CTAN} تقویم میلادی چند سال را چاپ می‌کند: نُه سال در هر صفحه، هر سال در چهار سطر سه‌ماهه، و هر ماه با یک ستون برای هر هفته و یک سطر برای هر روز هفته. \tx{jalali week columns} همین چیدمان را برای ماه‌های شمسی می‌سازد و نمونهٔ \tx{persian-calendar-years.tex}، که همراه بسته است، معادل شمسی \pkg{calxxxx-yyyy} است: \cs{FirstYear} و \cs{LastYear} را در ابتدای آن تنظیم کنید (مثلاً \tx{1405} و \tx{1413}) و آن را با \lr{XeLaTeX} اجرا کنید. کنار هر سال نام حیوان آن (\cs{pcalendaryearname}) هم می‌آید. کد زیر یک سال را رسم می‌کند؛ نمونه آن را در یک ماکرو می‌گذارد و روی سال‌ها می‌چرخد، سه سال در هر سطر:
+\paragraph{تقویم چند سال.} سند \pkg{calxxxx-yyyy} در \lr{CTAN} تقویم میلادی چند سال را چاپ می‌کند: نُه سال در هر صفحه، هر سال در چهار سطر سه‌ماهه، و هر ماه با یک ستون برای هر هفته و یک سطر برای هر روز هفته. \tx{jalali week columns} همین چیدمان را برای ماه‌های شمسی می‌سازد و نمونهٔ \tx{persian-calendar-years.tex}، که همراه بسته است، معادل شمسی \pkg{calxxxx-yyyy} است: \cs{FirstYear} و \cs{LastYear} را در ابتدای آن تنظیم کنید (مثلاً \tx{1405} و \tx{1413}) و آن را با \lr{XeLaTeX} اجرا کنید. کنار هر سال نام حیوان آن (\cs{pcalyearname}) هم می‌آید. کد زیر یک سال را رسم می‌کند؛ نمونه آن را در یک ماکرو می‌گذارد و روی سال‌ها می‌چرخد، سه سال در هر سطر:
 \begin{latin}\begin{verbatim}
 \begin{tikzpicture}[font=\tiny]
   \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
-    {1405\quad\pcalendaryearname{1405}};
+    {1405\quad\pcalyearname{1405}};
   \foreach \m in {1,...,12} {
     \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
     \pgfmathtruncatemacro\row{div(\m-1,3)}% season
@@ -318,7 +321,7 @@
        jalali week columns, jalali weekday initials,
        day xshift=-0.3cm, day yshift=0.235cm,
        jalali month label above centered,
-       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       month text={\pcalmonthname{\pcalcurrentmonth}},
        every jalali weekday/.style={gray}]
       if (Friday) [red];
   }
@@ -327,7 +330,7 @@
 \begin{center}
 \begin{tikzpicture}[font=\tiny]
   \node[anchor=base east, font=\footnotesize\bfseries] at (0.3,0.35)
-    {1405\quad\pcalendaryearname{1405}};
+    {1405\quad\pcalyearname{1405}};
   \foreach \m in {1,...,12} {
     \pgfmathtruncatemacro\col{mod(\m-1,3)}% month within the season
     \pgfmathtruncatemacro\row{div(\m-1,3)}% season
@@ -336,7 +339,7 @@
        jalali week columns, jalali weekday initials,
        day xshift=-0.3cm, day yshift=0.235cm,
        jalali month label above centered,
-       month text={\pcalendarmonthname{\pcalendarcurrentmonth}},
+       month text={\pcalmonthname{\pcalcurrentmonth}},
        every jalali weekday/.style={gray}]
       if (Friday) [red];
   }
@@ -346,10 +349,10 @@
 % ---------------------------------------------------------------------------
 \section{برنامه‌ریز سالانه}\label{sec:yplan}
 
-بستهٔ \pkg{yplan} در \lr{CTAN} یک برنامه‌ریز سالانهٔ عمودی چاپ می‌کند: همهٔ روزهای سال در دو صفحهٔ \lr{A4}، شش ماه در هر صفحه، با یک ستون برای هر ماه و یک سطر برای هر روز. \cs{pcalendarplanner} همین کار را برای سال شمسی انجام می‌دهد. این برنامه‌ریز یک \tx{tabular} معمولی است، پس به \pkg{TikZ} یا بستهٔ دیگری جز آن‌چه برای چاپ فارسی لازم است نیازی ندارد.
+بستهٔ \pkg{yplan} در \lr{CTAN} یک برنامه‌ریز سالانهٔ عمودی چاپ می‌کند: همهٔ روزهای سال در دو صفحهٔ \lr{A4}، شش ماه در هر صفحه، با یک ستون برای هر ماه و یک سطر برای هر روز. \cs{pcalplanner} همین کار را برای سال شمسی انجام می‌دهد. این برنامه‌ریز یک \tx{tabular} معمولی است، پس به \pkg{TikZ} یا بستهٔ دیگری جز آن‌چه برای چاپ فارسی لازم است نیازی ندارد.
 
-\macro|\pcalendarplanner{year}|
-سال شمسی \tx{year} را در دو صفحه چاپ می‌کند: فروردین تا شهریور، و سپس مهر تا اسفند. هر صفحه با \cs{clearpage} شروع می‌شود و سبک صفحهٔ \tx{empty} دارد. بالای جدول سال و در سال کبیسه پس از آن \cs{pcalendarplannerleapyear} («\pcalendarplannerleapyear») می‌آید. در کنار جدول نام روزهای هفته است و سطرها بر اساس روز هفته چیده شده‌اند، پس هر سطر در همهٔ ماه‌ها یک روز هفته است. هفته از شنبه تا جمعه است و پس از هر جمعه خط دوتایی می‌آید. مانند \pkg{yplan} فقط دور خانه‌هایی که روز دارند خط کشیده می‌شود، و هر صفحه به اندازهٔ نیاز ماه‌هایش سطر دارد (حداکثر ۳۷). شش ستون ماه پهنایی را که ستون روزهای هفته و خط‌ها باقی می‌گذارند به تساوی تقسیم می‌کنند، پس حاشیه‌های صفحه پهنای آن‌ها را تعیین می‌کند. با \pkg{xepersian} جدول راست‌به‌چپ است: ستون روزهای هفته در سمت راست و پس از آن فروردین. سال می‌تواند یک ماکرو باشد.
+\macro|\pcalplanner{year}|
+سال شمسی \tx{year} را در دو صفحه چاپ می‌کند: فروردین تا شهریور، و سپس مهر تا اسفند. هر صفحه با \cs{clearpage} شروع می‌شود و سبک صفحهٔ \tx{empty} دارد. بالای جدول سال و در سال کبیسه پس از آن \cs{pcalplannerleapyear} («\pcalplannerleapyear») می‌آید. در کنار جدول نام روزهای هفته است و سطرها بر اساس روز هفته چیده شده‌اند، پس هر سطر در همهٔ ماه‌ها یک روز هفته است. هفته از شنبه تا جمعه است و پس از هر جمعه خط دوتایی می‌آید. مانند \pkg{yplan} فقط دور خانه‌هایی که روز دارند خط کشیده می‌شود، و هر صفحه به اندازهٔ نیاز ماه‌هایش سطر دارد (حداکثر ۳۷). شش ستون ماه پهنایی را که ستون روزهای هفته و خط‌ها باقی می‌گذارند به تساوی تقسیم می‌کنند، پس حاشیه‌های صفحه پهنای آن‌ها را تعیین می‌کند. با \pkg{xepersian} جدول راست‌به‌چپ است: ستون روزهای هفته در سمت راست و پس از آن فروردین. سال می‌تواند یک ماکرو باشد.
 \begin{latin}\begin{verbatim}
 \documentclass{article}
 \usepackage[a4paper,margin=1.2cm]{geometry}
@@ -357,31 +360,31 @@
 \usepackage{xepersian}
 \settextfont{Parisa}
 \begin{document}
-\pcalendarplanner{1405}
+\pcalplanner{1405}
 \end{document}
 \end{verbatim}\end{latin}
 نمونهٔ \tx{persian-calendar-planner.tex}، که همراه بسته است، همین سند است با جمعه‌های سایه‌دار.
 
 \paragraph{تنظیم چیدمان.} مانند \pkg{yplan}، این‌ها را می‌توانید با \cs{renewcommand} از نو تعریف کنید:
 \begin{itemize}
-  \item \cs{pcalendarplannerdaystrut}: ارتفاع سطرهای روز؛ به‌طور پیش‌فرض \tx{\textbackslash rule\{0pt\}\{12pt\}}. برای پر کردن صفحه آن را بلندتر یا کوتاه‌تر کنید.
-  \item \cs{pcalendarplannermonthstrut}: همین برای سطر نام ماه‌ها.
-  \item \cs{pcalendarplannerleapyear}: برچسب سال کبیسه.
+  \item \cs{pcalplannerdaystrut}: ارتفاع سطرهای روز؛ به‌طور پیش‌فرض \tx{\textbackslash rule\{0pt\}\{12pt\}}. برای پر کردن صفحه آن را بلندتر یا کوتاه‌تر کنید.
+  \item \cs{pcalplannermonthstrut}: همین برای سطر نام ماه‌ها.
+  \item \cs{pcalplannerleapyear}: برچسب سال کبیسه.
 \end{itemize}
 
-\macro|\pcalendarplannercell{year}{month}{day}{weekday}|
-یک خانهٔ روز را چاپ می‌کند. \cs{pcalendarplanner} آن را برای هر روز با سال، ماه و روز شمسی و روز هفته صدا می‌زند؛ روز هفته مانند \cs{pcalendarweekdayname} شماره‌گذاری شده است (۰ شنبه و ۶ جمعه). به‌طور پیش‌فرض فقط شمارهٔ روز را چاپ می‌کند. برای رنگ کردن، علامت زدن یا نوشتن یادداشت در روزها آن را از نو تعریف کنید؛ خانه‌های خالی آن را صدا نمی‌زنند. تعریف زیر جمعه‌ها را سایه می‌زند و ۱ فروردین را قرمز چاپ می‌کند:
+\macro|\pcalplannercell{year}{month}{day}{weekday}|
+یک خانهٔ روز را چاپ می‌کند. \cs{pcalplanner} آن را برای هر روز با سال، ماه و روز شمسی و روز هفته صدا می‌زند؛ روز هفته مانند \cs{pcalweekdayname} شماره‌گذاری شده است (۰ شنبه و ۶ جمعه). به‌طور پیش‌فرض فقط شمارهٔ روز را چاپ می‌کند. برای رنگ کردن، علامت زدن یا نوشتن یادداشت در روزها آن را از نو تعریف کنید؛ خانه‌های خالی آن را صدا نمی‌زنند. تعریف زیر جمعه‌ها را سایه می‌زند و ۱ فروردین را قرمز چاپ می‌کند:
 \begin{latin}\begin{verbatim}
 \usepackage[table]{xcolor}
 \providecommand\UseMathForPositioningText{}
 ...
-\renewcommand\pcalendarplannercell[4]{%
+\renewcommand\pcalplannercell[4]{%
   \ifnum#4=6 \cellcolor{gray!20}\fi
   \ifnum\numexpr#2*100+#3=101 \textcolor{red}{#3}\else#3\fi}
 \end{verbatim}\end{latin}
 \cs{cellcolor} از بستهٔ \pkg{colortbl} است که گزینهٔ \tx{table} در \pkg{xcolor} آن را بار می‌کند. سطر \cs{providecommand} اشکالی در \pkg{bidi} را دور می‌زند (بخش~\ref{sec:limits}). در خانه‌ها از \cs{textcolor} استفاده کنید نه \cs{color}: \cs{color} در ابتدای خانه شماره را یک سطر پایین می‌برد. هر خانه ستونی از نوع پاراگراف است، پس متن بلندتر، مثل نام یک مناسبت، درون آن می‌شکند.
 
-\paragraph{چرا جدول و نه \lr{TikZ}.} رسم همین برنامه‌ریز با \pkg{TikZ}، با یک گره برای هر روز، حدود ۷۰ برابر \cs{pcalendarplanner} زمان برد (برای ده سال حدود ۱۱ ثانیه در برابر ۰٫۱۵ ثانیه، بدون زمان بار کردن بسته‌ها) و ترتیب راست‌به‌چپ و پهنای ستون‌ها را هم باید خودش تنظیم می‌کرد. برای تقویم‌های گرافیکی کلیدهای بخش~\ref{sec:tikz} انتخاب بهتری‌اند؛ رنگ و یادداشت در برنامه‌ریز را \cs{pcalendarplannercell} پوشش می‌دهد.
+\paragraph{چرا جدول و نه \lr{TikZ}.} رسم همین برنامه‌ریز با \pkg{TikZ}، با یک گره برای هر روز، حدود ۷۰ برابر \cs{pcalplanner} زمان برد (برای ده سال حدود ۱۱ ثانیه در برابر ۰٫۱۵ ثانیه، بدون زمان بار کردن بسته‌ها) و ترتیب راست‌به‌چپ و پهنای ستون‌ها را هم باید خودش تنظیم می‌کرد. برای تقویم‌های گرافیکی کلیدهای بخش~\ref{sec:tikz} انتخاب بهتری‌اند؛ رنگ و یادداشت در برنامه‌ریز را \cs{pcalplannercell} پوشش می‌دهد.
 
 % ---------------------------------------------------------------------------
 \section{نمونه‌های کاربردی}\label{sec:recipes}
@@ -389,31 +392,31 @@
 \paragraph{فاصلهٔ دو تاریخ شمسی به روز.}\leavevmode\par
 \begin{latin}\begin{verbatim}
 \newcount\a \newcount\b
-\pcalendardatetojulian{1403-01-01}\a
-\pcalendardatetojulian{1404-01-01}\b
+\pcaldatetojulian{1403-01-01}\a
+\pcaldatetojulian{1404-01-01}\b
 \advance\b by -\a
 \number\b
 \end{verbatim}\end{latin}
-\pcalendardatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
-\pcalendardatetojulian{1404-01-01}\jd\advance\jd by -\ja
+\pcaldatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
+\pcaldatetojulian{1404-01-01}\jd\advance\jd by -\ja
 نتیجه \number\jd{} روز است (۱۴۰۳ کبیسه است).
 
 \paragraph{چاپ چند روز پیاپی.} برای چاپ پنج روز پشت‌سرهم از اول فروردین ۱۴۰۳ می‌توانید از حلقه استفاده کنید. هر تاریخ را باید همان‌جا تبدیل و چاپ کنید، چون با تبدیل بعدی نتیجه عوض می‌شود:
 \begin{latin}\begin{verbatim}
 \newcount\jd
 \foreach \x in {0,...,4}{%
-  \pcalendardatetojulian{1403-01-01+\x}\jd
-  \pcalendarjuliantodate\jd\y\m\d
+  \pcaldatetojulian{1403-01-01+\x}\jd
+  \pcaljuliantodate\jd\y\m\d
   \number\y-\number\m-\number\d\par
 }
 \end{verbatim}\end{latin}
 \foreach \x in {0,...,4}{%
-  \pcalendardatetojulian{1403-01-01+\x}\jd
-  \pcalendarjuliantodate\jd\y\m\d
+  \pcaldatetojulian{1403-01-01+\x}\jd
+  \pcaljuliantodate\jd\y\m\d
   \par\noindent\hspace*{1em}\iso{\number\y-\number\m-\number\d}%
 }
 \par\medskip
-استفاده از \tx{\textbackslash x} درون \cs{pcalendardatetojulian} اشکالی ندارد، چون این فرمان ورودی‌اش را باز می‌کند.
+استفاده از \tx{\textbackslash x} درون \cs{pcaldatetojulian} اشکالی ندارد، چون این فرمان ورودی‌اش را باز می‌کند.
 
 \paragraph{شمارنده‌ها را بیرون از حلقه تعریف کنید.} \cs{newcount} را درون حلقه ننویسید: در هر دور یک شمارندهٔ تازه برمی‌دارد و سرانجام کار با خطای «\lr{No room for a new \textbackslash count}» متوقف می‌شود.
 
@@ -440,8 +443,8 @@
 می‌آید: خانهٔ اول بخشی از دی است که در سال میلادی باقی مانده و خانهٔ آخر کل ماه را نشان می‌دهد؛ برای همین
 سیزده خانه لازم است.
 
-\paragraph{پل شمارهٔ روز ژولین.} \cs{pcalendardatetojulian} ابتدا تاریخ شمسی را با فرمان شمسی-به-میلادیِ
-بالا به تاریخ میلادی برمی‌گرداند و آن را به \cs{pgfcalendardatetojulian} می‌دهد. \cs{pcalendarjuliantodate}
+\paragraph{پل شمارهٔ روز ژولین.} \cs{pcaldatetojulian} ابتدا تاریخ شمسی را با فرمان شمسی-به-میلادیِ
+بالا به تاریخ میلادی برمی‌گرداند و آن را به \cs{pgfcalendardatetojulian} می‌دهد. \cs{pcaljuliantodate}
 عکس این مسیر را می‌رود: \cs{pgfcalendarjuliantodate} تاریخ میلادی می‌سازد و فرمان میلادی-به-شمسی آن را
 به تاریخ شمسی تبدیل می‌کند.
 
@@ -452,16 +455,16 @@
 \paragraph{بدون نشتی شمارنده.} همهٔ شمارنده‌ها هنگام بارگذاری بسته فقط یک بار تعریف می‌شوند؛ پس در یک سند
 می‌توانید هر تعداد تبدیل انجام دهید. آزمونی در مخزن (\tx{leaks.lvt}) همین را بررسی می‌کند.
 
-\paragraph{تقویم‌های \lr{TikZ}.} کلیدهای بخش~\ref{sec:tikz} هنگام بارگذاری بسته با \cs{pgfkeys} تعریف می‌شوند، پس تا وقتی به کار نروند به \pkg{TikZ} نیازی ندارند. \tx{jalali dates} هر دو سر بازه را به میلادی تبدیل می‌کند و به کلید \tx{dates} کتابخانه می‌دهد؛ \tx{last} به روز اول ماه شمسی بعد با جابه‌جایی \tx{+-1} تبدیل می‌شود. \tx{jalali} پیش از هر روز، و پیش از کدهای خود کتابخانه، فرمانی اجرا می‌کند که \cs{pcalendarcurrentyear} و بقیه را تنظیم می‌کند، و شرط \tx{day of month} را فقط برای همان تقویم از نو تعریف می‌کند. تبدیل‌ها درون یک گروه اجرا می‌شوند، چون \pkg{pgfcalendar} روزها را با \cs{loop} می‌پیماید و تبدیل‌ها هم از \cs{loop} استفاده می‌کنند.
+\paragraph{تقویم‌های \lr{TikZ}.} کلیدهای بخش~\ref{sec:tikz} هنگام بارگذاری بسته با \cs{pgfkeys} تعریف می‌شوند، پس تا وقتی به کار نروند به \pkg{TikZ} نیازی ندارند. \tx{jalali dates} هر دو سر بازه را به میلادی تبدیل می‌کند و به کلید \tx{dates} کتابخانه می‌دهد؛ \tx{last} به روز اول ماه شمسی بعد با جابه‌جایی \tx{+-1} تبدیل می‌شود. \tx{jalali} پیش از هر روز، و پیش از کدهای خود کتابخانه، فرمانی اجرا می‌کند که \cs{pcalcurrentyear} و بقیه را تنظیم می‌کند، و شرط \tx{day of month} را فقط برای همان تقویم از نو تعریف می‌کند. تبدیل‌ها درون یک گروه اجرا می‌شوند، چون \pkg{pgfcalendar} روزها را با \cs{loop} می‌پیماید و تبدیل‌ها هم از \cs{loop} استفاده می‌کنند.
 
-\paragraph{برنامه‌ریز سالانه.} \cs{pcalendarplanner} برای هر صفحه فقط روز اول هر یک از شش ماه آن (و ماه بعد) را با همان سازوکار \cs{pcalendardatetojulian} به شمارهٔ روز تبدیل می‌کند؛ تفاضل آن‌ها طول ماه‌هاست و روز هفتهٔ روز اول هر ماه سطر شروع آن را می‌دهد. سپس سطرها در یک ثبات توکن نوشته می‌شوند، یک خانه برای هر ماه که در خانه‌های دارای روز \cs{pcalendarplannercell} را صدا می‌زند، همراه با \cs{cline}های زیر آن‌ها، و این ثبات درون \tx{tabular} قرار می‌گیرد. سطرها به همان دلیل بالا با بازگشت ساخته می‌شوند، نه با \cs{loop}.
+\paragraph{برنامه‌ریز سالانه.} \cs{pcalplanner} برای هر صفحه فقط روز اول هر یک از شش ماه آن (و ماه بعد) را با همان سازوکار \cs{pcaldatetojulian} به شمارهٔ روز تبدیل می‌کند؛ تفاضل آن‌ها طول ماه‌هاست و روز هفتهٔ روز اول هر ماه سطر شروع آن را می‌دهد. سپس سطرها در یک ثبات توکن نوشته می‌شوند، یک خانه برای هر ماه که در خانه‌های دارای روز \cs{pcalplannercell} را صدا می‌زند، همراه با \cs{cline}های زیر آن‌ها، و این ثبات درون \tx{tabular} قرار می‌گیرد. سطرها به همان دلیل بالا با بازگشت ساخته می‌شوند، نه با \cs{loop}.
 
 % ---------------------------------------------------------------------------
 \section{محدودیت‌ها و مشکلات شناخته‌شده}\label{sec:limits}
 
 \begin{itemize}\sloppy % long code names cannot be hyphenated
   \item \textbf{ورودی بررسی نمی‌شود.} اگر ماه ۱۳، روز ۴۰ یا رشتهٔ نادرستی بدهید، یا خروجی غلط می‌شود یا \TeX{} خطا می‌دهد (نه خود بسته).
-  \item \textbf{ورودی باید خودِ تاریخ باشد.} \cs{pdate}، \cs{gdate}، \cs{pisodate} و \cs{gisodate} ورودی را همان‌طور که نوشته شده در خط‌های تیره می‌شکنند و فرمانی را که تاریخ در آن ذخیره شده باز نمی‌کنند. پس این‌طور بنویسید: \cs{pdate}\tx{\{2015-03-21\}}، نه \cs{pdate}\cs{mydate}. (\cs{pcalendardatetojulian} ورودی‌اش را
+  \item \textbf{ورودی باید خودِ تاریخ باشد.} \cs{pdate}، \cs{gdate}، \cs{pisodate} و \cs{gisodate} ورودی را همان‌طور که نوشته شده در خط‌های تیره می‌شکنند و فرمانی را که تاریخ در آن ذخیره شده باز نمی‌کنند. پس این‌طور بنویسید: \cs{pdate}\tx{\{2015-03-21\}}، نه \cs{pdate}\cs{mydate}. (\cs{pcaldatetojulian} ورودی‌اش را
     باز می‌کند و این مشکل را ندارد.)
   \item \textbf{قاعدهٔ کبیسهٔ تقریبی.} قاعدهٔ ۳۳ ساله فقط تقریبی حسابی از تقویم رسمی است، چون تقویم رسمی بر پایهٔ رصد نجومی تعیین می‌شود. این دو در سال‌های رایج یکی‌اند، اما در همهٔ سال‌ها یکی نیستند. برای سال‌های دور، نتیجه را با یک جدول معتبر مقایسه کنید.
   \item \textbf{یک اشکال شناخته‌شده.} \cs{pcal@jalalitogregorian}\tx{\{1279-10-11\}} با پیام
@@ -477,7 +480,7 @@
   \item \textbf{خانه‌ها و عنوان روزهای راست‌چین را فرض می‌کنند.} \tx{jalali day boxes} و \tx{jalali month label above centered} لنگر پیش‌فرض \tx{every day} کتابخانه (\tx{base east}) را فرض می‌کنند. حرف‌های روزهای هفته همه یک سبک دارند، پس نمی‌شود فقط حرف جمعه را رنگی کرد.
   \item \textbf{وابستگی به جزئیات داخلی \lr{TikZ}.} \tx{jalali} کد خود را به ماکروی داخلی \cs{tikz@before@day} کتابخانه اضافه می‌کند. اگر نسخهٔ آیندهٔ \pkg{TikZ} نام آن را عوض کند، تقویم‌های شمسی از کار می‌افتند؛ آزمون \tx{tikz.lvt} این را نشان می‌دهد.
   \item \textbf{سایه زدن خانه‌های برنامه‌ریز با \pkg{xepersian}.} بار کردن \pkg{colortbl} (مثلاً با \tx{\textbackslash usepackage[table]\{xcolor\}}) همراه با \pkg{xepersian} در اولین جدول با خطای «\lr{\texttt{Undefined control sequence}}» برای \cs{UseMathForPositioningText} متوقف می‌شود. نسخهٔ \pkg{bidi} از \pkg{array} این ماکرو را به کار می‌برد که نسخه‌های فعلی \pkg{array} دیگر تعریفش نمی‌کنند. تا وقتی \pkg{bidi} اصلاح شود، این ماکرو را با \cs{providecommand} در پیش‌درآمد سند خالی تعریف کنید (سطر دوم مثال بخش~\ref{sec:yplan}).
-  \item \textbf{برنامه‌ریز اندازهٔ صفحه را تغییر نمی‌دهد.} \cs{pcalendarplanner} اندازهٔ صفحه و حاشیه‌ها را عوض نمی‌کند؛ آن‌ها را با \pkg{geometry} و ارتفاع سطرها را با \cs{pcalendarplannerdaystrut} تنظیم کنید.
+  \item \textbf{برنامه‌ریز اندازهٔ صفحه را تغییر نمی‌دهد.} \cs{pcalplanner} اندازهٔ صفحه و حاشیه‌ها را عوض نمی‌کند؛ آن‌ها را با \pkg{geometry} و ارتفاع سطرها را با \cs{pcalplannerdaystrut} تنظیم کنید.
   \item \textbf{\cs{wd} را از نو تعریف نکنید.} \cs{newcount}\cs{wd} یا مانند آن یک فرمان پایهٔ \TeX{} را که \pkg{TikZ} لازم دارد از بین می‌برد و متن ناخواسته‌ای مثل «\tx{==0pt}» در تصویرها ظاهر می‌شود.
 \end{itemize}
 
@@ -485,7 +488,8 @@
 \section{تاریخچهٔ نسخه‌ها}\label{sec:history}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
-  \item[\lr{0.7 (2026-11-05)}] برنامه‌ریز سالانه به شیوهٔ \pkg{yplan}: فرمان \cs{pcalendarplanner} و فرمان \cs{pcalendarplannercell} برای رنگ کردن یا یادداشت‌گذاری روزها. نمونهٔ \tx{persian-calendar-planner.tex}.
+  \item[\lr{0.71 (2026-11-05)}] نام‌های کوتاه‌تر: \cs{pcal\ldots} به جای \cs{pcalendar\ldots}؛ نام‌های قدیمی هنوز کار می‌کنند (بخش~\ref{sec:what}).
+  \item[\lr{0.7 (2026-11-05)}] برنامه‌ریز سالانه به شیوهٔ \pkg{yplan}: فرمان \cs{pcalplanner} و فرمان \cs{pcalplannercell} برای رنگ کردن یا یادداشت‌گذاری روزها. نمونهٔ \tx{persian-calendar-planner.tex}.
   \item[\lr{0.62 (2026-11-04)}] \tx{jalali week columns} و نمونهٔ \tx{persian-calendar-years.tex}.
   \item[\lr{0.61 (2026-11-03)}] \tx{jalali day boxes} (جدول خانه‌دار) و \tx{jalali weekday initials} (حرف اول روزهای هفته).
   \item[\lr{0.6 (2026-11-03)}] تغییر نام از \pkg{pcalendar} به \pkg{persian-calendar} به درخواست \lr{CTAN} (فقط نام فایل‌ها و بسته؛ نام فرمان‌ها تغییری نکرده است). رسم جدول ماه‌های شمسی با کتابخانهٔ \tx{calendar} در \pkg{TikZ} (بخش~\ref{sec:tikz}). ذکر مجوز به‌صورت \lr{LPPL 1.3c} در همه‌جا.
@@ -498,13 +502,5 @@
   \item[\lr{0.2 (2015-08-09)}] تبدیل شمسی به میلادی.
   \item[\lr{0.1 (2015-07-25)}] نخستین نسخه.
 \end{description}
-
-% ---------------------------------------------------------------------------
-\section{مجوز}\label{sec:license}
-
-می‌توانید این اثر را طبق شرایط مجوز عمومی پروژهٔ
-\lr{\LaTeX} (\lr{LPPL})، نسخهٔ \lr{1.3c} یا هر نسخهٔ جدیدتر به انتخاب خودتان، توزیع یا ویرایش کنید. آخرین نسخهٔ
-مجوز در \tx{http://www.latex-project.org/lppl.txt} موجود است. وضعیت نگهداری این اثر در \lr{LPPL}
-«\lr{author-maintained}» است، یعنی نویسنده خودش آن را نگهداری می‌کند.
 
 \end{document}
