@@ -56,4 +56,26 @@
   \ASSERT{\R}{yyn}
   \pcal@ypweeksfalse
 }
+\TEST{notes: a mark in the cell, a list grouped by month, every-year notes first}{
+  \pcalplannernote{1-13}{every}\pcalplannernote{1405-1-13}{once}\pcalplannernote{1-2}{two}%
+  \pcalplannernote{3-14}{june}\pcalplannernote{1406-1-1}{other year}\pcalplannernote{12-30}{leap only}%
+  % record the list: [year-month] for a month, day) for a day, / between the texts of one day (the texts
+  % themselves are typeset into a box and not recorded)
+  \HALF{1405}{1}\def\pcal@ypyear{1405}\def\pcal@ypbase{1}\gdef\L{}\begingroup
+    \def\pcalplannernotemonth#1#2{\xdef\L{\L[#1-#2]}}\def\pcalplannernoteday#1#2#3{\xdef\L{\L#3)}}%
+    \def\pcalplannernotemonthsep{}\def\pcalplannernotesep{}\def\pcalplannernotetextsep{\xdef\L{\L/}}%
+    \setbox0\vbox{\pcal@ypnotes}\endgroup
+  \ASSERT{\L}{[1405-1]2)13)/[1405-3]14)}
+  % 30 Esfand only in a leap year: 1403 yes, 1405 no
+  \HALF{1403}{7}\def\pcal@ypyear{1403}\def\pcal@ypbase{7}\gdef\L{}\begingroup
+    \def\pcalplannernotemonth#1#2{\xdef\L{\L[#1-#2]}}\def\pcalplannernoteday#1#2#3{\xdef\L{\L#3)}}%
+    \setbox0\vbox{\pcal@ypnotes}\endgroup
+  \ASSERT{\L}{[1403-12]30)}
+  \HALF{1405}{7}\def\pcal@ypyear{1405}\def\pcal@ypbase{7}\gdef\L{}\begingroup
+    \def\pcalplannernotemonth#1#2{\xdef\L{\L[#1-#2]}}\setbox0\vbox{\pcal@ypnotes}\endgroup
+  \ASSERT{\L}{}
+  % the mark: 13 Farvardin has it, 14 Farvardin does not
+  \def\pcal@ypyear{1405}%
+  \edef\R{\pcal@ypnotemark{1}{13}|\pcal@ypnotemark{1}{14}}\ASSERT{\detokenize\expandafter{\R}}{\detokenize{\pcalplannermark|}}
+}
 \END

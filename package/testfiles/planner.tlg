@@ -31,3 +31,11 @@ TEST 5: week numbers: the mark goes into each Saturday and into 1 Farvardin
 ============================================================
 PASSED
 ============================================================
+============================================================
+TEST 6: notes: a mark in the cell, a list grouped by month, every-year notes first
+============================================================
+PASSED
+PASSED
+PASSED
+PASSED
+============================================================

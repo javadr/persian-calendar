@@ -21,7 +21,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \def\pcalendardate{2026/11/06}
-\def\pcalendarversion{0.77}
+\def\pcalendarversion{0.78}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -682,6 +682,55 @@
 \def\pcal@ypweekfix#1{\ifnum#1<0 \pcal@ypwp\else
     \ifnum\numexpr(#1-3)/7+1\relax>\pcal@ypwn\space 1\else\the\numexpr(#1-3)/7+1\relax\fi\fi}%
 \def\pcal@ypweekcell#1{\hfill\pcalplannerweeknumber{#1}}%
+%
+% Notes, as on a wall calendar: \pcalplannernote{M-D}{text} (every year) or \pcalplannernote{Y-M-D}{text}
+% (that year only) puts \pcalplannermark after the day in its cell and lists the notes under the table of
+% the page that holds the day, in date order, grouped by month: each month once, then its days, e.g.
+% «فروردین: ۱) ... ۱۳) ...   خرداد: ۱۴) ...». A day with several notes is listed once, its texts joined
+% by \pcalplannernotetextsep; notes for every year come first. Each note is stored as \pcal@n{text} in
+% \pcal@ypn@M@D or \pcal@ypn@Y@M@D.
+\def\pcalplannermark{\textsuperscript{*}}%
+\def\pcalplannernotesfont{\footnotesize}%
+% Heading of a month in the list (Jalali year, month), the label of a day (year, month, day), and the
+% separators between months, between days and between the texts of one day.
+\def\pcalplannernotemonth#1#2{\textbf{\pcalmonthname{#2}:}~}%
+\def\pcalplannernoteday#1#2#3{#3)~}%
+\def\pcalplannernotemonthsep{\qquad}%
+\def\pcalplannernotesep{\quad}%
+\def\pcalplannernotetextsep{،~}%
+\def\pcalplannernote#1#2{\pcal@npar#1---\@nil{#2}}%
+\def\pcal@npar#1-#2-#3-#4\@nil#5{\def\pcal@arg{#3}%
+    \ifx\pcal@arg\pgfutil@empty\edef\pcal@nkey{pcal@ypn@\number#1@\number#2}%
+    \else\edef\pcal@nkey{pcal@ypn@\number#1@\number#2@\number#3}\fi
+    \expandafter\ifx\csname\pcal@nkey\endcsname\relax\expandafter\gdef\csname\pcal@nkey\endcsname{}\fi
+    \expandafter\g@addto@macro\csname\pcal@nkey\endcsname{\pcal@n{#5}}}%
+% Expands to \pcalplannermark if month #1, day #2 of the planner's year has a note.
+\def\pcal@ypnotemark#1#2{\ifnum\ifcsname pcal@ypn@#1@#2\endcsname1\else
+    \ifcsname pcal@ypn@\pcal@ypyear @#1@#2\endcsname1\else0\fi\fi=1 \noexpand\pcalplannermark\fi}%
+% The notes of the page's six months, walked day by day (by recursion: the converters use \loop).
+% Flags: no note yet on the page, none yet in this month, none yet on this day.
+\newcount\pcal@ypnm \newcount\pcal@ypnd \newif\ifpcal@ypfirstnote \newif\ifpcal@ypnewmonth \newif\ifpcal@ypnewday
+\def\pcal@ypnotes{\pcal@ypfirstnotetrue\pcal@ypnm=\pcal@ypbase\relax\pcal@ypnotesm
+    \ifpcal@ypfirstnote\else\par\fi}%
+\def\pcal@ypnotesm{\ifnum\pcal@ypnm<\numexpr\pcal@ypbase+6\relax
+    \pcal@ypnewmonthtrue\pcal@ypnd=1 \pcal@ypnotesd\advance\pcal@ypnm by 1 \expandafter\pcal@ypnotesm\fi}%
+\def\pcal@ypnotesd{\ifnum\pcal@ypnd>\csname pcal@ypl\the\numexpr\pcal@ypnm-\pcal@ypbase+1\endcsname\relax\else
+    \pcal@ypnewdaytrue
+    \pcal@ypnoteof{pcal@ypn@\the\pcal@ypnm @\the\pcal@ypnd}%
+    \pcal@ypnoteof{pcal@ypn@\pcal@ypyear @\the\pcal@ypnm @\the\pcal@ypnd}%
+    \advance\pcal@ypnd by 1 \expandafter\pcal@ypnotesd\fi}%
+\def\pcal@ypnoteof#1{\ifcsname#1\endcsname\csname#1\endcsname\fi}%
+% One note: open the list, the month and the day as needed, then the text.
+\def\pcal@n#1{\ifpcal@ypfirstnote\par\medskip\noindent\pcalplannernotesfont\fi
+    \ifpcal@ypnewmonth
+      \ifpcal@ypfirstnote\else\pcalplannernotemonthsep\fi
+      \pcal@ypnoteargs\pcalplannernotemonth{}\pcal@ypnewmonthfalse
+    \else\ifpcal@ypnewday\pcalplannernotesep\fi\fi
+    \ifpcal@ypnewday\pcal@ypnoteargs\pcalplannernoteday{{\the\pcal@ypnd}}\pcal@ypnewdayfalse
+    \else\pcalplannernotetextsep\fi
+    \pcal@ypfirstnotefalse #1}%
+% #1{year}{month}#2, with the year and month expanded.
+\def\pcal@ypnoteargs#1#2{\edef\pcal@arg{{\pcal@ypyear}{\the\pcal@ypnm}}\expandafter#1\pcal@arg#2}%
 % Julian day of the 1st of Jalali month #2 (may be 13) of year #1, into \pcal@ypj#3.
 \def\pcal@ypfirst#1#2#3{{\pcal@temp=\numexpr#2\relax\pcal@temptwo=#1\relax
     \ifnum\pcal@temp>12 \advance\pcal@temp by -12 \advance\pcal@temptwo by 1 \fi
@@ -701,6 +750,7 @@
     \ifnum\numexpr(#1)-\csname pcal@ypo#2\endcsname<\csname pcal@ypl#2\endcsname\space 1\else 0\fi\fi}%
 \def\pcal@ypcell#1{&\ifnum\pcal@ypin\pcal@yprow{#1}=1 \noexpand\pcalplannercell{\pcal@ypyear}{\the\numexpr\pcal@ypbase+#1-1\relax}%
     {\the\numexpr\pcal@yprow-\csname pcal@ypo#1\endcsname+1\relax}{\the\pcal@ypwd}%
+    \pcal@ypnotemark{\the\numexpr\pcal@ypbase+#1-1\relax}{\the\numexpr\pcal@yprow-\csname pcal@ypo#1\endcsname+1\relax}%
     \ifpcal@ypweeks\pcal@ypweekmark{\the\numexpr\pcal@ypbase+#1-1\relax}{\the\numexpr\pcal@yprow-\csname pcal@ypo#1\endcsname+1\relax}\fi
     \fi}%
 % In the first cell of a week (a Saturday, or 1 Farvardin), the week number.
@@ -738,7 +788,7 @@
       \pcal@yphead{#2}\pcal@yphead{#2+1}\pcal@yphead{#2+2}\pcal@yphead{#2+3}\pcal@yphead{#2+4}\pcal@yphead{#2+5}\\
       \hline\hline
       \the\pcal@yptoks
-    \end{tabular}\par\endgroup\clearpage}%
+    \end{tabular}\par\pcal@ypnotes\endgroup\clearpage}%
 \def\pcal@yphead#1{&\multicolumn{1}{c|}{\pcalmonthname{\numexpr#1\relax}}}%
 % \pcalplanner{year} with week numbers, \pcalplanner*{year} without.
 \def\pcalplanner{\@ifstar{\pcal@planner\pcal@ypweeksfalse}{\pcal@planner\pcal@ypweekstrue}}%

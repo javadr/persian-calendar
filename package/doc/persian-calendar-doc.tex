@@ -455,8 +455,8 @@ The year may be a macro.
 \pcalplanner{1405}
 \end{document}
 \end{verbatim}
-The sample \texttt{persian-calendar-planner.tex}, which comes with the package, is this document with the
-Fridays shaded and week numbers.
+The sample \texttt{persian-calendar-planner.tex}, which comes with the package, prints such planners
+with the Fridays shaded and a few notes.
 
 \paragraph{Week numbers.} \cs{pcalplanner} prints the number of the week in each Saturday cell, on the far
 side of the cell from the day (the left under \pkg{xepersian}), and in the cell of 1~Farvardin when that is
@@ -478,6 +478,31 @@ its argument, in \cs{scriptsize}; redefine it to change the look.
   \item \cs{pcalplannermonthstrut}: the same for the row of month names.
   \item \cs{pcalplannerleapyear}: the leap-year label.
 \end{itemize}
+
+\macro|\pcalplannernote{M-D}{text}|  \quad\texttt{\bfseries\textbackslash pcalplannernote\{Y-M-D\}\{text\}}
+Adds a note to a day, as on a wall calendar: \cs{pcalplanner} puts \cs{pcalplannermark} (a star) after the
+day in its cell and lists the notes of each page under its table, in date order and grouped by month: each
+month once, followed by its days and their notes, as in ``Farvardin: 1)~\ldots{} 13)~\ldots{}\quad
+Khordad: 14)~\ldots''. A date without a year
+(\texttt{M-D}) is for every year, which suits holidays; one with a year (\texttt{Y-M-D}) only for that
+year. A day may have several notes; it is listed once, with its texts joined by a comma, and the
+notes for every year come first. Give the notes before
+\cs{pcalplanner}, for example in the preamble. A note for 30~Esfand appears only in a leap year.
+\begin{verbatim}
+\pcalplannernote{1-1}{Nowruz}
+\pcalplannernote{1-13}{Nature Day}
+\pcalplannernote{1405-7-1}{First day of autumn 1405}
+\end{verbatim}
+These macros set the look of the list; redefine them, and \cs{pcalplannermark}, to change it:
+\begin{itemize}
+  \item \cs{pcalplannernotesfont}: the font of the list, \cs{footnotesize};
+  \item \cs{pcalplannernotemonth}\texttt{\{year\}\{month\}}: the heading of a month, its name in bold and a colon;
+  \item \cs{pcalplannernoteday}\texttt{\{year\}\{month\}\{day\}}: the label of a day, \texttt{day)};
+  \item \cs{pcalplannernotemonthsep}, \cs{pcalplannernotesep}, \cs{pcalplannernotetextsep}: the space between
+    months (\cs{qquad}), between days (\cs{quad}) and between the texts of one day (a Persian comma).
+\end{itemize}
+The notes take room under the table: with many of them, make \cs{pcalplannerdaystrut} shorter so that
+each page still fits.
 
 \macro|\pcalplannercell{year}{month}{day}{weekday}|
 Typesets one day cell. \cs{pcalplanner} calls it for every day with the Jalali year, month and day, and the
@@ -625,6 +650,8 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.78 (2026-11-06)] \cs{pcalplannernote}: notes in the year planner, marked in the cells and listed under
+    each page by month, as on a wall calendar.
   \item[0.77 (2026-11-06)] Week numbers in \cs{pcalplanner}, by ISO~8601 moved to Saturday weeks; \cs{pcalplanner*}
     leaves them out.
   \item[0.76 (2026-11-06)] Manuals: the Installation section is now ``Loading the package''.

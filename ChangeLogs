@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.78 ## Nov 6, 2026
+%% added \pcalplannernote{M-D or Y-M-D}{text}: a star in the planner cell and the notes listed under each page, grouped by month (Farvardin: 1) ... 13) ...); \pcalplannermark, \pcalplannernotesfont, \pcalplannernotemonth, \pcalplannernoteday and three separators set the look; the planner sample lists 88 Iranian cultural, literary, scientific and historical days
 %% ver 0.77 ## Nov 6, 2026
 %% \pcalplanner prints week numbers (ISO 8601 moved to Saturday-to-Friday weeks: week 1 holds the first Tuesday; 52 or 53 weeks); \pcalplanner* leaves them out; \pcalplannerweeknumber sets them
 %% ver 0.76 ## Nov 6, 2026
