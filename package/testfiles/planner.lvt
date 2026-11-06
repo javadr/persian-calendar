@@ -29,4 +29,31 @@
   \HAS{\pcalplannercell{1405}{7}{1}{4}}\HAS{\pcalplannercell{1405}{12}{29}{0}}\HAS{\pcalplannercell{1405}{12}{30}}
   \ASSERT{\R}{yyn}
 }
+\TEST{week numbers: ISO 8601 with Saturday weeks, week 1 holds the first Tuesday}{
+  % \W{year}{m}{d}: append the week number of that day to \R (the setup is not expandable)
+  \def\W#1#2#3{\pcal@ypweeksetup{#1}\edef\R{\R\pcal@ypweekno{#2}{#3},}}%
+  % weeks per year: 1402 starts on Tuesday (53), 1403 Wednesday, 1405 Saturday (52)
+  \def\R{}\def\N#1{\pcal@ypweeksetup{#1}\edef\R{\R\pcal@ypwn,}}\N{1402}\N{1403}\N{1405}\ASSERT{\R}{53,52,52,}
+  % 1403: 1-3 Farvardin are week 53 of 1402; week 1 starts on Saturday 4 Farvardin
+  \def\R{}\W{1403}{1}{1}\W{1403}{1}{3}\W{1403}{1}{4}\W{1403}{1}{10}\W{1403}{1}{11}\W{1403}{12}{30}%
+  \ASSERT{\R}{53,53,1,1,2,52,}
+  % 1404 starts on Friday: 1 Farvardin is week 52 of 1403, week 1 starts on 2 Farvardin
+  \def\R{}\W{1404}{1}{1}\W{1404}{1}{2}\ASSERT{\R}{52,1,}
+  % 1405 starts on Saturday; 29 Esfand 1405 is the Saturday of week 1 of 1406 (which starts on Sunday)
+  \def\R{}\W{1405}{1}{1}\W{1405}{1}{7}\W{1405}{1}{8}\W{1405}{7}{1}\W{1405}{12}{28}\W{1405}{12}{29}%
+  \ASSERT{\R}{1,1,2,27,52,1,}
+  % 1402 starts on Tuesday: 1 Farvardin is in week 1, and the year reaches week 53
+  \def\R{}\W{1402}{1}{1}\W{1402}{12}{27}\ASSERT{\R}{1,53,}
+}
+\TEST{week numbers: the mark goes into each Saturday and into 1 Farvardin}{
+  \pcal@ypweekstrue
+  \HALF{1403}{1}\def\pcal@ypyear{1403}\def\pcal@ypbase{1}\pcal@ypweeksetup{1403}%
+  \pcal@yprow=0 \pcal@ypwd=0 \pcal@yptoks{}\pcal@yprowloop
+  \def\R{}\def\HAS#1{\edef\x{\noexpand\pgfutil@in@{\detokenize{#1}}{\detokenize\expandafter{\the\pcal@yptoks}}}\x
+    \edef\R{\R\ifpgfutil@in@ y\else n\fi}}
+  % 1 Farvardin (Wednesday): week 53 of 1402; 4 Farvardin (Saturday): week 1; 5 Farvardin (Sunday): no mark
+  \HAS{{1}{4}\pcal@ypweekcell {53}}\HAS{{4}{0}\pcal@ypweekcell {1}}\HAS{{5}{1}\pcal@ypweekcell}
+  \ASSERT{\R}{yyn}
+  \pcal@ypweeksfalse
+}
 \END

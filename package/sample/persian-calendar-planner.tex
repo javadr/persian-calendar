@@ -11,11 +11,15 @@
 \settextfont{Parisa}
 
 % Every day cell goes through \pcalplannercell{year}{month}{day}{weekday}, weekday 0 = Saturday.
-% Here: Fridays shaded, and 1 Farvardin (Nowruz) in red.
+% Here: Fridays shaded, and 1 Farvardin (Nowruz) in red. The week numbers are on by default; \pcalplanner* leaves them out.
 \renewcommand\pcalplannercell[4]{%
   \ifnum#4=6 \cellcolor{gray!20}\fi
   \ifnum\numexpr#2*100+#3=101 \textcolor{red}{#3}\else#3\fi}
 
 \begin{document}
+\pcalplanner{1401}
+\pcalplanner{1402}
+\pcalplanner{1403}
+\pcalplanner{1404}
 \pcalplanner{1405}
 \end{document}

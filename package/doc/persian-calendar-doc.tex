@@ -435,7 +435,7 @@ six months to a page, with a column per month and a row per day. \cs{pcalplanner
 year. It is an ordinary \texttt{tabular}, so it needs neither \pkg{TikZ} nor any package beyond the ones
 that print Persian.
 
-\macro|\pcalplanner{year}|
+\macro|\pcalplanner{year}|  \quad\texttt{\bfseries\textbackslash pcalplanner*\{year\}}
 Typesets Jalali \texttt{year} on two pages: Farvardin to Shahrivar, then Mehr to Esfand. Each page starts
 with \cs{clearpage} and has page style \texttt{empty}. Above the table is the year, followed by
 \cs{pcalplannerleapyear} (``\rl{\setpersianfont\pcalplannerleapyear}'') in a leap year. Down the side are the weekday names; the
@@ -456,7 +456,20 @@ The year may be a macro.
 \end{document}
 \end{verbatim}
 The sample \texttt{persian-calendar-planner.tex}, which comes with the package, is this document with the
-Fridays shaded.
+Fridays shaded and week numbers.
+
+\paragraph{Week numbers.} \cs{pcalplanner} prints the number of the week in each Saturday cell, on the far
+side of the cell from the day (the left under \pkg{xepersian}), and in the cell of 1~Farvardin when that is
+not a Saturday; \cs{pcalplanner*} leaves the week numbers out. There is no official rule for numbering the
+weeks of the Jalali year, so the package moves ISO~8601 to the Persian week. ISO makes week~1 the week
+that holds the year's first Thursday, the middle day of a Monday-to-Sunday week. The middle day of a
+Saturday-to-Friday week is Tuesday, so here week~1 is the week that holds the first Tuesday of the year,
+that is the week holding 4~Farvardin. As in ISO, every week runs from Saturday to Friday, and a year has
+52 weeks, or 53 when 1~Farvardin is a Tuesday, or a Monday in a leap year. 1--3~Farvardin belong to the
+last week of the old year when 1~Farvardin is a Wednesday, Thursday or Friday: 1~Farvardin 1403, a
+Wednesday, is in week~53 of 1402. The last days of Esfand belong to week~1 of the new year when the next
+1~Farvardin is a Sunday, Monday or Tuesday. \cs{pcalplannerweeknumber} prints the number, which it takes as
+its argument, in \cs{scriptsize}; redefine it to change the look.
 
 \paragraph{Adjusting the layout.} As in \pkg{yplan}, these can be redefined with \cs{renewcommand}:
 \begin{itemize}
@@ -612,6 +625,8 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.77 (2026-11-06)] Week numbers in \cs{pcalplanner}, by ISO~8601 moved to Saturday weeks; \cs{pcalplanner*}
+    leaves them out.
   \item[0.76 (2026-11-06)] Manuals: the Installation section is now ``Loading the package''.
   \item[0.75 (2026-11-06)] \cs{pcaldaysbetween}: the number of days between two Jalali dates.
   \item[0.74 (2026-11-06)] \cs{pcalweekday} and \cs{pcaldateweekdayname}: the weekday of a Jalali date.

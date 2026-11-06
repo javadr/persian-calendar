@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.77 ## Nov 6, 2026
+%% \pcalplanner prints week numbers (ISO 8601 moved to Saturday-to-Friday weeks: week 1 holds the first Tuesday; 52 or 53 weeks); \pcalplanner* leaves them out; \pcalplannerweeknumber sets them
 %% ver 0.76 ## Nov 6, 2026
 %% manuals: the Installation section is now Loading the package; TeX Live and MiKTeX install the package from CTAN, so the manual-install steps are gone
 %% ver 0.75 ## Nov 6, 2026
