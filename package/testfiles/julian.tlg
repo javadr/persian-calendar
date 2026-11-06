@@ -31,3 +31,14 @@ TEST 5: \pcaldateweekdayname prints \pcalweekdayname of the date's weekday
 PASSED
 PASSED
 ============================================================
+============================================================
+TEST 6: \pcaldaysbetween : days from the first date to the second
+============================================================
+\n=\count...
+PASSED
+PASSED
+PASSED
+PASSED
+PASSED
+PASSED
+============================================================

@@ -156,6 +156,16 @@
 \paragraph{\cs{y} و \cs{m} و \cs{d} را همان لحظه بخوانید.} بعد از \cs{pcaljuliantodate}، این سه فرمان رونوشتی از مقدار نیستند و فقط نام دیگری برای شمارنده‌های نتیجهٔ بسته‌اند. به همین دلیل هر تبدیل بعدی (\cs{pdate}، \cs{gisodate} و مانند آن‌ها) مقدارشان را عوض می‌کند. اگر بعداً به آن‌ها نیاز دارید، همان لحظه در شمارنده‌های خودتان نگه‌شان دارید:
 \tx{\textbackslash newcount\textbackslash myyear\ \textbackslash myyear=\textbackslash y}.
 
+\macro|\pcaldaysbetween{Y-M-D}{Y-M-D}{\count}|
+تعداد روزها از تاریخ شمسی اول تا تاریخ شمسی دوم را در \cs{count} می‌گذارد؛ اگر تاریخ دوم زودتر باشد، نتیجه منفی است. هر دو تاریخ، مانند \cs{pcaldatetojulian}، می‌توانند با جابه‌جایی چند روزه تمام شوند.
+\begin{latin}\begin{verbatim}
+\newcount\n
+\pcaldaysbetween{1403-01-01}{1404-01-01}{\n}
+\number\n
+\end{verbatim}\end{latin}
+\pcaldaysbetween{1403-01-01}{1404-01-01}{\jd}%
+نتیجه \number\jd{} روز است (۱۴۰۳ کبیسه است).
+
 \paragraph{عبور از پایان سال.} محاسبهٔ روز، سال کبیسه را هم درنظر می‌گیرد:
 \pcaldatetojulian{1403-12-29+1}\jd\pcaljuliantodate\jd\y\m\d%
 یک روز بعد از ۱۴۰۳-۱۲-۲۹ می‌شود \iso{\number\y-\number\m-\number\d}، چون ۱۴۰۳ کبیسه است؛
@@ -368,18 +378,6 @@
 % ---------------------------------------------------------------------------
 \section{نمونه‌های کاربردی}\label{sec:recipes}
 
-\paragraph{فاصلهٔ دو تاریخ شمسی به روز.}\leavevmode\par
-\begin{latin}\begin{verbatim}
-\newcount\a \newcount\b
-\pcaldatetojulian{1403-01-01}\a
-\pcaldatetojulian{1404-01-01}\b
-\advance\b by -\a
-\number\b
-\end{verbatim}\end{latin}
-\pcaldatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
-\pcaldatetojulian{1404-01-01}\jd\advance\jd by -\ja
-نتیجه \number\jd{} روز است (۱۴۰۳ کبیسه است).
-
 \paragraph{چاپ چند روز پیاپی.} برای چاپ پنج روز پشت‌سرهم از اول فروردین ۱۴۰۳ می‌توانید از حلقه استفاده کنید. هر تاریخ را باید همان‌جا تبدیل و چاپ کنید، چون با تبدیل بعدی نتیجه عوض می‌شود:
 \begin{latin}\begin{verbatim}
 \newcount\jd
@@ -467,6 +465,7 @@
 \section{تاریخچهٔ نسخه‌ها}\label{sec:history}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[\lr{0.75 (2026-11-06)}] \cs{pcaldaysbetween}: تعداد روزهای میان دو تاریخ شمسی.
   \item[\lr{0.74 (2026-11-06)}] \cs{pcalweekday} و \cs{pcaldateweekdayname}: روز هفتهٔ یک تاریخ شمسی.
   \item[\lr{0.73 (2026-11-06)}] گزینهٔ \tx{tikz} که \pkg{TikZ} و کتابخانهٔ \tx{calendar} آن را بارگذاری می‌کند.
   \item[\lr{0.72 (2026-11-05)}] \cs{pcalyear} و \cs{pcalyears}: تقویم سال‌ها به شیوهٔ \pkg{calxxxx-yyyy}، با سبک‌هایی برای سال، عنوان آن، ماه‌ها و جمعه‌ها.

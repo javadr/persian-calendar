@@ -40,4 +40,13 @@
   \pcaldateweekdayname{1405-01-06}\ASSERT{\got}{5}
   \endgroup
 }
+\TEST{\pcaldaysbetween: days from the first date to the second}{
+  \newcount\n
+  \pcaldaysbetween{1403-01-01}{1404-01-01}{\n}\ASSERT{\the\n}{366}% 1403 is a leap year
+  \pcaldaysbetween{1404-01-01}{1405-01-01}{\n}\ASSERT{\the\n}{365}
+  \pcaldaysbetween{1404-01-01}{1403-01-01}{\n}\ASSERT{\the\n}{-366}% earlier: negative
+  \pcaldaysbetween{1403-06-31}{1403-07-01}{\n}\ASSERT{\the\n}{1}
+  \pcaldaysbetween{1403-05-05}{1403-05-05}{\n}\ASSERT{\the\n}{0}
+  \pcaldaysbetween{1403-01-01+10}{1403-01-01}{\n}\ASSERT{\the\n}{-10}% offsets
+}
 \END

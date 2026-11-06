@@ -188,6 +188,17 @@ are aliases of the package's internal result registers, not copies. Any later co
 (\cs{pdate}, \cs{gisodate}, and so on) changes them. If you need the values later, store them in your
 own counters first: \texttt{\cs{newcount}\cs{myyear}\ \cs{myyear=\cs{y}}}.
 
+\macro|\pcaldaysbetween{Y-M-D}{Y-M-D}{\count}|
+Stores the number of days from the first Jalali date to the second in \cs{count}; it is negative when the
+second date is earlier. Both dates may end in an offset, as with \cs{pcaldatetojulian}.
+\begin{verbatim}
+\newcount\n
+\pcaldaysbetween{1403-01-01}{1404-01-01}{\n}
+\number\n
+\end{verbatim}
+\pcaldaysbetween{1403-01-01}{1404-01-01}{\jd}%
+prints \number\jd{} (1403 is a leap year).
+
 \paragraph{Offsets across a year end.} Day arithmetic knows about leap years:
 \pcaldatetojulian{1403-12-29+1}\jd\pcaljuliantodate\jd\y\m\d%
 1403-12-29 plus one day is \iso{\number\y-\number\m-\number\d}, because 1403 is a leap year;
@@ -480,18 +491,6 @@ a line. The cell is a paragraph column, so longer text, such as a holiday name, 
 % ---------------------------------------------------------------------------
 \section{Recipes}\label{sec:recipes7}
 
-\paragraph{Days between two Jalali dates.}
-\begin{verbatim}
-\newcount\a \newcount\b
-\pcaldatetojulian{1403-01-01}\a
-\pcaldatetojulian{1404-01-01}\b
-\advance\b by -\a
-\number\b
-\end{verbatim}
-\pcaldatetojulian{1403-01-01}\jd\newcount\ja\ja=\jd
-\pcaldatetojulian{1404-01-01}\jd\advance\jd by -\ja
-prints \number\jd{} days (1403 is a leap year).
-
 \paragraph{A list of consecutive days.} Typeset the 5 days after 1 Farvardin 1403 with a loop. Each date
 is converted and printed right away, because the result macros are overwritten by the next
 conversion:
@@ -617,6 +616,7 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.75 (2026-11-06)] \cs{pcaldaysbetween}: the number of days between two Jalali dates.
   \item[0.74 (2026-11-06)] \cs{pcalweekday} and \cs{pcaldateweekdayname}: the weekday of a Jalali date.
   \item[0.73 (2026-11-06)] The \texttt{tikz} option, which loads \pkg{TikZ} and its \texttt{calendar} library.
   \item[0.72 (2026-11-05)] \cs{pcalyear} and \cs{pcalyears}: year calendars in the manner of

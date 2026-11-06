@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.75 ## Nov 6, 2026
+%% added \pcaldaysbetween{Y-M-D}{Y-M-D}{\count}, the days from the first Jalali date to the second (negative if earlier, offsets allowed); it replaces the recipe in the manuals
 %% ver 0.74 ## Nov 6, 2026
 %% added \pcalweekday{Y-M-D}{\count} (weekday of a Jalali date, Saturday = 0, offsets allowed) and \pcaldateweekdayname{Y-M-D}; they replace the five-line recipe in the manuals
 %% ver 0.73 ## Nov 6, 2026
