@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.76 ## Nov 6, 2026
+%% manuals: the Installation section is now Loading the package; TeX Live and MiKTeX install the package from CTAN, so the manual-install steps are gone
 %% ver 0.75 ## Nov 6, 2026
 %% added \pcaldaysbetween{Y-M-D}{Y-M-D}{\count}, the days from the first Jalali date to the second (negative if earlier, offsets allowed); it replaces the recipe in the manuals
 %% ver 0.74 ## Nov 6, 2026

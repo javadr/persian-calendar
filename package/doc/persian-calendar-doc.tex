@@ -81,13 +81,9 @@ what this manual uses, but any setup that can typeset Persian will do. Without o
 macros \cs{pisodate} and \cs{gisodate}, which print only digits.
 
 % ---------------------------------------------------------------------------
-\section{Installation}\label{sec:installation2}
+\section{Loading the package}\label{sec:installation2}
 
-From a TeX distribution that includes the package, nothing needs doing. To install it by hand, copy
-\texttt{persian-calendar.sty} into a directory that TeX searches, for example the local tree
-\texttt{texmf/tex/latex/persian-calendar/}, and refresh the file database with \texttt{mktexlsr}. In the
-source repository, \texttt{make dev} does this for you. You can also keep \texttt{persian-calendar.sty}
-next to your document.
+TeX Live and MiKTeX install the package from CTAN, so nothing needs installing by hand.
 
 Load the package in the preamble. The examples here use \pkg{xepersian} for the Persian text and load
 \pkg{persian-calendar} before it:
@@ -616,6 +612,7 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.76 (2026-11-06)] Manuals: the Installation section is now ``Loading the package''.
   \item[0.75 (2026-11-06)] \cs{pcaldaysbetween}: the number of days between two Jalali dates.
   \item[0.74 (2026-11-06)] \cs{pcalweekday} and \cs{pcaldateweekdayname}: the weekday of a Jalali date.
   \item[0.73 (2026-11-06)] The \texttt{tikz} option, which loads \pkg{TikZ} and its \texttt{calendar} library.
