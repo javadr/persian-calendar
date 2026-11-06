@@ -30,28 +30,29 @@
 \newcommand\yc[1]{\edef\yy{\number\numexpr#1\relax}\ifnum\yy>1420 \else\lr{\yy}\quad\pcalyearname{\yy}\fi}
 \newcommand\YROW[1]{\yc{#1}&\yc{#1+8}&\yc{#1+16}&\yc{#1+24}&\yc{#1+32}}
 \newcommand\WEEKDAY[2]{%
-  \pcaldatetojulian{#1}\jd
-  \pgfcalendarjuliantoweekday{\jd}{\wday}%
-  \advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
-  \par\noindent\code{#1}\quad$\Rightarrow$\quad\pcalweekdayname{\wday}\quad\lr{(#2)}}
+  \pcalweekday{#1}{\wday}%
+  \par\noindent\code{#1}\quad$\Rightarrow$\quad\pcaldateweekdayname{#1}\quad\lr{(\number\wday, #2)}}
 
+% the main font is Persian, so the title and the section numbers are set in the Latin font
+\title{\lr{persian-calendar: sample and manual test}}\author{}\date{}
+\renewcommand\thesection{\lr{\arabic{section}}}
 \begin{document}
 \setLTR % the explanations are English; only the results are Persian
 
-\section*{\lr{persian-calendar: sample and manual test}}
+\maketitle
 
 \note{persian-calendar converts dates between the Persian (Jalali) and Gregorian calendars and provides
 Persian month, weekday and year names. Each line below shows the call, an arrow, and the typeset result.
 Only printing the Persian text needs a Unicode engine and a Persian font; this sample uses XeLaTeX with
 \texttt{xepersian}. The conversions themselves work with any engine.}
 
-\subsection*{\lr{1. Today}}
+\section{\lr{Today}}
 \note{\texttt{\textbackslash year}, \texttt{\textbackslash month} and \texttt{\textbackslash day} are
 LaTeX's current date (Gregorian), so these lines change every day.}
 \demo{\pdate{\year-\month-\day}}{\pdate{\year-\month-\day}}{today as day, month name, year}
 \demo{\pisodate{\year-\month-\day}}{\lr{\pisodate{\year-\month-\day}}}{today as DD/MM/YYYY}
 
-\subsection*{\lr{2. Gregorian to Jalali}}
+\section{\lr{Gregorian to Jalali}}
 \note{\texttt{\textbackslash pdate\{Y-M-D\}} takes a Gregorian date and prints the Jalali date with the month name.
 \texttt{\textbackslash pisodate\{Y-M-D\}} prints it as DD/MM/YYYY, zero padded.}
 \GtoJ{2015-03-21}{Nowruz 1394, the first day of the Jalali year}
@@ -60,7 +61,7 @@ LaTeX's current date (Gregorian), so these lines change every day.}
 \GtoJ{2024-12-31}{a day in Dey, which crosses the Gregorian new year}
 \GtoJ{2025-03-20}{Esfand 30, 1403, the next leap-year end}
 
-\subsection*{\lr{3. Jalali to Gregorian}}
+\section{\lr{Jalali to Gregorian}}
 \note{\texttt{\textbackslash gdate\{Y-M-D\}} and \texttt{\textbackslash gisodate\{Y-M-D\}} are the reverse:
 the argument is a Jalali date, the result is Gregorian.}
 \JtoG{1394-01-01}{Nowruz 1394}
@@ -69,7 +70,7 @@ the argument is a Jalali date, the result is Gregorian.}
 \JtoG{1403-10-11}{a day in Dey 1403}
 \JtoG{1403-12-30}{last day of leap year 1403}
 
-\subsection*{\lr{4. Start of each Jalali year}}
+\section{\lr{Start of each Jalali year}}
 \note{The Gregorian date on which every fifth Jalali year starts. It is March 20, 21 or 22.}
 \YEAR{1380}
 \YEAR{1385}
@@ -78,7 +79,7 @@ the argument is a Jalali date, the result is Gregorian.}
 \YEAR{1400}
 \YEAR{1405}
 
-\subsection*{\lr{5. Name macros}}
+\section{\lr{Name macros}}
 \note{These take a number and print the name. Months are 1 to 12; weekdays are 0 to 6,
 where 0 is Saturday, the first day of the Persian week.}
 \demo{\pcalmonthname{1}}{\pcalmonthname{1}}{Jalali month 1}
@@ -90,7 +91,7 @@ where 0 is Saturday, the first day of the Persian week.}
 \par\medskip\noindent\lr{All Jalali months:}\quad
 \foreach \m in {1,...,12}{\pcalmonthname{\m}\space}
 
-\subsection*{\lr{6. Julian day numbers and date arithmetic}}
+\section{\lr{Julian day numbers and date arithmetic}}
 \note{\texttt{\textbackslash pcaldatetojulian\{Y-M-D\}\{\textbackslash count\}} stores the Julian day
 number of a Jalali date in a count register. A \texttt{+N} suffix adds N days.
 \texttt{\textbackslash pcaljuliantodate\{\textbackslash count\}\{\textbackslash y\}\{\textbackslash m\}\{\textbackslash d\}}
@@ -108,15 +109,15 @@ converts a day number back and sets \texttt{\textbackslash y}, \texttt{\textback
 \pcaljuliantodate\jd\y\m\d%
 \demo{\pcaldatetojulian{1403-12-29+2}\jd}{\lr{\number\y-\number\m-\number\d}}{rolls over into the new year}
 
-\subsection*{\lr{7. Weekday of a Jalali date}}
-\note{The package has no weekday macro of its own. PGF's \texttt{\textbackslash pgfcalendarjuliantoweekday}
-numbers Monday as 0, so the sample shifts the result by 2 to make Saturday 0, then calls
-\texttt{\textbackslash pcalweekdayname}.}
+\section{\lr{Weekday of a Jalali date}}
+\note{\texttt{\textbackslash pcalweekday\{Y-M-D\}\{\textbackslash count\}} stores the weekday,
+Saturday = 0 as in \texttt{\textbackslash pcalweekdayname}; \texttt{\textbackslash pcaldateweekdayname\{Y-M-D\}}
+prints its name.}
 \WEEKDAY{1394-01-01}{Saturday, March 21, 2015}
 \WEEKDAY{1403-01-01}{Wednesday, March 20, 2024}
 \WEEKDAY{1404-01-01}{Friday, March 21, 2025}
 
-\subsection*{\lr{8. Animal year names}}
+\section{\lr{Animal year names}}
 \note{\texttt{\textbackslash pcalyearname\{year\}} gives the animal of the 12-year cycle of the
 Turkish-Mongol calendar for a Jalali year. It is defined for 0 to 2099 only.}
 \medskip
@@ -131,7 +132,7 @@ Turkish-Mongol calendar for a Jalali year. It is defined for 0 to 2099 only.}
 \YROW{1387}\\
 \end{tabular}
 
-\subsection*{\lr{9. A Jalali month grid with TikZ}}
+\section{\lr{A Jalali month grid with TikZ}}
 \note{With \texttt{tikz} and its \texttt{calendar} library loaded, \texttt{jalali dates} and
 \texttt{jalali week list} lay out Jalali months, Saturday to Friday. The negative \texttt{day xshift}
 puts Saturday on the right. The month is Dey 1404, which has 30 days; Fridays are red.}
@@ -141,7 +142,7 @@ puts Saturday on the right. The month is Dey 1404, which has 30 days; Fridays ar
 \end{center}
 
 \clearpage
-\subsection*{\lr{10. A year by season}}
+\section{\lr{A year by season}}
 \note{One \texttt{\textbackslash calendar} per month in a \texttt{\textbackslash foreach}, placed with
 \texttt{at}: each season is a row of three months, read right to left. The labels show the month name only (\texttt{month text}), since all months are in 1405.
 1405 is not a leap year, so Esfand ends on the 29th.}
@@ -160,7 +161,7 @@ puts Saturday on the right. The month is Dey 1404, which has 30 days; Fridays ar
 \end{center}
 
 \clearpage
-\subsection*{\lr{11. A boxed grid with weekday initials}}
+\section{\lr{A boxed grid with weekday initials}}
 \note{\texttt{jalali day boxes} draws each day as a box one step wide and high, so the boxes join into a
 grid, and empty boxes complete the first and last weeks; \texttt{jalali weekday initials} adds the initials above each month. Fridays are filled through their
 \texttt{every day} style.}
@@ -171,7 +172,7 @@ grid, and empty boxes complete the first and last weeks; \texttt{jalali weekday 
   if (Friday) [red, every day/.append style={fill=red!10}];
 \end{center}
 
-\subsection*{\lr{Limits}}
+\section{\lr{Limits}}
 \note{The date arguments must be literal \texttt{Y-M-D} text. A macro holding a date, such as
 \texttt{\textbackslash pdate\{\textbackslash mydate\}}, is not expanded and fails. The Jalali leap rule is the
 33-year arithmetic approximation, which can differ from the official calendar in some years.}

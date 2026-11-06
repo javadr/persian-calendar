@@ -21,7 +21,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \def\pcalendardate{2026/11/06}
-\def\pcalendarversion{0.73}
+\def\pcalendarversion{0.74}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -390,6 +390,12 @@
     \let#3=\pcal@m
     \let#4=\pcal@d
 }%
+%
+% Weekday of a Jalali date (Y-M-D, optionally +offset) into count #2, Saturday = 0, as \pcalweekdayname.
+% pgfcalendar counts from Monday = 0, hence the shift by two.
+\def\pcalweekday#1#2{\pcaldatetojulian{#1}{\pcal@temp}\pgfcalendarjuliantoweekday{\pcal@temp}{#2}%
+    \advance#2 by 2 \ifnum#2>6 \advance#2 by -7 \fi}%
+\def\pcaldateweekdayname#1{{\pcalweekday{#1}{\pcal@temptwo}\pcalweekdayname{\pcal@temptwo}}}%
 %
 \def\pisodate#1{%
     \pcal@gregoriantojalali{#1}

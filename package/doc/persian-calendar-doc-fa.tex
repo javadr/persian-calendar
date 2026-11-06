@@ -66,7 +66,7 @@
   \item با کتابخانهٔ \tx{calendar} در \pkg{TikZ} جدول ماه‌ها و تقویم سال‌های شمسی را رسم کنید (بخش~\ref{sec:tikz})؛
   \item پلنر سالانهٔ دوصفحه‌ای به شیوهٔ \pkg{yplan} چاپ کنید (بخش~\ref{sec:yplan}).
 \end{itemize}
-اما این بسته مناسبت‌ها و تعطیلات رسمی را نمی‌شناسد و فرمان جداگانه‌ای هم برای روز هفتهٔ یک تاریخ ندارد؛ هرچند در بخش~\ref{sec:names} می‌بینید که با چند خط می‌شود روز هفته را هم به دست آورد.
+اما این بسته مناسبت‌ها و تعطیلات رسمی را نمی‌شناسد.
 
 \paragraph{پیش‌نیازها.} تبدیل تاریخ فقط به بستهٔ \pkg{pgf} (که \pkg{pgfcalendar} بخشی از آن است) نیاز دارد و با \lr{pdfLaTeX}، \lr{XeLaTeX} و \lr{LuaLaTeX} کار می‌کند. نام‌های فارسی (و در نتیجه \cs{pdate}، \cs{gdate} و فرمان‌های نام) به‌صورت متن \lr{UTF-8} در خود فایل بسته نوشته شده‌اند؛ پس چاپ آن‌ها به موتور و بسته‌هایی نیاز دارد که حروف فارسی \lr{UTF-8} را پشتیبانی کنند و به قلمی که این حروف را داشته باشد. این راهنما از \pkg{xepersian} همراه با \lr{XeLaTeX} استفاده می‌کند، اما هر روش دیگری که فارسی را حروف‌چینی کند کافی است. اگر چنین چیزی ندارید، از فرمان‌های عددی \cs{pisodate} و \cs{gisodate} استفاده کنید که فقط رقم چاپ می‌کنند.
 
@@ -204,18 +204,17 @@
 \YROW{1382}
 \end{tabular}}
 
-\paragraph{روز هفتهٔ یک تاریخ.} فرمان آماده‌ای برای این کار نداریم، اما از روی شمارهٔ روز می‌شود آن را حساب کرد. \pkg{pgfcalendar} دوشنبه را ۰ می‌گیرد و \cs{pcalweekdayname} شنبه را؛ پس نتیجه را دو واحد جابه‌جا می‌کنیم:
+\macro|\pcalweekday{Y-M-D}{\count}|
+روز هفتهٔ یک تاریخ شمسی را در شمارندهٔ \tx{\textbackslash count} می‌گذارد، با همان شماره‌گذاری \cs{pcalweekdayname}: ۰ شنبه و ۶ جمعه است. مانند \cs{pcaldatetojulian}، تاریخ می‌تواند با جابه‌جایی چند روزه تمام شود و ماکروهای درون آن باز می‌شوند.
 \begin{latin}\begin{verbatim}
-\newcount\jd \newcount\wday
-\pcaldatetojulian{1403-01-01}\jd
-\pgfcalendarjuliantoweekday{\jd}{\wday}
-\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
-\pcalweekdayname{\wday}
+\newcount\wday
+\pcalweekday{1403-01-01}{\wday}      % \wday = 4, Wednesday
+\pcalweekday{1403-01-01+10}{\wday}   % ten days later: 0, Saturday
 \end{verbatim}\end{latin}
-\pcaldatetojulian{1403-01-01}\jd%
-\pgfcalendarjuliantoweekday{\jd}{\wday}%
-\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi%
-نتیجه «\pcalweekdayname{\wday}» است؛ یعنی اول فروردین ۱۴۰۳ چهارشنبه بوده است.
+
+\macro|\pcaldateweekdayname{Y-M-D}|
+نام روز هفتهٔ یک تاریخ شمسی را چاپ می‌کند: \cs{pcalweekdayname} از نتیجهٔ \cs{pcalweekday}.
+\ex|\pcaldateweekdayname{1403-01-01}|{\pcaldateweekdayname{1403-01-01}}
 
 % ---------------------------------------------------------------------------
 \section{تقویم با \lr{TikZ}}\label{sec:tikz}
@@ -468,6 +467,7 @@
 \section{تاریخچهٔ نسخه‌ها}\label{sec:history}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[\lr{0.74 (2026-11-06)}] \cs{pcalweekday} و \cs{pcaldateweekdayname}: روز هفتهٔ یک تاریخ شمسی.
   \item[\lr{0.73 (2026-11-06)}] گزینهٔ \tx{tikz} که \pkg{TikZ} و کتابخانهٔ \tx{calendar} آن را بارگذاری می‌کند.
   \item[\lr{0.72 (2026-11-05)}] \cs{pcalyear} و \cs{pcalyears}: تقویم سال‌ها به شیوهٔ \pkg{calxxxx-yyyy}، با سبک‌هایی برای سال، عنوان آن، ماه‌ها و جمعه‌ها.
   \item[\lr{0.71 (2026-11-05)}] نام‌های کوتاه‌تر: \cs{pcal\ldots} به جای \cs{pcalendar\ldots}؛ نام‌های قدیمی هنوز کار می‌کنند.

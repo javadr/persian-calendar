@@ -1,6 +1,6 @@
 _____________________
 The persian-calendar package
-v0.73
+v0.74
 
 Provides Persian (Jalali) calendar support for LaTeX: conversion between
 Jalali and Gregorian dates, Persian month, weekday and year names,

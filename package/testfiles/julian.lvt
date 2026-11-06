@@ -23,4 +23,21 @@
   \pgfcalendardatetojulian{2015-03-21}\ja \pcaljuliantodate\ja\y\m\d
   \ASSERT{\number\y-\number\m-\number\d}{1394-1-1}
 }
+\TEST{\pcalweekday: Saturday = 0, offsets, a leap day, a whole week}{
+  \newcount\wday
+  \pcalweekday{1403-01-01}{\wday}\ASSERT{\the\wday}{4}% Wednesday
+  \pcalweekday{1405-01-01}{\wday}\ASSERT{\the\wday}{0}% Saturday
+  \pcalweekday{1403-01-01+10}{\wday}\ASSERT{\the\wday}{0}
+  \pcalweekday{1403-12-30}{\wday}\ASSERT{\the\wday}{5}% leap day, 2025-03-20, a Thursday
+  \def\week{}\def\day#1{\pcalweekday{1405-01-01+#1}{\wday}\edef\week{\week\the\wday}}%
+  \day0\day1\day2\day3\day4\day5\day6
+  \ASSERT{\week}{0123456}
+}
+\TEST{\pcaldateweekdayname prints \pcalweekdayname of the date's weekday}{
+  % it is not expandable (like \pdate), so record the number it passes on
+  \begingroup\def\pcalweekdayname#1{\xdef\got{\number#1}}%
+  \pcaldateweekdayname{1403-01-01}\ASSERT{\got}{4}
+  \pcaldateweekdayname{1405-01-06}\ASSERT{\got}{5}
+  \endgroup
+}
 \END

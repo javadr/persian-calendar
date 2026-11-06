@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.74 ## Nov 6, 2026
+%% added \pcalweekday{Y-M-D}{\count} (weekday of a Jalali date, Saturday = 0, offsets allowed) and \pcaldateweekdayname{Y-M-D}; they replace the five-line recipe in the manuals
 %% ver 0.73 ## Nov 6, 2026
 %% added the package option tikz, which loads TikZ and its calendar library; unknown options give a warning; sample/persian-calendar-years.tex uses it
 %% ver 0.72 ## Nov 5, 2026

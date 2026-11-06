@@ -70,8 +70,7 @@ The package is a date converter and a set of name tables. It provides:
     (section~\ref{sec:tikz});
   \item a two-page year planner in the manner of \pkg{yplan} (section~\ref{sec:yplan}).
 \end{itemize}
-It has no holidays, and it has no macro that returns the weekday of a date
-(section~\ref{sec:names6} shows how to get one in three lines).
+It has no holidays.
 
 \paragraph{Requirements.} The \pkg{pgf} bundle (which contains \pkg{pgfcalendar}) is all the
 conversions need, and they work with pdf\LaTeX{}, Xe\LaTeX{} and Lua\LaTeX{}. Only the names (and
@@ -242,20 +241,19 @@ The twelve animals in order, starting from year 1380:\gap
 \YROW{1382}
 \end{tabular}}
 
-\paragraph{The weekday of a date.} The package has no weekday macro, but the day number gives you
-one. \pkg{pgfcalendar} numbers Monday as 0, and \cs{pcalweekdayname} numbers Saturday as 0, so
-shift by two:
+\macro|\pcalweekday{Y-M-D}{\count}|
+Stores the weekday of a Jalali date in \texttt{\textbackslash count}, numbered like
+\cs{pcalweekdayname}: 0 is Saturday, 6 is Friday. As with \cs{pcaldatetojulian}, the date may end in an
+offset in days, and macros in it are expanded.
 \begin{verbatim}
-\newcount\jd \newcount\wday
-\pcaldatetojulian{1403-01-01}\jd
-\pgfcalendarjuliantoweekday{\jd}{\wday}
-\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi
-\pcalweekdayname{\wday}
+\newcount\wday
+\pcalweekday{1403-01-01}{\wday}      % \wday = 4, Wednesday
+\pcalweekday{1403-01-01+10}{\wday}   % ten days later: 0, Saturday
 \end{verbatim}
-\pcaldatetojulian{1403-01-01}\jd%
-\pgfcalendarjuliantoweekday{\jd}{\wday}%
-\advance\wday by 2 \ifnum\wday>6 \advance\wday by -7 \fi%
-gives \pcalweekdayname{\wday} (1 Farvardin 1403 was a Wednesday).
+
+\macro|\pcaldateweekdayname{Y-M-D}|
+Prints the weekday name of a Jalali date: \cs{pcalweekdayname} of \cs{pcalweekday}.
+\ex|\pcaldateweekdayname{1403-01-01}|{\pcaldateweekdayname{1403-01-01}}
 
 % ---------------------------------------------------------------------------
 \section{Calendars with TikZ}\label{sec:tikz}
@@ -619,6 +617,7 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.74 (2026-11-06)] \cs{pcalweekday} and \cs{pcaldateweekdayname}: the weekday of a Jalali date.
   \item[0.73 (2026-11-06)] The \texttt{tikz} option, which loads \pkg{TikZ} and its \texttt{calendar} library.
   \item[0.72 (2026-11-05)] \cs{pcalyear} and \cs{pcalyears}: year calendars in the manner of
     \pkg{calxxxx-yyyy}, with styles for the year, its title, the months and the Fridays.
