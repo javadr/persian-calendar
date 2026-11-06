@@ -81,7 +81,11 @@
 \usepackage{xepersian}
 \settextfont{XB Niloofar}
 \end{verbatim}\end{latin}
-بسته گزینه‌ای ندارد.
+\paragraph{گزینهٔ \tx{tikz}.} تقویم‌های شمسی بخش~\ref{sec:tikz} به \pkg{TikZ} و کتابخانهٔ \tx{calendar} آن نیاز دارند. گزینهٔ \tx{tikz} هر دو را بارگذاری می‌کند:
+\begin{latin}\begin{verbatim}
+\usepackage[tikz]{persian-calendar}
+\end{verbatim}\end{latin}
+بدون این گزینه بسته فقط \pkg{pgf} و \pkg{pgfcalendar} را بارگذاری می‌کند، پس سندی که فقط تاریخ تبدیل می‌کند سریع‌تر بارگذاری می‌شود. اگر \pkg{tikz} یا این کتابخانه را خودتان هم بارگذاری کنید اشکالی ندارد.
 
 % ---------------------------------------------------------------------------
 \section{شروع سریع}\label{sec:quick}
@@ -216,11 +220,9 @@
 % ---------------------------------------------------------------------------
 \section{تقویم با \lr{TikZ}}\label{sec:tikz}
 
-کتابخانهٔ \tx{calendar} در \pkg{TikZ} با فرمان \cs{calendar} تقویم رسم می‌کند، اما فقط ماه‌های میلادی را می‌شناسد. این بسته چند کلید به آن اضافه می‌کند تا ماه‌های شمسی را بچیند. \pkg{tikz} و این کتابخانه را خودتان بارگذاری کنید؛ بسته آن‌ها را بارگذاری نمی‌کند:
+کتابخانهٔ \tx{calendar} در \pkg{TikZ} با فرمان \cs{calendar} تقویم رسم می‌کند، اما فقط ماه‌های میلادی را می‌شناسد. این بسته چند کلید به آن اضافه می‌کند تا ماه‌های شمسی را بچیند. این کلیدها به \pkg{tikz} و این کتابخانه نیاز دارند که گزینهٔ \tx{tikz} آن‌ها را بارگذاری می‌کند (بخش~\ref{sec:install}):
 \begin{latin}\begin{verbatim}
-\usepackage{tikz}
-\usetikzlibrary{calendar}
-\usepackage{persian-calendar}
+\usepackage[tikz]{persian-calendar}
 ...
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
                jalali week list, day xshift=-2.2em, day yshift=2.5ex,
@@ -306,7 +308,7 @@
 \end{tikzpicture}
 \end{center}
 
-\paragraph{تقویم چند سال.} سند \pkg{calxxxx-yyyy} در \lr{CTAN} تقویم میلادی چند سال را چاپ می‌کند: نُه سال در هر صفحه، هر سال در چهار سطر سه‌ماهه، و هر ماه با یک ستون برای هر هفته و یک سطر برای هر روز هفته. \cs{pcalyear} و \cs{pcalyears} همین چیدمان را با \tx{jalali week columns} برای سال‌های شمسی رسم می‌کنند. این دو فرمان هم مانند کلیدهای بالا به \pkg{TikZ} و کتابخانهٔ \tx{calendar} آن نیاز دارند و بدون آن‌ها با پیام خطایی که همین را می‌گوید متوقف می‌شوند.
+\paragraph{تقویم چند سال.} سند \pkg{calxxxx-yyyy} در \lr{CTAN} تقویم میلادی چند سال را چاپ می‌کند: نُه سال در هر صفحه، هر سال در چهار سطر سه‌ماهه، و هر ماه با یک ستون برای هر هفته و یک سطر برای هر روز هفته. \cs{pcalyear} و \cs{pcalyears} همین چیدمان را با \tx{jalali week columns} برای سال‌های شمسی رسم می‌کنند. این دو فرمان هم مانند کلیدهای بالا به \pkg{TikZ} و کتابخانهٔ \tx{calendar} آن (گزینهٔ \tx{tikz}) نیاز دارند و بدون آن‌ها با پیام خطایی که همین را می‌گوید متوقف می‌شوند.
 
 \macro|\pcalyear{year}|
 یک سال شمسی را به‌صورت یک \tx{tikzpicture} رسم می‌کند: سال در بالا، سپس چهار سطر برای فصل‌ها، هر کدام سه ماه از راست به چپ، با جمعه‌های قرمز. اندازهٔ آن برای نُه سال در یک صفحهٔ \lr{A4} تنظیم شده است، \lr{0.3\,cm} برای هر روز.
@@ -466,6 +468,7 @@
 \section{تاریخچهٔ نسخه‌ها}\label{sec:history}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[\lr{0.73 (2026-11-06)}] گزینهٔ \tx{tikz} که \pkg{TikZ} و کتابخانهٔ \tx{calendar} آن را بارگذاری می‌کند.
   \item[\lr{0.72 (2026-11-05)}] \cs{pcalyear} و \cs{pcalyears}: تقویم سال‌ها به شیوهٔ \pkg{calxxxx-yyyy}، با سبک‌هایی برای سال، عنوان آن، ماه‌ها و جمعه‌ها.
   \item[\lr{0.71 (2026-11-05)}] نام‌های کوتاه‌تر: \cs{pcal\ldots} به جای \cs{pcalendar\ldots}؛ نام‌های قدیمی هنوز کار می‌کنند.
   \item[\lr{0.7 (2026-11-05)}] پلنر سالانه به شیوهٔ \pkg{yplan}: فرمان \cs{pcalplanner} و فرمان \cs{pcalplannercell} برای رنگ کردن یا یادداشت‌گذاری روزها. نمونهٔ \tx{persian-calendar-planner.tex}.

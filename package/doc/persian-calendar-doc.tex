@@ -97,7 +97,13 @@ Load the package in the preamble. The examples here use \pkg{xepersian} for the 
 \usepackage{xepersian}
 \settextfont{Parisa}
 \end{verbatim}
-The package takes no options.
+\paragraph{The \texttt{tikz} option.} The Jalali calendars of section~\ref{sec:tikz} need \pkg{TikZ} and
+its \texttt{calendar} library. The option \texttt{tikz} loads both:
+\begin{verbatim}
+\usepackage[tikz]{persian-calendar}
+\end{verbatim}
+Without it the package loads only \pkg{pgf} and \pkg{pgfcalendar}, so a document that only converts
+dates loads faster. Loading \pkg{tikz} or the library yourself as well does no harm.
 
 % ---------------------------------------------------------------------------
 \section{Quick start}\label{sec:quick3}
@@ -255,12 +261,10 @@ gives \pcalweekdayname{\wday} (1 Farvardin 1403 was a Wednesday).
 \section{Calendars with TikZ}\label{sec:tikz}
 
 The \pkg{TikZ} \texttt{calendar} library draws calendars with \cs{calendar}, but it only knows Gregorian
-months. The package adds a few keys that make it lay out Jalali months instead. Load \pkg{tikz} and the
-library yourself; the package does not load them:
+months. The package adds a few keys that make it lay out Jalali months instead. They need \pkg{tikz} and
+the library, which the \texttt{tikz} option loads (section~\ref{sec:installation2}):
 \begin{verbatim}
-\usepackage{tikz}
-\usetikzlibrary{calendar}
-\usepackage{persian-calendar}
+\usepackage[tikz]{persian-calendar}
 ...
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last,
                jalali week list, day xshift=-2.2em, day yshift=2.5ex,
@@ -389,7 +393,7 @@ which sets its own.
 calendars for a range of years, nine years to a page, each year as four rows of three months and each month
 as a column per week and a row per weekday. \cs{pcalyear} and \cs{pcalyears} draw the same layout for
 Jalali years, with \texttt{jalali week columns}. Like the keys above they need \pkg{TikZ} and its
-\texttt{calendar} library; without them they stop with an error that says so.
+\texttt{calendar} library (the \texttt{tikz} option); without them they stop with an error that says so.
 
 \macro|\pcalyear{year}|
 Draws one Jalali year as a \texttt{tikzpicture}: the year as title, then four rows of seasons, three months
@@ -615,6 +619,7 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.73 (2026-11-06)] The \texttt{tikz} option, which loads \pkg{TikZ} and its \texttt{calendar} library.
   \item[0.72 (2026-11-05)] \cs{pcalyear} and \cs{pcalyears}: year calendars in the manner of
     \pkg{calxxxx-yyyy}, with styles for the year, its title, the months and the Fridays.
   \item[0.71 (2026-11-05)] Shorter names: \cs{pcal\ldots} instead of \cs{pcalendar\ldots}; the old names still

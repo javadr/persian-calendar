@@ -1,0 +1,14 @@
+\documentclass{article}
+\input{regression-test}
+\usepackage[tikz]{persian-calendar}% loads TikZ and its calendar library; no \usepackage{tikz} here
+\begin{document}
+\START
+\TEST{option tikz loads TikZ and its calendar library}{
+  \ASSERT{\ifdefined\tikzset y\else n\fi\ifdefined\tikzdaytext y\else n\fi}{yy}
+}
+\TEST{with option tikz, \pcalyear works with no other package}{
+  \newcount\days \tracinglostchars=0 % the month names are Persian, the test font is not
+  \tikzset{every pcal month/.style={day code={\global\advance\days 1}}}%
+  \setbox0\hbox{\pcalyear{1405}}\ASSERT{\the\days}{365}
+}
+\END

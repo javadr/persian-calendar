@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.73 ## Nov 6, 2026
+%% added the package option tikz, which loads TikZ and its calendar library; unknown options give a warning; sample/persian-calendar-years.tex uses it
 %% ver 0.72 ## Nov 5, 2026
 %% added \pcalyear{year} and \pcalyears{first}{last}, year calendars like calxxxx-yyyy (needs TikZ and its calendar library); styles every pcal year, every pcal year title, every pcal month, pcal friday
 %% sample/persian-calendar-years.tex now calls \pcalyears; it no longer ends with an empty page, and the year calendars show no year names

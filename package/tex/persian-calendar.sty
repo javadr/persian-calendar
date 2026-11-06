@@ -20,11 +20,17 @@
 %%
 %%
 \NeedsTeXFormat{LaTeX2e}
-\def\pcalendardate{2026/11/05}
-\def\pcalendarversion{0.72}
+\def\pcalendardate{2026/11/06}
+\def\pcalendarversion{0.73}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
+% Option `tikz' also loads TikZ and its calendar library, for the Jalali calendars and \pcalyear.
+\newif\ifpcal@tikz
+\DeclareOption{tikz}{\pcal@tikztrue}
+\DeclareOption*{\PackageWarning{persian-calendar}{Unknown option `\CurrentOption' ignored}}
+\ProcessOptions\relax
+\ifpcal@tikz\RequirePackage{tikz}\usetikzlibrary{calendar}\fi
 %
 \newif\ifpcal@leap\newif\ifpcal@kabiseh%
 \newcount\pcal@i%
@@ -596,7 +602,8 @@
   /tikz/every pcal month/.style={}, /tikz/pcal friday/.style={red}}%
 \def\pcal@needtikz{\ifx\tikz@lib@cal@calendar\@undefined\PackageError{persian-calendar}%
     {\string\pcalyear\space and \string\pcalyears\space need TikZ and its calendar library}%
-    {Add \string\usepackage{tikz} and \string\usetikzlibrary{calendar} to the preamble.}\fi}%
+    {Load the package with \string\usepackage[tikz]{persian-calendar}, or add \string\usepackage{tikz}
+     and \string\usetikzlibrary{calendar} to the preamble.}\fi}%
 \def\pcalyear#1{\pcal@needtikz\ifx\tikz@lib@cal@calendar\@undefined\else
   \begin{tikzpicture}[font=\tiny,every pcal year]
     \node[anchor=base east,font=\footnotesize\bfseries,every pcal year title] at (0.3,0.35) {#1};

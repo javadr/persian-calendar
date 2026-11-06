@@ -36,7 +36,7 @@ Load `persian-calendar` in the preamble. The example below uses `xepersian` and 
 \number\y-\number\m-\number\d         % 1394-1-11
 ```
 
-With `tikz` and `\usetikzlibrary{calendar}` loaded, three Jalali months, Saturday to Friday, right to left:
+With `\usepackage[tikz]{persian-calendar}` (the `tikz` option loads TikZ and its `calendar` library), three Jalali months, Saturday to Friday, right to left:
 
 ```latex
 \tikz\calendar[jalali dates=1405-01-01 to 1405-03-last, jalali week list,
@@ -45,6 +45,14 @@ With `tikz` and `\usetikzlibrary{calendar}` loaded, three Jalali months, Saturda
 ```
 
 Add `jalali day boxes` for a grid of boxes and `jalali weekday initials` for a row of weekday initials above each month. `jalali week columns` lays a month out the other way, a row per weekday and a column per week.
+
+Whole years and a year planner:
+
+```latex
+\pcalyear{1405}          % one year: four seasons of three months (needs the tikz option)
+\pcalyears{1405}{1413}   % a range of years, nine to an A4 page, like calxxxx-yyyy
+\pcalplanner{1405}       % a two-page year planner like yplan (a table, no TikZ needed)
+```
 
 The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/persian-calendar-doc.tex`](package/doc/persian-calendar-doc.tex)) and Persian ([`package/doc/persian-calendar-doc-fa.tex`](package/doc/persian-calendar-doc-fa.tex)). `package/sample/persian-calendar-test.tex` shows every macro with its output, and `package/sample/persian-calendar-years.tex` prints Jalali calendars for a range of years, nine to a page, like `calxxxx-yyyy`.
 
