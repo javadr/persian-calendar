@@ -69,6 +69,16 @@ ctan: readme doc
 	rm -rf $(PKG)
 	$(MAKE) cleanup
 
+# Same content as `ctan` (whose zip is kept for ctan.org), packed with maximum compression for archiving,
+# as persian-calendar-vVERSION-YYYYMMDD.tar.xz with a top folder of the same name.
+ARCHIVE := $(PKG)-v$(VERSION)-$(subst /,,$(DATE)).tar.xz
+.PHONY: ctan-archive
+ctan-archive: ctan
+	rm -rf .archive && mkdir .archive && unzip -q $(PKG).zip -d .archive
+	tar -C .archive --transform 's,^$(PKG),$(ARCHIVE:.tar.xz=),' -cf - $(PKG) | xz -9e -T0 > $(ARCHIVE)
+	rm -rf .archive
+	@echo "Created $(ARCHIVE)"
+
 # README is generated from the \ProvidesPackage line (version, date); do not edit it by hand.
 .PHONY: readme
 readme:

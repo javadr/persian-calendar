@@ -33,4 +33,5 @@ graphify-out/
 
 # CTAN release archive
 /persian-calendar.zip
+/persian-calendar-v*.tar.xz
 /package/doc/*.pdf
