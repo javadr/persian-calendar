@@ -1,0 +1,16 @@
+% A yearly to-do list (two A5 pages a month): first with teal lines and five titled columns of your own, then with no options (48 pages).
+% Build: make test   (XeLaTeX; xepersian and the fonts XB Niloofar and Parisa are needed)
+\documentclass{article}
+\usepackage[margin=0pt,a5paper]{geometry}
+\usepackage[tikz]{persian-calendar}
+\usepackage{xepersian}
+\settextfont{XB Niloofar}
+\setdigitfont{Parisa}
+\setlatintextfont[Extension=.otf,BoldFont=lmroman10-bold,ItalicFont=lmroman10-italic,BoldItalicFont=lmroman10-bolditalic]{lmroman10-regular}
+\parindent=0pt
+\pagestyle{empty}
+
+\begin{document}
+\pcaltodo[line color=teal, columns={هفتهٔ بعد, کار|رویداد, خرید, تماس, مطالعه}]{1405}
+\pcaltodo{1406}% no options: brown lines and no titled columns, all the space is yours
+\end{document}

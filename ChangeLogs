@@ -1,4 +1,6 @@
 %% Change Logs
+%% ver 0.80 ## Nov 15, 2026
+%% added \pcaltodo[options]{year}, a yearly to-do list from the XePersian yearly-todo-list: two pages a month, a column per day with the Jalali day and day of the year, the weekday letter, the Gregorian date in Latin (3-letter month, day of the year) and the Jalali week number in a circle with an arrow to the next week; options line color and columns={...} (titled columns of your own, none by default); it scales in proportion to the text area, so any paper size works; sample/persian-calendar-todo.tex
 %% ver 0.78 ## Nov 6, 2026
 %% added \pcalplannernote{M-D or Y-M-D}{text}: a star in the planner cell and the notes listed under each page, grouped by month (Farvardin: 1) ... 13) ...); \pcalplannermark, \pcalplannernotesfont, \pcalplannernotemonth, \pcalplannernoteday and three separators set the look; the planner sample lists 88 Iranian cultural, literary, scientific and historical days
 %% ver 0.77 ## Nov 6, 2026

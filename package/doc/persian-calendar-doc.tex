@@ -68,7 +68,8 @@ The package is a date converter and a set of name tables. It provides:
   \item the animal name of a year in the twelve-animal cycle;
   \item Jalali month grids and year calendars drawn with the \pkg{TikZ} \texttt{calendar} library
     (section~\ref{sec:tikz});
-  \item a two-page year planner in the manner of \pkg{yplan} (section~\ref{sec:yplan}).
+  \item a two-page year planner in the manner of \pkg{yplan} (section~\ref{sec:yplan});
+  \item a yearly to-do list with Jalali week numbers, scaled to any paper size (section~\ref{sec:todo}).
 \end{itemize}
 It has no holidays.
 
@@ -523,6 +524,46 @@ shades the Fridays and prints 1 Farvardin in red:
 a line. The cell is a paragraph column, so longer text, such as a holiday name, wraps inside it.
 
 % ---------------------------------------------------------------------------
+\section{A yearly to-do list}\label{sec:todo}
+
+\macro|\pcaltodo[options]{year}|
+Prints a yearly to-do list for Jalali \texttt{year}: two pages
+for each month, a page for the first half and a page for the rest. A page has a column for each day, with
+rows to write in. The head of a day column shows, from the top, the Gregorian day of the year, the
+Gregorian month in three letters and the Gregorian day, all in the Latin font; then the Jalali week number,
+the weekday as one letter and the Jalali day of the year, and under them the Jalali day. The week number
+is drawn in a circle on each Saturday (and on 1 Farvardin), by the rule of \cs{pcalplanner}
+(section~\ref{sec:yplan}); an arrow runs from it to the next week's number. Above the days are the month
+and year, and the range of Gregorian months. It needs \pkg{TikZ} (the \texttt{tikz} option), and
+\pkg{xepersian} for the Persian text.
+\begin{verbatim}
+\documentclass{article}
+\usepackage[a5paper,margin=0pt]{geometry}
+\usepackage[tikz]{persian-calendar}
+\usepackage{xepersian}
+\settextfont{Parisa}
+\setlatintextfont{Linux Libertine}
+\pagestyle{empty}
+\begin{document}
+\pcaltodo[line color=teal, columns={Next week, Task|event, Purchase}]{1405}
+\end{document}
+\end{verbatim}
+\begin{description}
+  \item[\texttt{line color=}\textit{colour}] the colour of all lines; \texttt{brown} by default.
+  \item[\texttt{columns=}\{\textit{a},\textit{b},\ldots\}] the titles of the columns to the left of the day columns,
+    one column per title and as many as you like. The first title is next to the days and the others follow to
+    the left; each title is written from top to bottom in its column. There are no columns by default, so all
+    the space is yours.
+\end{description}
+\paragraph{Page size.} The form is designed for A5 (14.8\,cm by 20.98\,cm). It is scaled, in proportion, to
+fit the text area, with its text and lines, so any paper works: set it and the margins with \pkg{geometry}.
+\texttt{a5paper,margin=0pt} gives the original size. When the page has other proportions, the form is
+centred. Each form ends with \cs{newpage}.
+\paragraph{Look.} \cs{pcaltodoweekday}\texttt{\{n\}} prints the weekday (0 is Saturday) and
+\cs{pcaltodogregmonth}\texttt{\{m\}} the Gregorian month; redefine them to change those. The week number
+is set by \cs{pcalplannerweeknumber}.
+
+% ---------------------------------------------------------------------------
 \section{Recipes}\label{sec:recipes7}
 
 \paragraph{A list of consecutive days.} Typeset the 5 days after 1 Farvardin 1403 with a loop. Each date
@@ -650,6 +691,8 @@ holds a day, together with the \cs{cline}s under them, and the register is put i
 \section{Version history}\label{sec:version11}
 
 \begin{description}\sloppy % long code names cannot be hyphenated
+  \item[0.80 (2026-11-15)] \cs{pcaltodo}: a yearly to-do list with weekday letters, Latin Gregorian dates, circled
+    Jalali week numbers and your own titled columns, scaled to any paper size.
   \item[0.78 (2026-11-06)] \cs{pcalplannernote}: notes in the year planner, marked in the cells and listed under
     each page by month, as on a wall calendar.
   \item[0.77 (2026-11-06)] Week numbers in \cs{pcalplanner}, by ISO~8601 moved to Saturday weeks; \cs{pcalplanner*}

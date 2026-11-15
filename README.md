@@ -52,6 +52,7 @@ Whole years and a year planner:
 \pcalyear{1405}          % one year: four seasons of three months (needs the tikz option)
 \pcalyears{1405}{1413}   % a range of years, nine to an A4 page, like calxxxx-yyyy
 \pcalplanner{1405}       % a two-page year planner like yplan (a table, no TikZ needed)
+\pcaltodo[columns={Next week,Task,Purchase}]{1405}  % a yearly to-do list, scaled to any paper (needs the tikz option)
 ```
 
 The full manual, with every macro, examples and the known limitations, is in English ([`package/doc/persian-calendar-doc.tex`](package/doc/persian-calendar-doc.tex)) and Persian ([`package/doc/persian-calendar-doc-fa.tex`](package/doc/persian-calendar-doc-fa.tex)). `package/sample/persian-calendar-test.tex` shows every macro with its output, and `package/sample/persian-calendar-years.tex` prints Jalali calendars for a range of years, nine to a page, like `calxxxx-yyyy`.

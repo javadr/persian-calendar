@@ -20,8 +20,8 @@
 %%
 %%
 \NeedsTeXFormat{LaTeX2e}
-\def\pcalendardate{2026/11/06}
-\def\pcalendarversion{0.78}
+\def\pcalendardate{2026/11/15}
+\def\pcalendarversion{0.80}
 \ProvidesPackage{persian-calendar}[\pcalendardate\space v\pcalendarversion\space Provides Persian Calendar]
 \RequirePackage{pgf}
 \RequirePackage{pgfcalendar}
@@ -793,6 +793,84 @@
 % \pcalplanner{year} with week numbers, \pcalplanner*{year} without.
 \def\pcalplanner{\@ifstar{\pcal@planner\pcal@ypweeksfalse}{\pcal@planner\pcal@ypweekstrue}}%
 \def\pcal@planner#1#2{\begingroup#1\pcal@yphalf{#2}{1}\pcal@yphalf{#2}{7}\endgroup}%
+%
+% ---- \pcaltodo[options]{year}: a yearly to-do list, two A5 pages a month, from the XePersian yearly-todo-list ----
+% The form is 14.8cm x 20.98cm (A5) and is scaled, in proportion, to fit the text area of any page, so load
+% geometry with the paper and margins you want (a5paper, margin=0pt gives it at full size) and \pagestyle{empty}. Each page has a
+% column per day, right to left, topped by the Jalali day, its day of the year, the weekday, and the Gregorian
+% day, month and day of the year; left of the days come labelled columns to write in. Needs TikZ.
+% Options: line color=<colour> (brown); columns={a,b,...}, the titles of the columns left of the days, as many as
+% you like (none by default, so all the space is yours). \pcaltodoweekday{n} and \pcaltodogregmonth{m}
+% print the weekday (one letter, Saturday = 0) and the Gregorian month; redefine them to change those.
+\newcount\pcal@tdjy \newcount\pcal@tdjn \newcount\pcal@tdjd \newcount\pcal@tdwk \newcount\pcal@tdbase
+\newcount\pcal@tdlen \newcount\pcal@tdjj \newcount\pcal@tdgdoy \newcount\pcal@tdjdoy
+\def\pcaltodoweekday#1{\scriptsize\pcalweekdayshortname{#1}}%
+% Everything Gregorian is Latin: \pcal@tdlatin sets its argument in a box in the Latin font (xepersian's \latinfont, with its digit font switched off; \lr failed in rotated nodes).
+\def\pcal@tdlatin#1{\leavevmode\hbox{\ifx\latinfont\@undefined\else\latinfont\ifx\@nonlatinfalse\@undefined\else\@nonlatinfalse\fi\fi#1}}%
+\def\pcaltodogregmonth@#1{\ifcase#1\or Jan\or Feb\or Mar\or Apr\or May\or Jun\or Jul\or Aug\or Sep\or Oct\or Nov\or Dec\fi}%
+\def\pcaltodogregmonth#1{\tiny\pcal@tdlatin{\pcaltodogregmonth@{#1}}}%
+\pgfkeys{/pcal todo/.cd, line color/.store in=\pcal@tdcolor, columns/.store in=\pcal@tdlabels}%
+\def\pcal@tddefaults{\def\pcal@tdcolor{brown}\def\pcal@tdlabels{}}%
+\def\pcal@tdrtl{\ifx\hboxR\@undefined\expandafter\hbox\else\expandafter\hboxR\fi}%
+% One page: #1 month, #2 first day shown, #3 number of day columns.
+\def\pcal@todopage#1#2#3{%
+  \pgfmathsetmacro\pcal@tdxl{14.8-0.4*#3}% left edge of the day columns
+  \pgfmathsetmacro\pcal@tdshift{0.4*(15-#3)}%
+  \pgfmathtruncatemacro\pcal@tdncol{#3+\pcal@tdnlab}% day columns and labelled columns
+  {\centering\begin{tikzpicture}[draw=\pcal@tdcolor, scale=\pcal@tds, transform shape, line width=\pcal@tdlw pt]
+    \foreach \y in {0,.7,...,18.7,20.98} {\draw (0,\y) -- (14.8,\y);}
+    \draw (\pcal@tdxl,18.5) -- (14.8,18.5);
+    \foreach \k in {0,...,\pcal@tdncol}
+      {\draw[line width=\pcal@tdlwthin pt] ({14.8-0.4*\k},0) -- ({14.8-0.4*\k},\ifnum\k>#3 20.2\else20.97\fi);}% label columns stop below the month title
+    \draw ({14.8-0.4*\pcal@tdncol},20.2) -- (\pcal@tdxl,20.2);% closes the label columns
+    \foreach \k in {0,...,\numexpr#3-1\relax}{%
+      \pgfmathsetmacro\pcal@tdx{14.6-0.4*\k}%
+      \pcal@tdjdoy=\numexpr\pcal@tdbase+#2+\k\relax
+      \pcal@tdjd=\numexpr\pcal@tdjy+\pcal@tdjdoy-1\relax
+      \pgfcalendarjuliantodate{\the\pcal@tdjd}{\pcal@tdgy}{\pcal@tdgm}{\pcal@tdgd}%
+      \pgfcalendardatetojulian{\pcal@tdgy-1-1}{\pcal@tdjj}%
+      \pcal@tdgdoy=\numexpr\pcal@tdjd-\pcal@tdjj+1\relax
+      \pgfcalendarjuliantoweekday{\the\pcal@tdjd}{\pcal@tdwk}% Monday = 0 ...
+      \advance\pcal@tdwk by 2 \ifnum\pcal@tdwk>6 \advance\pcal@tdwk by -7 \fi % ... Saturday = 0
+      \node at (\pcal@tdx,18.35) {\tiny\the\numexpr#2+\k\relax};
+      \node [rotate=90, anchor=east, inner sep=0pt] at (\pcal@tdx,18.93) {\tiny\the\pcal@tdjdoy};
+      \node [inner sep=0pt] at (\pcal@tdx,19.12) {\pcaltodoweekday{\the\pcal@tdwk}};
+      \node [inner sep=0pt] at (\pcal@tdx,19.86) {\tiny\pcal@tdlatin{\number\pcal@tdgd}};
+      \node [rotate=90, anchor=east, inner sep=0pt] at (\pcal@tdx,20.35) {\pcaltodogregmonth{\pcal@tdgm}};
+      \node [rotate=90, anchor=west, inner sep=0pt] at (\pcal@tdx,20.5) {\tiny\pcal@tdlatin{\the\pcal@tdgdoy}};
+      % week number (the planner's rule) in the Saturday columns and on 1 Farvardin, between the Gregorian and the Jalali rows
+      \ifnum\ifnum\pcal@tdwk=0 1\else\ifnum\pcal@tdjdoy=1 1\else0\fi\fi=1
+        \node [circle, draw, inner sep=0.5pt, minimum size=0.24cm] at (\pcal@tdx,19.56) {\pcalplannerweeknumber{\tiny\pcal@ypweekfix{\numexpr\pcal@tdjdoy-1-(\pcal@yps)\relax}}};%
+      \else\ifnum\pcal@tdwk=6 \draw[line width=\pcal@tdlwthick pt,->] ({\pcal@tdx+0.2},19.56) -- ({\pcal@tdx-0.17},19.56);\else\draw[line width=\pcal@tdlwthick pt] ({\pcal@tdx+0.2},19.56) -- ({\pcal@tdx-0.2},19.56);\fi\fi % an arrow from each week number to the next
+    }%
+    % header, once per page, from the first and last day shown
+    \pcal@tdjd=\numexpr\pcal@tdjy+\pcal@tdbase+#2-1\relax
+    \pgfcalendarjuliantodate{\the\pcal@tdjd}{\pcal@tdya}{\pcal@tdma}{\pcal@tdda}%
+    \pcal@tdjd=\numexpr\pcal@tdjd+#3-1\relax
+    \pgfcalendarjuliantodate{\the\pcal@tdjd}{\pcal@tdyb}{\pcal@tdmb}{\pcal@tddb}%
+    \node [anchor=east] at ({\pcal@tdxl-0.1},20.6) {\pcal@tdrtl{\pcalmonthname{#1}\space\pcal@tdyear}};
+    \node [anchor=west] at (.35,20.6) {\pcal@tdlatin{\pcaltodogregmonth@{\pcal@tdma}%
+      \ifnum\pcal@tdma=\pcal@tdmb\relax\else--\pcaltodogregmonth@{\pcal@tdmb}\fi\space\ifnum\pcal@tdya=\pcal@tdyb\relax\pcal@tdya\else\pcal@tdya/\pcal@tdyb\fi}};
+    \ifx\pcal@tdlabels\pgfutil@empty\else\foreach \pcal@tdlab [count=\pcal@tdi from 0] in \pcal@tdlabels {%
+      \pgfmathsetmacro\pcal@tdx{\pcal@tdxl-0.2-0.4*\pcal@tdi}%
+      \node [rotate=90, anchor=east, inner sep=0pt] at (\pcal@tdx,20.1) {\pcal@tdrtl{\footnotesize\pcal@tdlab}};}\fi%
+  \end{tikzpicture}\par}\newpage}%
+% \pcaltodo[options]{year}
+\def\pcaltodo{\@ifnextchar[\pcal@todo{\pcal@todo[]}}%
+\def\pcal@todo[#1]#2{\pcal@needtikz\pcal@tddefaults\pgfkeys{/pcal todo/.cd,#1}%
+  \def\pcal@tdnlab{0}%
+  \ifx\pcal@tdlabels\pgfutil@empty\else\foreach \pcal@tdlab [count=\pcal@tdi] in \pcal@tdlabels {\xdef\pcal@tdnlab{\pcal@tdi}}\fi%
+  % the form is 14.8cm x 20.98cm (A5); it is scaled to fit the text area (a hair under, so the picture never overflows the page), lines and text with it
+  \pgfmathsetmacro\pcal@tds{0.995*min(\the\textwidth/14.8cm,\the\textheight/20.98cm)}%
+  \pgfmathsetmacro\pcal@tdlw{0.4*\pcal@tds}\pgfmathsetmacro\pcal@tdlwthin{0.1*\pcal@tds}\pgfmathsetmacro\pcal@tdlwthick{1.6*\pcal@tds}%
+  \def\pcal@tdyear{#2}\pcal@ypweeksetup{#2}%
+  \pcaldatetojulian{#2-1-1}{\pcal@tdjy}\pcaldatetojulian{\the\numexpr#2+1\relax-1-1}{\pcal@tdjn}%
+  \foreach \pcal@tdm in {1,...,12}{%
+    \pcal@tdbase=\ifnum\pcal@tdm<7 \numexpr(\pcal@tdm-1)*31\relax\else\numexpr186+(\pcal@tdm-7)*30\relax\fi
+    \pcal@tdlen=\ifnum\pcal@tdm<7 31\else\ifnum\pcal@tdm<12 30\else\numexpr29+\pcal@tdjn-\pcal@tdjy-365\relax\fi\fi
+    \edef\pcal@tdhalf{\ifnum\pcal@tdm<7 16\else15\fi}%
+    \pcal@todopage{\pcal@tdm}{1}{\pcal@tdhalf}%
+    \pcal@todopage{\pcal@tdm}{\the\numexpr\pcal@tdhalf+1\relax}{\the\numexpr\pcal@tdlen-\pcal@tdhalf\relax}}}%
 %
 % Names before 0.71, kept so older documents still work; they call the new names, so they follow redefinitions.
 \def\pcalendardatetojulian{\pcaldatetojulian}
